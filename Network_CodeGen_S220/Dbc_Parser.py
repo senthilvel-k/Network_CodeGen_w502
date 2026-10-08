@@ -579,6 +579,11 @@ class dbc_parser:
         else:
             return None
     
+    def get_nodes(self):
+        '''returns the node names defined in the BU_ line of the database'''
+        self.__parse_messages__()
+        return list(self.__nodes)
+
     def check__node(self):
         
         try:

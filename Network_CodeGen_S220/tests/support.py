@@ -26,15 +26,12 @@ PAGE_FILES = [
 ]
 
 # Known-good legacy runs produced by the CURRENT source (output dates after the last
-# generator edit, 2024-07-02) with the same DBC revision and saved configuration:
-# fixture -> (legacy CODE_GEN folder, files that are comparable).
-# The 40024 runs used an "_Edited" DBC that is not in the repo; the fixture DBC reconstructs
-# only the edits proven by the saved data (see tools/build_fixtures.py). 47 further signal
-# renames are unknown, so only the files independent of those names are comparable.
+# generator edit, 2024-07-02) with the same DBC and saved configuration:
+# fixture -> (legacy CODE_GEN folder, files compared).
 LEGACY_REFS = {
     "s237_36144_2": (ROOT / "CODE_GEN" / "DBC_S237_36144_2", CODE_FILES),
-    "s2xx_40024": (ROOT / "CODE_GEN" / "DBC_40024_2", ["can_rxrule.cfg", "nw_can_dll.h", "nw_nm_par.h"]),
-    "s2xx_40024_a": (ROOT / "CODE_GEN" / "DBC_40024", ["can_rxrule.cfg", "nw_can_dll.h", "nw_nm_par.h"]),
+    "s2xx_40024": (ROOT / "CODE_GEN" / "DBC_40024_2", CODE_FILES),
+    "s2xx_40024_a": (ROOT / "CODE_GEN" / "DBC_40024", CODE_FILES),
 }
 # Legacy runs made by OLDER generator code: informational comparison only.
 OLD_CODE_REFS = {

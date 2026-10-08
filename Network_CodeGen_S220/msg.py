@@ -229,6 +229,85 @@ def message_structure_generation(Dbc_Msg):
   
   
    
+class UnsupportedMultiplexLayout(ValueError):
+  """A multiplexed message whose layout msg_struct_gen_multiplex cannot generate."""
+  def __init__(self, msg_name, multiplexor, problem):
+    ValueError.__init__(self, '%s: %s' % (msg_name, problem))
+    self.msg_name = msg_name
+    self.multiplexor = multiplexor
+    self.problem = problem
+
+def _layout_rows(endbit, length, order):
+  # Rows visited by the layout walk in msg_struct_gen_multiplex (same stepping rules).
+  row, col = endbit//8, endbit%8
+  rows = []
+  if order == 'Intel':
+    for sig_len in range(length):
+      rows.append(row)
+      if col < 7:
+        col = col+1
+      elif col >= 7 and row < 7:
+        col = 0
+        row = row+1
+  elif order == 'Motorola':
+    for sig_len in range(length, 0, -1):
+      rows.append(row)
+      if col > 0 and col <= 7:
+        col = col-1
+      elif col == 0 and row < 7:
+        col = 7
+        row = row+1
+  return rows
+
+def multiplex_layout_problem(mes, mul_msg):
+  """Why msg_struct_gen_multiplex cannot lay out this message, or None.
+  Supported (VCU5_500 layout): each multiplexed signal starts at bit 0 and the multiplexor
+  lies in byte 7 (only byte 7 of the multiplexor layout is written, see mul_sig_index)."""
+  if mul_msg is None or mul_msg['Multiplexor'] is None:
+    return 'it has multiplexed signals but no multiplexor signal (M)'
+  if mul_msg['Multiplex_maxval'] == 0:
+    return 'its multiplexed signals only use multiplexer value 0'
+  for multilexor_index in range(mul_msg['Multiplex_maxval']+1):
+    for mul_sig in mul_msg['Multiplex_group'][multilexor_index]:
+      signals = mes['Sig_List'][mul_sig]
+      length, endbit = int(signals['Len']), int(signals['Endbit'])
+      temp_len = length//8 if length%8 == 0 else length//8+1
+      if any(row >= temp_len for row in _layout_rows(endbit, length, signals['Order'])):
+        return 'signal %s (start bit %d, length %d, %s) does not start at bit 0' % (mul_sig, endbit, length, signals['Order'])
+  root = mes['Sig_List'][mul_msg['Multiplexor']]
+  if any(row != 7 for row in _layout_rows(int(root['Endbit']), int(root['Len']), root['Order'])):
+    return 'its multiplexor %s (start bit %s, length %s) is not in byte 7' % (mul_msg['Multiplexor'], root['Endbit'], root['Len'])
+  return None
+
+def _enable_key(mes, cfg):
+  # Same selection as message_structure_generation: which enable flag decides the layout.
+  if mes['Msg_name'].upper()+'_tx_enable' in cfg:
+    if cfg[mes['Msg_name']+'_msg_type_no_of_events'] == 'Appl':
+      return mes['Msg_name'].upper()+'_tx_enable'
+  elif mes['Msg_name'].upper()+'_rx_enable' in cfg:
+    if cfg[mes['Msg_name']+'_msg_type_no_of_events'] == 'Appl':
+      return mes['Msg_name'].upper()+'_rx_enable'
+  return None
+
+def find_unsupported_multiplex(dbc_obj, cfg):
+  """First enabled multiplexed message that msg_struct_gen_multiplex cannot generate:
+  (msg_name, multiplexor, problem), else None. Missing settings are left to the generator."""
+  for direction in ('tx', 'rx'):
+    for mes in sorted(dbc_obj.get_msg_type(all_parser, direction), key=lambda x: x['Msg_name']):
+      if mes.get('Multiplex') != 'YES':
+        continue
+      try:
+        key = _enable_key(mes, cfg)
+        if key is None or cfg[key] not in ['on','On',1,'1','ON']:
+          continue
+      except KeyError:
+        continue
+      mul_msg = dbc_obj.get_multiplex(mes['id'])
+      problem = multiplex_layout_problem(mes, mul_msg)
+      if problem:
+        return mes['Msg_name'], (mul_msg or {}).get('Multiplexor'), problem
+  return None
+
 def msg_struct_gen_multiplex(mes):
   global dbc,msg_data_dir,datatype_16,datatype_8,tp_generic_config,nm_generic_config,il_generic_config
   
@@ -255,6 +334,9 @@ def msg_struct_gen_multiplex(mes):
     }
   '''
   mul_msg=dbc.get_multiplex(mes['id'])
+  problem = multiplex_layout_problem(mes, mul_msg)
+  if problem:
+    raise UnsupportedMultiplexLayout(mes['Msg_name'], mul_msg and mul_msg['Multiplexor'], problem)
   #print mul_msg
   for signal in mes['Sig_List']:
     mes['Sig_List'][signal]['Sig_name']=signal

@@ -497,21 +497,21 @@ BO_ 1585 ICC1_1000: 8 Vector__XXX
  SG_ ICC_ALERT_MSG : 8|3@1+ (1,0) [0|7] ""  SMART_CORE
 
 BO_ 1170 MBFM17_200: 8 Vector__XXX
- SG_ IBS_BATT_TEMP : 32|16@1+ (0.5,-40) [-40|125] "DegC"  SMART_CORE
- SG_ IBS_BATT_VOLT : 16|16@1+ (0.001,0) [4|24] "V"  SMART_CORE
- SG_ IBS_CURRENT : 0|16@1+ (1,-1250) [-1250|1250] "Amps"  SMART_CORE
+ SG_ IBS_BATT_TEMP_MBFM : 32|16@1+ (0.5,-40) [-40|125] "DegC"  SMART_CORE
+ SG_ IBS_BATT_VOLT_MBFM : 16|16@1+ (0.001,0) [4|24] "V"  SMART_CORE
+ SG_ IBS_CURRENT_MBFM : 0|16@1+ (1,-1250) [-1250|1250] "Amps"  SMART_CORE
 
 BO_ 1994 ICC_DIAG_RES: 8 Vector__XXX
  SG_ DIAG_ICC_RES_DATA : 0|64@1+ (1,0) [0|1.8446744074E+019] ""  SMART_CORE
 
 BO_ 1169 MBFM16_200: 8 Vector__XXX
- SG_ BATT_RESET_FLG : 32|1@1- (1,0) [0|1] ""  SMART_CORE
- SG_ STS_ESS_DEACTIVATION : 29|3@1+ (1,0) [0|7] ""  SMART_CORE
- SG_ BATT_CHARGE_LAMP_INDC : 27|2@1+ (1,0) [0|3] ""  SMART_CORE
- SG_ ALTERNATOR_MODE : 24|3@1+ (1,0) [0|7] ""  SMART_CORE
- SG_ IBS_SOF : 16|8@1+ (1,0) [0|100] "%"  SMART_CORE
- SG_ IBS_SOH : 8|8@1+ (1,0) [0|100] "%"  SMART_CORE
- SG_ IBS_SOC : 0|8@1+ (1,0) [0|100] "%"  SMART_CORE
+ SG_ BATT_RESET_FLG_MBFM : 32|1@1- (1,0) [0|1] ""  SMART_CORE
+ SG_ STS_ESS_DEACTIVATION_MBFM : 29|3@1+ (1,0) [0|7] ""  SMART_CORE
+ SG_ BATT_CHARGE_LAMP_INDC_MBFM : 27|2@1+ (1,0) [0|3] ""  SMART_CORE
+ SG_ ALTERNATOR_MODE_MBFM : 24|3@1+ (1,0) [0|7] ""  SMART_CORE
+ SG_ IBS_SOF_MBFM : 16|8@1+ (1,0) [0|100] "%"  SMART_CORE
+ SG_ IBS_SOH_MBFM : 8|8@1+ (1,0) [0|100] "%"  SMART_CORE
+ SG_ IBS_SOC_MBFM : 0|8@1+ (1,0) [0|100] "%"  SMART_CORE
 
 BO_ 1988 HLCU1_DIAG_REQ: 8 SMART_CORE
  SG_ DIAG_HLCU_REQ_DATA : 0|64@1+ (1,0) [0|1.8446744074E+019] "" Vector__XXX
@@ -622,7 +622,7 @@ BO_ 1856 FATC_DIAG_REQ: 8 SMART_CORE
  SG_ DIAG_FATC_REQ_DATA : 0|64@1+ (1,0) [0|1.8446744074E+019] "" Vector__XXX
 
 BO_ 1144 SBRM1_100: 8 Vector__XXX
- SG_ PSGR_REAR_SEAT_BELT : 2|6@1+ (1,0) [0|63] ""  SMART_CORE
+ SG_ PSGR_REAR_SEAT_BELT_SBRM : 2|6@1+ (1,0) [0|63] ""  SMART_CORE
 
 BO_ 1963 WLC_DIAG_RES: 8 Vector__XXX
  SG_ DIAG_WLC_RES_DATA : 0|64@1+ (1,0) [0|1.84467440737096E+019] ""  SMART_CORE
@@ -661,7 +661,7 @@ BO_ 295 EMS21_10: 8 Vector__XXX
  SG_ BRK_PEDAL1 : 27|2@1+ (1,0) [0|3] ""  SMART_CORE
 
 BO_ 375 AMT6_20: 8 Vector__XXX
- SG_ TGS_LEVER : 16|4@1+ (1,0) [0|15] ""  SMART_CORE
+ SG_ TGS_LEVER_AMT : 16|4@1+ (1,0) [0|15] ""  SMART_CORE
  SG_ AMT_BUZZER : 34|1@1+ (1,0) [0|1] ""  SMART_CORE
  SG_ AMT_MIL : 22|2@1+ (1,0) [0|3] ""  SMART_CORE
  SG_ ALERT_AMT : 29|3@1+ (1,0) [0|7] ""  SMART_CORE
@@ -730,7 +730,7 @@ BO_ 1077 IS11_500: 8 SMART_CORE
  SG_ CLTH_OVRRIDE : 24|4@1+ (1,0) [0|15] "" Vector__XXX
  SG_ AGG_BRK : 20|4@1+ (1,0) [0|15] "" Vector__XXX
  SG_ AGG_ACC : 16|4@1+ (1,0) [0|15] "" Vector__XXX
- SG_ ECO_INDEX : 8|7@1+ (1,0) [0|127] "" Vector__XXX
+ SG_ ECO_INDEX_IS11 : 8|7@1+ (1,0) [0|127] "" Vector__XXX
  SG_ STS_TRIP : 4|1@1+ (1,0) [0|1] "" Vector__XXX
  SG_ COMM_ERR_FLG : 6|1@1+ (1,0) [0|1] "" Vector__XXX
  SG_ TPMS_FLG : 7|1@1+ (1,0) [0|1] "" Vector__XXX
@@ -1408,12 +1408,12 @@ BO_ 1720 IS_NM_TEST: 8 SMART_CORE
 
 BO_ 1655 TGU4_500: 8 SMART_CORE
  SG_ CLOCK_AM_PM : 40|1@1+ (1,0) [0|1] "" Vector__XXX
- SG_ CLOCK_YEAR : 0|6@1+ (1,2000) [2016|2063] "" Vector__XXX
- SG_ CLOCK_MONTH : 8|4@1+ (1,0) [0|12] "" Vector__XXX
- SG_ CLOCK_MIN : 32|6@1+ (1,0) [0|59] "Minute" Vector__XXX
- SG_ CLOCK_HOUR : 24|5@1+ (1,0) [0|23] "Hour" Vector__XXX
- SG_ CLOCK_FORMAT : 12|1@1+ (1,0) [0|1] "" Vector__XXX
- SG_ CLOCK_DATE : 16|5@1+ (1,0) [0|31] "" Vector__XXX
+ SG_ CLOCK_YEAR_TGU : 0|6@1+ (1,2000) [2016|2063] "" Vector__XXX
+ SG_ CLOCK_MONTH_TGU : 8|4@1+ (1,0) [0|12] "" Vector__XXX
+ SG_ CLOCK_MIN_TGU : 32|6@1+ (1,0) [0|59] "Minute" Vector__XXX
+ SG_ CLOCK_HOUR_TGU : 24|5@1+ (1,0) [0|23] "Hour" Vector__XXX
+ SG_ CLOCK_FORMAT_TGU : 12|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ CLOCK_DATE_TGU : 16|5@1+ (1,0) [0|31] "" Vector__XXX
 
 BO_ 339 TGU2_100: 8 SMART_CORE
  SG_ TGU_CHARGINGENDTIME_FORMAT m1 : 3|1@1+ (1,0) [-1|0] "" Vector__XXX
@@ -1459,20 +1459,20 @@ BO_ 338 TGU1_100: 8 SMART_CORE
  SG_ TGU_EV_PARAM_INDEX M : 0|3@1+ (1,0) [-4|3] "" Vector__XXX
 
 BO_ 1761 TGU_NM_TEST: 8 SMART_CORE
- SG_ NM_VIN_CHECK_STS : 34|1@1+ (1,0) [0|1] "" Vector__XXX
- SG_ NM_VIN_DTC_STS : 3|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ NM_VC_DTC_STS : 1|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ NM_MCF_DTC_STS : 32|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ NM_VBATT : 16|8@1+ (0.1,0) [0|25] "Volt" Vector__XXX
- SG_ NM_UV_STS : 14|1@1+ (1,0) [0|1] "" Vector__XXX
- SG_ NM_SW_VER : 24|4@1+ (1,0) [0|15] "" Vector__XXX
- SG_ NM_STS_IGN : 0|1@1+ (1,0) [0|1] "" Vector__XXX
- SG_ NM_SCF_DTC_STS : 5|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ NM_OV_STS : 15|1@1+ (1,0) [0|1] "" Vector__XXX
- SG_ NM_NA_DTC_STS : 12|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ NM_MTO_DTC_STS : 10|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ NM_FC_DTC_STS : 8|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ NM_ACTIVE_STS : 28|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ NM_VIN_CHECK_STS_TGU : 34|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ NM_VIN_DTC_STS_TGU : 3|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ NM_VC_DTC_STS_TGU : 1|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ NM_MCF_DTC_STS_TGU : 32|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ NM_VBATT_TGU : 16|8@1+ (0.1,0) [0|25] "Volt" Vector__XXX
+ SG_ NM_UV_STS_TGU : 14|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ NM_SW_VER_TGU : 24|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ NM_STS_IGN_TGU : 0|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ NM_SCF_DTC_STS_TGU : 5|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ NM_OV_STS_TGU : 15|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ NM_NA_DTC_STS_TGU : 12|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ NM_MTO_DTC_STS_TGU : 10|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ NM_FC_DTC_STS_TGU : 8|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ NM_ACTIVE_STS_TGU : 28|4@1+ (1,0) [0|15] "" Vector__XXX
 
 BO_ 999 BMS5_100: 8 Vector__XXX
  SG_ BMS_BatteryMaxCellVoltage : 16|14@1+ (1,0) [0|5000] "mV"  SMART_CORE
@@ -1503,7 +1503,7 @@ BO_ 1652 TGU1_500: 8 SMART_CORE
 
 BO_ 374 AMT5_20: 8 Vector__XXX
  SG_ ENGINE_STOP_AMT : 14|1@1+ (1,0) [0|1] ""  SMART_CORE
- SG_ TGS_MODE : 10|2@1+ (1,0) [0|3] ""  SMART_CORE
+ SG_ TGS_MODE_AMT : 10|2@1+ (1,0) [0|3] ""  SMART_CORE
  SG_ TCU_SHIFT_MODE : 8|2@1+ (1,0) [0|3] ""  SMART_CORE
  SG_ GEAR_ACTUAL_AMT : 0|4@1+ (1,0) [0|15] ""  SMART_CORE
 
@@ -1634,7 +1634,7 @@ BO_ 920 HLCU1_100: 8 Vector__XXX
  SG_ HEADLAMP_AUTO_LEVEL : 1|1@1+ (1,0) [0|1] ""  SMART_CORE
 
 BO_ 921 HLCU2_100: 8 Vector__XXX
- SG_ STS_HIGHBEAM_BOOSTER : 0|1@1+ (1,0) [0|1] ""  SMART_CORE
+ SG_ STS_HIGHBEAM_BOOSTER_1 : 0|1@1+ (1,0) [0|1] ""  SMART_CORE
 
 BO_ 667 HLCU2_NSM: 8 Vector__XXX
  SG_ RESERVED_HLCU : 0|64@1+ (1,0) [0|0] ""  SMART_CORE
@@ -1963,7 +1963,7 @@ BO_ 928 APA2_50: 8 Vector__XXX
  SG_ FPAS_SPAS_ACTIVE_STS : 57|1@1+ (1,0) [0|1] ""  SMART_CORE
  SG_ FR_SEGMENT : 12|4@1+ (1,0) [0|15] ""  SMART_CORE
  SG_ RL_SEG_WARN : 36|1@1+ (1,0) [0|1] ""  SMART_CORE
- SG_ RPAS_ACTIVE_STS : 56|1@1+ (1,0) [0|1] ""  SMART_CORE
+ SG_ RPAS_ACTIVE_STS1 : 56|1@1+ (1,0) [0|1] ""  SMART_CORE
  SG_ RL_SEGMENT : 16|4@1+ (1,0) [0|15] ""  SMART_CORE
  SG_ FR_SEG_WARN : 35|1@1+ (1,0) [0|1] ""  SMART_CORE
  SG_ FMR_SEG_WARN : 34|1@1+ (1,0) [0|1] ""  SMART_CORE
@@ -2041,7 +2041,7 @@ BO_ 643 GW_HEARTBEAT: 8 Vector__XXX
  SG_ BATT_VOLTAGE : 16|8@1+ (0.1,0) [0|25] "VOLT"  SMART_CORE
 
 BO_ 322 EMS36_10: 8 Vector__XXX
- SG_ DRIVER_DEMAND_TRQ : 35|11@1+ (1,-1024) [-1024|1022] "Nm"  SMART_CORE
+ SG_ DRIVER_DEMAND_TRQ_EMS36 : 35|11@1+ (1,-1024) [-1024|1022] "Nm"  SMART_CORE
  SG_ ENG_TRQ_AFTR_RED1 : 24|11@1+ (1,-1024) [-1024|1022] "Nm"  SMART_CORE
  SG_ ACC_PED1 : 0|8@1+ (0.4,0) [0|100] "%"  SMART_CORE
  SG_ ENG_SPD1 : 8|16@1+ (1,0) [0|7999] "rpm"  SMART_CORE
@@ -2150,8 +2150,8 @@ BO_ 971 IS4_500: 8 SMART_CORE
  SG_ STS_SELECT_UNLOCK : 17|1@1+ (1,0) [0|1] "" Vector__XXX
  SG_ FR_SEAT_HEAT_VENT_LEVEL_IS : 32|2@1+ (1,0) [0|3] "" Vector__XXX
  SG_ FL_SEAT_HEAT_VENT_LEVEL_IS : 52|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ SET_TIRE_FILL_ASST_IC : 26|1@1+ (1,0) [0|1] "" Vector__XXX
- SG_ TPMS_AUTOLEARN : 7|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ SET_TIRE_FILL_ASST_IS : 26|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ TPMS_AUTOLEARN_IS : 7|1@1+ (1,0) [0|1] "" Vector__XXX
  SG_ INST_ECO_INDEX : 8|7@1+ (1,0) [0|127] "" Vector__XXX
  SG_ ECO_INDEX : 0|7@1+ (1,0) [0|127] "" Vector__XXX
  SG_ RES_DRIVESCORE_INFO : 55|1@1+ (1,0) [0|1] "" Vector__XXX
@@ -2274,8 +2274,8 @@ BO_ 1841 RVC_DIAG_REQ: 8 SMART_CORE
 
 BO_ 541 TPMS3_100: 8 Vector__XXX
  SG_ TYRE_POSITION_AUTOLOCATED : 3|5@1+ (1,0) [0|32] ""  SMART_CORE
- SG_ SPARE_TYRE_TEMP : 40|8@1+ (1,-40) [-40|214] "deg C"  SMART_CORE
- SG_ SPARE_TYRE_PRESSURE : 48|8@1+ (0.25,0) [0|63.5] "Psi"  SMART_CORE
+ SG_ SPARE_TYRE_TEMP_TPMS : 40|8@1+ (1,-40) [-40|214] "deg C"  SMART_CORE
+ SG_ SPARE_TYRE_PRESSURE_TPMS : 48|8@1+ (0.25,0) [0|63.5] "Psi"  SMART_CORE
  SG_ FILLING_SPARE_TYRE : 56|8@1+ (1,0) [0|255] ""  SMART_CORE
  SG_ FILLING_RR : 32|8@1+ (1,0) [0|255] ""  SMART_CORE
  SG_ FILLING_RL : 24|8@1+ (1,0) [0|255] ""  SMART_CORE
@@ -2283,29 +2283,29 @@ BO_ 541 TPMS3_100: 8 Vector__XXX
  SG_ FILLING_FL : 8|8@1+ (1,0) [0|255] ""  SMART_CORE
 
 BO_ 542 TPMS2_100: 8 Vector__XXX
- SG_ RR_TYRE_TEMP : 56|8@1+ (1,-40) [-40|214] "deg C"  SMART_CORE
- SG_ RR_TYRE_PRESSURE : 24|8@1+ (0.25,0) [0|63.5] "Psi"  SMART_CORE
- SG_ RL_TYRE_TEMP : 48|8@1+ (1,-40) [-40|214] "deg C"  SMART_CORE
- SG_ RL_TYRE_PRESSURE : 16|8@1+ (0.25,0) [0|63.5] "Psi"  SMART_CORE
- SG_ FR_TYRE_TEMP : 40|8@1+ (1,-40) [-40|214] "deg C"  SMART_CORE
- SG_ FR_TYRE_PRESSURE : 8|8@1+ (0.25,0) [0|63.5] "Psi"  SMART_CORE
- SG_ FL_TYRE_TEMP : 32|8@1+ (1,-40) [-40|214] "deg C"  SMART_CORE
- SG_ FL_TYRE_PRESSURE : 0|8@1+ (0.25,0) [0|63.5] "Psi"  SMART_CORE
+ SG_ RR_TYRE_TEMP_TPMS : 56|8@1+ (1,-40) [-40|214] "deg C"  SMART_CORE
+ SG_ RR_TYRE_PRESSURE_TPMS : 24|8@1+ (0.25,0) [0|63.5] "Psi"  SMART_CORE
+ SG_ RL_TYRE_TEMP_TPMS : 48|8@1+ (1,-40) [-40|214] "deg C"  SMART_CORE
+ SG_ RL_TYRE_PRESSURE_TPMS : 16|8@1+ (0.25,0) [0|63.5] "Psi"  SMART_CORE
+ SG_ FR_TYRE_TEMP_TPMS : 40|8@1+ (1,-40) [-40|214] "deg C"  SMART_CORE
+ SG_ FR_TYRE_PRESSURE_TPMS : 8|8@1+ (0.25,0) [0|63.5] "Psi"  SMART_CORE
+ SG_ FL_TYRE_TEMP_TPMS : 32|8@1+ (1,-40) [-40|214] "deg C"  SMART_CORE
+ SG_ FL_TYRE_PRESSURE_TPMS : 0|8@1+ (0.25,0) [0|63.5] "Psi"  SMART_CORE
 
 BO_ 537 TPMS1_100: 8 Vector__XXX
- SG_ TPMS_SYSTEM_FAULT : 48|5@1+ (1,0) [0|31] ""  SMART_CORE
- SG_ TPMS_SIGNAL_MISSING : 8|4@1+ (1,0) [0|15] ""  SMART_CORE
+ SG_ TPMS_SYSTEM_FAULT_TPMS : 48|5@1+ (1,0) [0|31] ""  SMART_CORE
+ SG_ TPMS_SIGNAL_MISSING_TPMS : 8|4@1+ (1,0) [0|15] ""  SMART_CORE
  SG_ TPMS_PROGRAM_MODE : 12|4@1+ (1,0) [0|15] ""  SMART_CORE
  SG_ TPMS_MALFUNCTION : 21|3@1+ (1,0) [0|7] ""  SMART_CORE
- SG_ TPMS_LEAKAGE_ALERT : 40|5@1+ (1,0) [0|31] ""  SMART_CORE
- SG_ TPMS_ID_NOT_LEARNT : 0|5@1+ (1,0) [0|31] ""  SMART_CORE
- SG_ STS_TPMS_LED : 56|3@1+ (1,0) [0|3] ""  SMART_CORE
- SG_ SPARE_TYRE_SWAP : 29|3@1+ (1,0) [0|4] ""  SMART_CORE
+ SG_ TPMS_LEAKAGE_ALERT_TPMS : 40|5@1+ (1,0) [0|31] ""  SMART_CORE
+ SG_ TPMS_ID_NOT_LEARNT_TPMS : 0|5@1+ (1,0) [0|31] ""  SMART_CORE
+ SG_ STS_TPMS_LED_TPMS : 56|3@1+ (1,0) [0|3] ""  SMART_CORE
+ SG_ SPARE_TYRE_SWAP_TPMS : 29|3@1+ (1,0) [0|4] ""  SMART_CORE
  SG_ REQ_TFA_PATTERN : 53|3@1+ (1,0) [0|5] "" Vector__XXX
- SG_ REQ_TFA_DISPLAY : 63|1@1+ (1,0) [0|1] ""  SMART_CORE
- SG_ LOW_TYRE_PRESSURE : 24|5@1+ (1,0) [0|31] ""  SMART_CORE
- SG_ HIGH_TYRE_TEMPERATURE : 16|5@1+ (1,0) [0|31] ""  SMART_CORE
- SG_ HIGH_TYRE_PRESSURE : 33|5@1+ (1,0) [0|31] ""  SMART_CORE
+ SG_ REQ_TFA_DISPLAY_TPMS : 63|1@1+ (1,0) [0|1] ""  SMART_CORE
+ SG_ LOW_TYRE_PRESSURE_TPMS : 24|5@1+ (1,0) [0|31] ""  SMART_CORE
+ SG_ HIGH_TYRE_TEMPERATURE_TPMS : 16|5@1+ (1,0) [0|31] ""  SMART_CORE
+ SG_ HIGH_TYRE_PRESSURE_TPMS : 33|5@1+ (1,0) [0|31] ""  SMART_CORE
 
 BO_ 1872 IS_DIAG_REQ: 8 Vector__XXX
  SG_ DIAG_IS_REQ_DATA : 0|64@1+ (1,0) [0|1.8446744074E+019] ""  SMART_CORE
@@ -2597,8 +2597,8 @@ BO_ 840 MBFM1_100: 8 Vector__XXX
  SG_ STS_LOW_BEAM : 52|1@1+ (1,0) [0|1] ""  SMART_CORE
  SG_ STS_HIGH_BEAM : 45|1@1+ (1,0) [0|1] ""  SMART_CORE
  SG_ INDC_TURN_FLSHR : 6|2@1+ (1,0) [0|3] ""  SMART_CORE
- SG_ STS_SEAT_BLT_PSGR : 50|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ STS_SEAT_BLT_DRV : 48|2@1+ (1,0) [0|3] ""  SMART_CORE
+ SG_ STS_SEAT_BLT_PSGR_MBFM : 50|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ STS_SEAT_BLT_DRV_MBFM : 48|2@1+ (1,0) [0|3] ""  SMART_CORE
  SG_ STS_DOOR : 32|6@1+ (1,0) [0|63] ""  SMART_CORE
  SG_ STS_PARKLAMP : 4|2@1+ (1,0) [0|3] ""  SMART_CORE
  SG_ INDC_FRNT_FOG : 0|1@1+ (1,0) [0|1] ""  SMART_CORE
@@ -2671,7 +2671,7 @@ BO_ 778 VCU10_100: 8 Vector__XXX
  SG_ PRESS_BRAKE : 4|1@1+ (1,0) [0|1] "NA"  SMART_CORE
  SG_ EV_READY_TT : 24|2@1+ (1,0) [0|3] ""  SMART_CORE
  SG_ DRIVE_EFFICIENCY : 8|8@1+ (1,-100) [-100|100] "%"  SMART_CORE
- SG_ TIME_TO_CHARGE : 32|8@1+ (5,0) [0|1275] "min"  SMART_CORE
+ SG_ TIME_TO_CHARGE_VCU : 32|8@1+ (5,0) [0|1275] "min"  SMART_CORE
  SG_ STATE_OF_CHARGE : 16|8@1+ (1,0) [0|100] "%"  SMART_CORE
  SG_ INDC_DRIVE_ENABLE : 5|2@1+ (1,0) [0|2] ""  SMART_CORE
  SG_ AEE_RESET_REQ_FB : 60|1@1+ (1,0) [0|1] ""  SMART_CORE
@@ -2924,7 +2924,7 @@ CM_ SG_ 154 MCM_WAKEUP_REASON "Reason for wake-up.";
 CM_ SG_ 1587 MCM1_CRC "CRC implementation for the Message";
 CM_ SG_ 1587 REQ_HEADLAMP_MCM "Turn ON/OFF headlamp request from MCM.";
 CM_ BO_ 1144 "MBFM1_100";
-CM_ SG_ 1144 PSGR_REAR_SEAT_BELT "BIT 0:- Rear Left Passenger
+CM_ SG_ 1144 PSGR_REAR_SEAT_BELT_SBRM "BIT 0:- Rear Left Passenger
 BIT 1:- Rear Middle Passenger
 BIT 2:- Rear Right Passenger
 BIT 3:- Rear 3rd RowLeft Passenger
@@ -2949,7 +2949,7 @@ CM_ SG_ 295 ENG_LOSSES "Engine losses";
 CM_ SG_ 295 EMS21_MSG_CNT "EMS21 message counter";
 CM_ SG_ 295 EMS21_CRC "EMS21 message checksum";
 CM_ SG_ 295 BRK_PEDAL1 "Break Pedal Signal";
-CM_ SG_ 375 TGS_LEVER "Transmission Gear Select lever position.
+CM_ SG_ 375 TGS_LEVER_AMT "Transmission Gear Select lever position.
 ";
 CM_ SG_ 304 ACC_READY "Adaptive Cruise Control (ACC) function available status";
 CM_ SG_ 304 EMS_DRIVE_ALERT "EMS DRIVE MODE:-DRIVE mode status indication to IC in case of failure.";
@@ -3464,7 +3464,7 @@ CM_ SG_ 1652 VEH_SEARCH_REQ "TGU commands to Search Vehicle";
 CM_ SG_ 1652 CHARGING_ON_OFF_REQ "CHARGING ENABLE DISABLE REQUEST";
 CM_ SG_ 1652 TGU_REVIVE_REQ "REVIVE REQUEST";
 CM_ SG_ 1652 REMOTE_DOOR_LOCK_UNLOCK "DOOR REMOTE LOCK/UNLOCK";
-CM_ SG_ 374 TGS_MODE "Mode Switch State";
+CM_ SG_ 374 TGS_MODE_AMT "Mode Switch State";
 CM_ SG_ 264 ALTERNATOR_CUTOFF_REQ "S201 Cluster controls Alternator cutoff, during vehicle launch EMS would request cluster for ALT cutoff.
 SIgnal implementation required only for S201 DCM71.";
 CM_ SG_ 264 CLUTCH_STS "'Clutch press states";
@@ -3568,7 +3568,7 @@ CM_ SG_ 285 BMS_Reason_HV_Disconnect_Request "Reason for HV Disconnect RequestRe
 CM_ SG_ 285 BMS_Reason_Derating "Reason for derated modeReason for derated mode";
 CM_ SG_ 920 STS_HIGHBEAM_BOOSTER "Highbeam booster status";
 CM_ SG_ 920 HEADLAMP_AUTO_LEVEL "Head Lamp Auto Level  ";
-CM_ SG_ 921 STS_HIGHBEAM_BOOSTER "Highbeam booster status";
+CM_ SG_ 921 STS_HIGHBEAM_BOOSTER_1 "Highbeam booster status";
 CM_ SG_ 771 DISP_AMBT_TEMP_FATC "Outside Temperature";
 CM_ SG_ 1711 FOD_ALERT "User alert in case of FOD ( Foreign Object Detection)";
 CM_ SG_ 1711 TIME_TO_CHARGE "Time to Charge";
@@ -3748,7 +3748,7 @@ CM_ SG_ 587 ACC_MODE "Mode Indication for ACC function";
 CM_ SG_ 928 FPAS_SPAS_ACTIVE_STS "FPAS Function Active Status";
 CM_ SG_ 928 FR_SEGMENT "Front Right Corner Sensor Display Segment .";
 CM_ SG_ 928 RL_SEG_WARN "Rear Left Corner Sensor Warning status.";
-CM_ SG_ 928 RPAS_ACTIVE_STS "RPAS Function Active Status";
+CM_ SG_ 928 RPAS_ACTIVE_STS1 "RPAS Function Active Status";
 CM_ SG_ 928 RL_SEGMENT "Rear Left Corner Sensor Display Segment .";
 CM_ SG_ 928 FR_SEG_WARN "Front Right Corner Sensor Warning status.";
 CM_ SG_ 928 FMR_SEG_WARN "Front Middle Right Sensor Warning status.";
@@ -3870,7 +3870,7 @@ CM_ SG_ 1407 FVSA_USM_STS "FVSA USM system On/off status
 CM_ SG_ 1407 TSR_SYS_STATE "TSR(Traffic sign Recognition) system operating state";
 CM_ SG_ 589 AEB_ZONE_STS_FCM "AEB warning zones status (prefil,partial braking ,full braking and stop request)";
 CM_ SG_ 592 SBW1_MSG_COUNT "Message Counter for TGS message";
-CM_ SG_ 592 SBW1_CRC_ "CRC for TGS message";
+CM_ SG_ 592 SBW1_CRC "CRC for TGS message";
 CM_ SG_ 592 SBW_FAULT "This Signal will indicate to the AMTCU, as to when should the AMT MIL has to be turned ON";
 CM_ SG_ 592 SBW_LEVER "Transmission Gear Select lever position.
 This would be used by the instrument cluster when the TCU mode is not DSI Mode or Range Mode";
@@ -4010,7 +4010,7 @@ CM_ SG_ 541 FILLING_FR "FILLING OF FRONT RIGHT TIRE
 Signal protected";
 CM_ SG_ 541 FILLING_FL "FILLING OF FRONT LEFT TIRE
 Signal protected";
-CM_ SG_ 537 TPMS_SYSTEM_FAULT "TPMS Malfunction Indication - Sensor Low Battery/ Transmitter Fault
+CM_ SG_ 537 TPMS_SYSTEM_FAULT_TPMS "TPMS Malfunction Indication - Sensor Low Battery/ Transmitter Fault
 
 Bit description
 0      Front Left tyre
@@ -4021,7 +4021,7 @@ Bit description
 
 0 : Normal
 1 : Faulty";
-CM_ SG_ 537 TPMS_SIGNAL_MISSING "Bit Position Description :-
+CM_ SG_ 537 TPMS_SIGNAL_MISSING_TPMS "Bit Position Description :-
 Bit 0 : FL tyre
 Bit 1 : FR tyre
 Bit 2 : RR tyre
@@ -4030,7 +4030,7 @@ Bit 3 : RL tyre
 Value Description :-
 0 : Normal
 1 : Signal missing";
-CM_ SG_ 537 TPMS_LEAKAGE_ALERT "Bit Position Description :-
+CM_ SG_ 537 TPMS_LEAKAGE_ALERT_TPMS "Bit Position Description :-
 Bit 0 : FL tyre
 Bit 1 : FR tyre
 Bit 2 : RR tyre
@@ -4169,7 +4169,7 @@ CM_ SG_ 840 PARK_LAMP_ON_REMINDER "Park Lamp ON Reminder";
 CM_ SG_ 840 KEY_IN_REMINDER "Key In Reminder";
 CM_ SG_ 840 STS_LOW_BEAM "Status of High Beam Indicator";
 CM_ SG_ 840 STS_HIGH_BEAM "Status of High Beam Indicator";
-CM_ SG_ 840 STS_SEAT_BLT_DRV "For EMS,
+CM_ SG_ 840 STS_SEAT_BLT_DRV_MBFM "For EMS,
 0x2 - Buckle Faulty / Onfail Value";
 CM_ SG_ 840 STS_DOOR "Status of Back, Hood, Co-Driver, Driver, Rear Left and Rear Right Doors. 
 Bit0 - Back , Bit1 - Hood ,Bit2 - Co-Driver , Bit3 - Driver , Bit4 - Rear Left , Bit5 - Rear Right
@@ -4199,7 +4199,7 @@ CM_ SG_ 778 EV_READY_TT "EV Ready Tell Tale only";
 CM_ SG_ 778 DRIVE_EFFICIENCY "Drive Efficiency
 More Power Less Efficiency
 Less Power High Efficiency";
-CM_ SG_ 778 TIME_TO_CHARGE "Time to Charge";
+CM_ SG_ 778 TIME_TO_CHARGE_VCU "Time to Charge";
 CM_ SG_ 778 STATE_OF_CHARGE "State of Charge";
 CM_ SG_ 778 INDC_DRIVE_ENABLE "to indication drive is enabled- should stay in this value as long as drive in enabled.";
 CM_ SG_ 778 GEAR_ACTUAL_VCU "Drive Mode";
@@ -5051,8 +5051,7 @@ BA_ "GenSigStartValue" SG_ 1443 BATT_FLG_DISCONN_IBS 0;
 BA_ "GenSigStartValue" SG_ 1443 LV_BATT_FIT_YEAR_IBS 0;
 BA_ "GenSigStartValue" SG_ 1443 LV_BATT_MANF_YEAR_IBS 0;
 BA_ "GenSigSendType" SG_ 1419 INSTANTANEOUS_FUEL_ECONOMY 0;
-BA_ "GenSigStartValue" SG_ 1419 INSTANTANEOUS_FUEL_ECONOMY 0;
-BA_ "GenSigSendType" SG_ 1419 CNG_MODE_RATIO 0;
+BA_ "GenSigSendType" SG_ 1419 CNG_AND_PETROL_RATIO 0;
 BA_ "GenSigSendType" SG_ 545 STS_EPS_STEERING_MODE 7;
 BA_ "GenSigSendType" SG_ 545 EPS_STEERING_MODE_ALERT 7;
 BA_ "GenSigSendType" SG_ 545 EPS_STEERING_MODE 7;
@@ -5066,8 +5065,8 @@ BA_ "GenSigStartValue" SG_ 989 LDC_Secondary_Temperature 550;
 BA_ "GenSigStartValue" SG_ 825 BMS_BatteryMinTemperature 680;
 BA_ "GenSigStartValue" SG_ 825 BMS_BatteryMaxTemperature 680;
 BA_ "GenSigStartValue" SG_ 1005 BMS_BatteryAvgTemperature 680;
-BA_ "GenSigStartValue" SG_ 301 BMS_BatteryBusVoltage 3650;
 BA_ "GenSigSendType" SG_ 301 BMS_BatteryBusVoltage 0;
+BA_ "GenSigStartValue" SG_ 301 BMS_BatteryBusVoltage 3650;
 BA_ "GenSigStartValue" SG_ 301 BMS_BatteryPackCurrent 6000;
 BA_ "GenSigStartValue" SG_ 1003 BMS_CellTemp9 500;
 BA_ "GenSigStartValue" SG_ 1003 BMS_CellTemp8 500;
@@ -5103,8 +5102,8 @@ BA_ "GenSigStartValue" SG_ 1003 BMS_CellTemp2 500;
 BA_ "GenSigStartValue" SG_ 1003 BMS_CellTemp1 500;
 BA_ "GenSigSendType" SG_ 1949 DIAG_SBRM_RES_DATA 7;
 BA_ "GenSigSendType" SG_ 1941 DIAG_SBRM_REQ_DATA 7;
-BA_ "GenSigStartValue" SG_ 1170 IBS_BATT_TEMP 80;
-BA_ "GenSigStartValue" SG_ 1170 IBS_CURRENT 1250;
+BA_ "GenSigStartValue" SG_ 1170 IBS_BATT_TEMP_MBFM 80;
+BA_ "GenSigStartValue" SG_ 1170 IBS_CURRENT_MBFM 1250;
 BA_ "GenSigStartValue" SG_ 1280 REQ_POWERTRAIN_CUSTOM_MODE 2;
 BA_ "GenSigSendType" SG_ 1280 IC11_MSG_CNT 7;
 BA_ "GenSigSendType" SG_ 1280 IC11_CRC 7;
@@ -5113,18 +5112,18 @@ BA_ "GenSigSendType" SG_ 1280 IC_STEERING_MODE_REQ 7;
 BA_ "GenSigSendType" SG_ 956 RESERVED_2 7;
 BA_ "GenSigStartValue" SG_ 786 IBS_CURRENT 1250;
 BA_ "GenSigStartValue" SG_ 786 IBS_BATT_TEMP 80;
-BA_ "GenSigEnvVarType" SG_ 295 ENG_LOSSES 0;
-BA_ "GenSigStartValue" SG_ 295 ENG_LOSSES 0;
-BA_ "GenSigSendType" SG_ 295 ENG_LOSSES 7;
 BA_ "SigCreator" SG_ 295 ENG_LOSSES "M&M-IVN";
+BA_ "GenSigSendType" SG_ 295 ENG_LOSSES 7;
+BA_ "GenSigStartValue" SG_ 295 ENG_LOSSES 0;
+BA_ "GenSigEnvVarType" SG_ 295 ENG_LOSSES 0;
 BA_ "GenSigSendType" SG_ 295 EMS21_MSG_CNT 7;
 BA_ "GenSigSendType" SG_ 295 EMS21_CRC 7;
-BA_ "SignalType" SG_ 375 TGS_LEVER "ENM";
-BA_ "GenSigTimeoutTime_IS" SG_ 375 TGS_LEVER 100;
-BA_ "GenSigEnvVarType" SG_ 375 TGS_LEVER 0;
-BA_ "GenSigSendType" SG_ 375 TGS_LEVER 7;
-BA_ "GenSigInactiveValue" SG_ 375 TGS_LEVER 0;
-BA_ "SigCreator" SG_ 375 TGS_LEVER "M&M-IVN";
+BA_ "SigCreator" SG_ 375 TGS_LEVER_AMT "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 375 TGS_LEVER_AMT 0;
+BA_ "GenSigSendType" SG_ 375 TGS_LEVER_AMT 7;
+BA_ "GenSigEnvVarType" SG_ 375 TGS_LEVER_AMT 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 375 TGS_LEVER_AMT 100;
+BA_ "SignalType" SG_ 375 TGS_LEVER_AMT "ENM";
 BA_ "SignalType" SG_ 375 AMT_MIL "ENM";
 BA_ "GenSigStartValue" SG_ 294 MAX_ALL_TRQ 1024;
 BA_ "GenSigStartValue" SG_ 294 MIN_ALL_TRQ 1024;
@@ -5181,7 +5180,7 @@ BA_ "GenSigStartValue" SG_ 626 BMS_BatteryTBatt 680;
 BA_ "GenSigStartValue" SG_ 626 BMS_BatteryPackVoltage 0;
 BA_ "GenSigStartValue" SG_ 337 BMS_Current2sensorReading 6000;
 BA_ "GenSigStartValue" SG_ 337 BMS_Current1sensorReading 6000;
-BA_ "GenSigStartValue" SG_ 1655 CLOCK_YEAR 16;
+BA_ "GenSigStartValue" SG_ 1655 CLOCK_YEAR_TGU 16;
 BA_ "GenSigStartValue" SG_ 339 TGU_CHARGINGSTARTTIME_YEAR 16;
 BA_ "GenSigStartValue" SG_ 339 TGU_CHARGINGENDTIME_YEAR 16;
 BA_ "GenSigStartValue" SG_ 338 TGU_TRIPSTARTTIME_YEAR 16;
@@ -5189,41 +5188,41 @@ BA_ "GenSigStartValue" SG_ 338 TGU_TRIPENDTIME_YEAR 16;
 BA_ "GenSigStartValue" SG_ 999 BMS_BatteryMaxCellVoltage 3650;
 BA_ "GenSigStartValue" SG_ 999 BMS_BatteryMinCellVoltage 3650;
 BA_ "GenSigStartValue" SG_ 999 BMS_BatteryAvgCellVoltage 0;
-BA_ "GenSigSendType" SG_ 2005 DIAG_TGU_REQ_DATA 7;
-BA_ "GenSigInactiveValue" SG_ 2005 DIAG_TGU_REQ_DATA 0;
 BA_ "SigCreator" SG_ 2005 DIAG_TGU_REQ_DATA "M&M-IVN";
-BA_ "GenSigSendType" SG_ 2013 DIAG_TGU_RES_DATA 7;
-BA_ "GenSigInactiveValue" SG_ 2013 DIAG_TGU_RES_DATA 0;
+BA_ "GenSigInactiveValue" SG_ 2005 DIAG_TGU_REQ_DATA 0;
+BA_ "GenSigSendType" SG_ 2005 DIAG_TGU_REQ_DATA 7;
 BA_ "SigCreator" SG_ 2013 DIAG_TGU_RES_DATA "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 2013 DIAG_TGU_RES_DATA 0;
+BA_ "GenSigSendType" SG_ 2013 DIAG_TGU_RES_DATA 7;
 BA_ "GenSigSendType" SG_ 1652 CHARGING_ON_OFF_REQ 0;
-BA_ "GenSigSendType" SG_ 1652 TGU_REVIVE_REQ 0;
-BA_ "GenSigInactiveValue" SG_ 1652 TGU_REVIVE_REQ 0;
 BA_ "SigCreator" SG_ 1652 TGU_REVIVE_REQ "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 1652 TGU_REVIVE_REQ 0;
+BA_ "GenSigSendType" SG_ 1652 TGU_REVIVE_REQ 0;
 BA_ "GenSigSendType" SG_ 1652 REMOTE_DOOR_LOCK_UNLOCK 0;
-BA_ "SignalType" SG_ 374 TGS_MODE "ENM";
-BA_ "GenSigEnvVarType" SG_ 374 TGS_MODE 0;
-BA_ "GenSigSendType" SG_ 374 TGS_MODE 7;
-BA_ "GenSigInactiveValue" SG_ 374 TGS_MODE 0;
-BA_ "SigCreator" SG_ 374 TGS_MODE "M&M-IVN";
+BA_ "SigCreator" SG_ 374 TGS_MODE_AMT "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 374 TGS_MODE_AMT 0;
+BA_ "GenSigSendType" SG_ 374 TGS_MODE_AMT 7;
+BA_ "GenSigEnvVarType" SG_ 374 TGS_MODE_AMT 0;
+BA_ "SignalType" SG_ 374 TGS_MODE_AMT "ENM";
 BA_ "SignalType" SG_ 374 GEAR_ACTUAL_AMT "ENM";
-BA_ "GenSigStartValue" SG_ 264 INTAKE_AIR_TEMP 40;
-BA_ "GenSigSendType" SG_ 264 INTAKE_AIR_TEMP 7;
-BA_ "GenSigInactiveValue" SG_ 264 INTAKE_AIR_TEMP 0;
 BA_ "SigCreator" SG_ 264 INTAKE_AIR_TEMP "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 264 INTAKE_AIR_TEMP 0;
+BA_ "GenSigSendType" SG_ 264 INTAKE_AIR_TEMP 7;
+BA_ "GenSigStartValue" SG_ 264 INTAKE_AIR_TEMP 40;
 BA_ "GenSigStartValue" SG_ 264 DRIVER_DEMAND_TRQ 1024;
-BA_ "CmxSigDefaultRaw" SG_ 771 DISP_AMBT_TEMP_FATC 255;
 BA_ "GenSigStartValue" SG_ 771 DISP_AMBT_TEMP_FATC 40;
+BA_ "CmxSigDefaultRaw" SG_ 771 DISP_AMBT_TEMP_FATC 255;
 BA_ "GenSigSendType" SG_ 1711 TIME_TO_CHARGE 0;
 BA_ "GenSigStartValue" SG_ 768 MEM_DISP 0;
 BA_ "GenSigSendType" SG_ 768 INCAR_TEMP 7;
 BA_ "GenSigStartValue" SG_ 1586 HEATER_TEMP 40;
 BA_ "GenSigStartValue" SG_ 828 RLS_IR_BRIGHTNESS 0;
-BA_ "GenSigSendType" SG_ 2029 DIAG_MBFM_RES_DATA 7;
-BA_ "GenSigInactiveValue" SG_ 2029 DIAG_MBFM_RES_DATA 0;
 BA_ "SigCreator" SG_ 2029 DIAG_MBFM_RES_DATA "M&M-IVN";
-BA_ "GenSigSendType" SG_ 1056 HEATER_INPUT_DC_VOLT 0;
-BA_ "GenSigInactiveValue" SG_ 1056 HEATER_INPUT_DC_VOLT 0;
+BA_ "GenSigInactiveValue" SG_ 2029 DIAG_MBFM_RES_DATA 0;
+BA_ "GenSigSendType" SG_ 2029 DIAG_MBFM_RES_DATA 7;
 BA_ "SigCreator" SG_ 1056 HEATER_INPUT_DC_VOLT "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 1056 HEATER_INPUT_DC_VOLT 0;
+BA_ "GenSigSendType" SG_ 1056 HEATER_INPUT_DC_VOLT 0;
 BA_ "GenSigStartValue" SG_ 1168 BATTERY_INLET_COOLANT_TEMP 0;
 BA_ "GenSigSendType" SG_ 965 RESERVED_2 7;
 BA_ "GenSigSendType" SG_ 942 RESERVED_2 7;
@@ -5240,31 +5239,31 @@ BA_ "GenSigSendType" SG_ 963 RESERVED_2 7;
 BA_ "GenSigSendType" SG_ 588 ACC_DRIVE_MODE 7;
 BA_ "GenSigStartValue" SG_ 826 INDC_ROLL 62;
 BA_ "GenSigStartValue" SG_ 826 INDC_PITCH 62;
-BA_ "GenSigEnvVarType" SG_ 310 SHIFTING 0;
-BA_ "GenSigSendType" SG_ 310 SHIFTING 7;
-BA_ "GenSigInactiveValue" SG_ 310 SHIFTING 0;
 BA_ "SigCreator" SG_ 310 SHIFTING "M&M-IVN";
-BA_ "GenSigEnvVarType" SG_ 310 GEAR_TARGET 0;
-BA_ "GenSigSendType" SG_ 310 GEAR_TARGET 7;
-BA_ "GenSigInactiveValue" SG_ 310 GEAR_TARGET 0;
+BA_ "GenSigInactiveValue" SG_ 310 SHIFTING 0;
+BA_ "GenSigSendType" SG_ 310 SHIFTING 7;
+BA_ "GenSigEnvVarType" SG_ 310 SHIFTING 0;
 BA_ "SigCreator" SG_ 310 GEAR_TARGET "M&M-IVN";
-BA_ "GenSigEnvVarType" SG_ 310 GEAR_ACTUAL 0;
-BA_ "GenSigSendType" SG_ 310 GEAR_ACTUAL 7;
-BA_ "GenSigInactiveValue" SG_ 310 GEAR_ACTUAL 0;
+BA_ "GenSigInactiveValue" SG_ 310 GEAR_TARGET 0;
+BA_ "GenSigSendType" SG_ 310 GEAR_TARGET 7;
+BA_ "GenSigEnvVarType" SG_ 310 GEAR_TARGET 0;
 BA_ "SigCreator" SG_ 310 GEAR_ACTUAL "M&M-IVN";
-BA_ "GenSigStartValue" SG_ 322 DRIVER_DEMAND_TRQ 1024;
+BA_ "GenSigInactiveValue" SG_ 310 GEAR_ACTUAL 0;
+BA_ "GenSigSendType" SG_ 310 GEAR_ACTUAL 7;
+BA_ "GenSigEnvVarType" SG_ 310 GEAR_ACTUAL 0;
+BA_ "GenSigStartValue" SG_ 322 DRIVER_DEMAND_TRQ_EMS36 1024;
 BA_ "GenSigStartValue" SG_ 322 ENG_TRQ_AFTR_RED1 1024;
 BA_ "GenSigStartValue" SG_ 1089 USM_RESET 1;
 BA_ "GenSigSendType" SG_ 1407 TSR_DSP_SPD 0;
 BA_ "GenSigSendType" SG_ 1407 TSR_SYS_STATE 0;
-BA_ "GenSigEnvVarType" SG_ 592 SBW_FAULT 0;
-BA_ "GenSigSendType" SG_ 592 SBW_FAULT 7;
-BA_ "GenSigInactiveValue" SG_ 592 SBW_FAULT 0;
 BA_ "SigCreator" SG_ 592 SBW_FAULT "M&M-IVN";
-BA_ "GenSigEnvVarType" SG_ 592 SBW_LEVER 0;
-BA_ "GenSigSendType" SG_ 592 SBW_LEVER 7;
-BA_ "GenSigInactiveValue" SG_ 592 SBW_LEVER 0;
+BA_ "GenSigInactiveValue" SG_ 592 SBW_FAULT 0;
+BA_ "GenSigSendType" SG_ 592 SBW_FAULT 7;
+BA_ "GenSigEnvVarType" SG_ 592 SBW_FAULT 0;
 BA_ "SigCreator" SG_ 592 SBW_LEVER "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 592 SBW_LEVER 0;
+BA_ "GenSigSendType" SG_ 592 SBW_LEVER 7;
+BA_ "GenSigEnvVarType" SG_ 592 SBW_LEVER 0;
 BA_ "GenSigSendType" SG_ 770 STS_PTC_HEATER 0;
 BA_ "GenSigSendType" SG_ 770 REQ_ACC_ON 0;
 BA_ "GenSigSendType" SG_ 770 COMPRESSURE_SPD 0;
@@ -5279,128 +5278,128 @@ BA_ "GenSigSendType" SG_ 918 HBA_MSG_CNT 0;
 BA_ "GenSigSendType" SG_ 918 HBA_USM_FB 0;
 BA_ "GenSigSendType" SG_ 918 HBA_STS 0;
 BA_ "GenSigSendType" SG_ 918 HBA_LAMP_STS 0;
-BA_ "GenSigSendType" SG_ 902 COMPRESSOR_TEMPERATURE 0;
-BA_ "GenSigInactiveValue" SG_ 902 COMPRESSOR_TEMPERATURE 0;
 BA_ "SigCreator" SG_ 902 COMPRESSOR_TEMPERATURE "M&M-IVN";
-BA_ "GenSigSendType" SG_ 902 ACC_CTRL_OUTPUT_POWER 0;
-BA_ "GenSigInactiveValue" SG_ 902 ACC_CTRL_OUTPUT_POWER 0;
+BA_ "GenSigInactiveValue" SG_ 902 COMPRESSOR_TEMPERATURE 0;
+BA_ "GenSigSendType" SG_ 902 COMPRESSOR_TEMPERATURE 0;
 BA_ "SigCreator" SG_ 902 ACC_CTRL_OUTPUT_POWER "M&M-IVN";
-BA_ "GenSigSendType" SG_ 901 STS_ACC_COMPRESSOR 0;
-BA_ "GenSigInactiveValue" SG_ 901 STS_ACC_COMPRESSOR 0;
+BA_ "GenSigInactiveValue" SG_ 902 ACC_CTRL_OUTPUT_POWER 0;
+BA_ "GenSigSendType" SG_ 902 ACC_CTRL_OUTPUT_POWER 0;
 BA_ "SigCreator" SG_ 901 STS_ACC_COMPRESSOR "M&M-IVN";
-BA_ "GenSigSendType" SG_ 901 ACC_CONTROLLER_OVERHEAT_FAULT 0;
-BA_ "GenSigInactiveValue" SG_ 901 ACC_CONTROLLER_OVERHEAT_FAULT 0;
+BA_ "GenSigInactiveValue" SG_ 901 STS_ACC_COMPRESSOR 0;
+BA_ "GenSigSendType" SG_ 901 STS_ACC_COMPRESSOR 0;
 BA_ "SigCreator" SG_ 901 ACC_CONTROLLER_OVERHEAT_FAULT "M&M-IVN";
-BA_ "GenSigSendType" SG_ 901 ACC_OVERCURRENT_FAULT 0;
-BA_ "GenSigInactiveValue" SG_ 901 ACC_OVERCURRENT_FAULT 0;
+BA_ "GenSigInactiveValue" SG_ 901 ACC_CONTROLLER_OVERHEAT_FAULT 0;
+BA_ "GenSigSendType" SG_ 901 ACC_CONTROLLER_OVERHEAT_FAULT 0;
 BA_ "SigCreator" SG_ 901 ACC_OVERCURRENT_FAULT "M&M-IVN";
-BA_ "GenSigSendType" SG_ 901 ACC_OVERVOLTAGE_FAULT 0;
-BA_ "GenSigInactiveValue" SG_ 901 ACC_OVERVOLTAGE_FAULT 0;
+BA_ "GenSigInactiveValue" SG_ 901 ACC_OVERCURRENT_FAULT 0;
+BA_ "GenSigSendType" SG_ 901 ACC_OVERCURRENT_FAULT 0;
 BA_ "SigCreator" SG_ 901 ACC_OVERVOLTAGE_FAULT "M&M-IVN";
-BA_ "GenSigSendType" SG_ 901 ACC_UNDERVOLTAGE_FAULT 0;
-BA_ "GenSigInactiveValue" SG_ 901 ACC_UNDERVOLTAGE_FAULT 0;
+BA_ "GenSigInactiveValue" SG_ 901 ACC_OVERVOLTAGE_FAULT 0;
+BA_ "GenSigSendType" SG_ 901 ACC_OVERVOLTAGE_FAULT 0;
 BA_ "SigCreator" SG_ 901 ACC_UNDERVOLTAGE_FAULT "M&M-IVN";
-BA_ "GenSigSendType" SG_ 901 ACC_MOTOR_OVERHEAT_FAULT 0;
-BA_ "GenSigInactiveValue" SG_ 901 ACC_MOTOR_OVERHEAT_FAULT 0;
+BA_ "GenSigInactiveValue" SG_ 901 ACC_UNDERVOLTAGE_FAULT 0;
+BA_ "GenSigSendType" SG_ 901 ACC_UNDERVOLTAGE_FAULT 0;
 BA_ "SigCreator" SG_ 901 ACC_MOTOR_OVERHEAT_FAULT "M&M-IVN";
-BA_ "GenSigSendType" SG_ 901 ACC_INPUT_DC_CURRENT 0;
-BA_ "GenSigInactiveValue" SG_ 901 ACC_INPUT_DC_CURRENT 0;
+BA_ "GenSigInactiveValue" SG_ 901 ACC_MOTOR_OVERHEAT_FAULT 0;
+BA_ "GenSigSendType" SG_ 901 ACC_MOTOR_OVERHEAT_FAULT 0;
 BA_ "SigCreator" SG_ 901 ACC_INPUT_DC_CURRENT "M&M-IVN";
-BA_ "GenSigSendType" SG_ 901 ACC_COM_FAULT 0;
-BA_ "GenSigInactiveValue" SG_ 901 ACC_COM_FAULT 0;
+BA_ "GenSigInactiveValue" SG_ 901 ACC_INPUT_DC_CURRENT 0;
+BA_ "GenSigSendType" SG_ 901 ACC_INPUT_DC_CURRENT 0;
 BA_ "SigCreator" SG_ 901 ACC_COM_FAULT "M&M-IVN";
-BA_ "SignalType" SG_ 632 TGS_MODE "ENM";
-BA_ "GenSigEnvVarType" SG_ 632 TGS_MODE 0;
-BA_ "GenSigSendType" SG_ 632 TGS_MODE 7;
-BA_ "GenSigInactiveValue" SG_ 632 TGS_MODE 0;
+BA_ "GenSigInactiveValue" SG_ 901 ACC_COM_FAULT 0;
+BA_ "GenSigSendType" SG_ 901 ACC_COM_FAULT 0;
 BA_ "SigCreator" SG_ 632 TGS_MODE "M&M-IVN";
-BA_ "GenSigEnvVarType" SG_ 632 INDC_AT_MALFUNC 0;
-BA_ "GenSigSendType" SG_ 632 INDC_AT_MALFUNC 7;
-BA_ "GenSigInactiveValue" SG_ 632 INDC_AT_MALFUNC 0;
+BA_ "GenSigInactiveValue" SG_ 632 TGS_MODE 0;
+BA_ "GenSigSendType" SG_ 632 TGS_MODE 7;
+BA_ "GenSigEnvVarType" SG_ 632 TGS_MODE 0;
+BA_ "SignalType" SG_ 632 TGS_MODE "ENM";
 BA_ "SigCreator" SG_ 632 INDC_AT_MALFUNC "M&M-IVN";
-BA_ "GenSigEnvVarType" SG_ 632 TRANS_MIL_LAMP 0;
-BA_ "GenSigSendType" SG_ 632 TRANS_MIL_LAMP 7;
-BA_ "GenSigInactiveValue" SG_ 632 TRANS_MIL_LAMP 0;
+BA_ "GenSigInactiveValue" SG_ 632 INDC_AT_MALFUNC 0;
+BA_ "GenSigSendType" SG_ 632 INDC_AT_MALFUNC 7;
+BA_ "GenSigEnvVarType" SG_ 632 INDC_AT_MALFUNC 0;
 BA_ "SigCreator" SG_ 632 TRANS_MIL_LAMP "M&M-IVN";
-BA_ "SignalType" SG_ 632 TGS_LEVER "ENM";
-BA_ "GenSigTimeoutTime_IS" SG_ 632 TGS_LEVER 100;
-BA_ "GenSigEnvVarType" SG_ 632 TGS_LEVER 0;
-BA_ "GenSigSendType" SG_ 632 TGS_LEVER 7;
-BA_ "GenSigInactiveValue" SG_ 632 TGS_LEVER 0;
+BA_ "GenSigInactiveValue" SG_ 632 TRANS_MIL_LAMP 0;
+BA_ "GenSigSendType" SG_ 632 TRANS_MIL_LAMP 7;
+BA_ "GenSigEnvVarType" SG_ 632 TRANS_MIL_LAMP 0;
 BA_ "SigCreator" SG_ 632 TGS_LEVER "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 632 TGS_LEVER 0;
+BA_ "GenSigSendType" SG_ 632 TGS_LEVER 7;
+BA_ "GenSigEnvVarType" SG_ 632 TGS_LEVER 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 632 TGS_LEVER 100;
+BA_ "SignalType" SG_ 632 TGS_LEVER "ENM";
 BA_ "GenSigStartValue" SG_ 369 MASTER_CYL_PRESSURE 800;
 BA_ "GenSigStartValue" SG_ 368 YAW_RATE 32768;
 BA_ "GenSigSendType" SG_ 271 WHL_RR_SPD 7;
 BA_ "GenSigSendType" SG_ 271 WHL_RL_SPD 7;
-BA_ "GenSigSendType" SG_ 704 STS_SEAT_BLT_PSGR 7;
-BA_ "GenSigInactiveValue" SG_ 704 STS_SEAT_BLT_PSGR 0;
 BA_ "SigCreator" SG_ 704 STS_SEAT_BLT_PSGR "M&M-IVN";
-BA_ "GenSigSendType" SG_ 704 STS_SEAT_BLT_DRV 7;
-BA_ "GenSigInactiveValue" SG_ 704 STS_SEAT_BLT_DRV 0;
+BA_ "GenSigInactiveValue" SG_ 704 STS_SEAT_BLT_PSGR 0;
+BA_ "GenSigSendType" SG_ 704 STS_SEAT_BLT_PSGR 7;
 BA_ "SigCreator" SG_ 704 STS_SEAT_BLT_DRV "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 704 STS_SEAT_BLT_DRV 0;
+BA_ "GenSigSendType" SG_ 704 STS_SEAT_BLT_DRV 7;
 BA_ "GenSigSendType" SG_ 276 SAS_CRC 0;
-BA_ "GenSigSendType" SG_ 540 AUTO_RAIN 7;
-BA_ "GenSigInactiveValue" SG_ 540 AUTO_RAIN 0;
 BA_ "SigCreator" SG_ 540 AUTO_RAIN "M&M-IVN";
-BA_ "GenSigSendType" SG_ 540 AUTO_LIGHT 7;
-BA_ "GenSigInactiveValue" SG_ 540 AUTO_LIGHT 0;
+BA_ "GenSigInactiveValue" SG_ 540 AUTO_RAIN 0;
+BA_ "GenSigSendType" SG_ 540 AUTO_RAIN 7;
 BA_ "SigCreator" SG_ 540 AUTO_LIGHT "M&M-IVN";
-BA_ "GenSigTimeoutTime_IS" SG_ 960 VIN_INDEX 5000;
-BA_ "GenSigSendType" SG_ 960 VIN_INDEX 7;
-BA_ "GenSigInactiveValue" SG_ 960 VIN_INDEX 0;
+BA_ "GenSigInactiveValue" SG_ 540 AUTO_LIGHT 0;
+BA_ "GenSigSendType" SG_ 540 AUTO_LIGHT 7;
 BA_ "SigCreator" SG_ 960 VIN_INDEX "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 960 VIN_INDEX 0;
+BA_ "GenSigSendType" SG_ 960 VIN_INDEX 7;
+BA_ "GenSigTimeoutTime_IS" SG_ 960 VIN_INDEX 5000;
 BA_ "GenSigSendType" SG_ 960 VIN_DATA_0 7;
-BA_ "GenSigStartValue" SG_ 293 ENG_SPD_RATE 32768;
-BA_ "GenSigSendType" SG_ 293 ENG_SPD_RATE 7;
-BA_ "GenSigInactiveValue" SG_ 293 ENG_SPD_RATE 0;
 BA_ "SigCreator" SG_ 293 ENG_SPD_RATE "M&M-IVN";
-BA_ "GenSigSendType" SG_ 292 STS_WATER_IN_FUEL 7;
-BA_ "GenSigInactiveValue" SG_ 292 STS_WATER_IN_FUEL 0;
+BA_ "GenSigInactiveValue" SG_ 293 ENG_SPD_RATE 0;
+BA_ "GenSigSendType" SG_ 293 ENG_SPD_RATE 7;
+BA_ "GenSigStartValue" SG_ 293 ENG_SPD_RATE 32768;
 BA_ "SigCreator" SG_ 292 STS_WATER_IN_FUEL "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 292 STS_WATER_IN_FUEL 0;
+BA_ "GenSigSendType" SG_ 292 STS_WATER_IN_FUEL 7;
 BA_ "GenSigStartValue" SG_ 292 ENG_TEMP 40;
-BA_ "GenSigEnvVarType" SG_ 269 ABS_ACTIVE 0;
-BA_ "GenSigInactiveValue" SG_ 269 ABS_ACTIVE 0;
 BA_ "SigCreator" SG_ 269 ABS_ACTIVE "M&M-IVN";
-BA_ "GenSigTimeoutTime_IS" SG_ 312 VACCUM_PUMP_LIFE 200;
+BA_ "GenSigInactiveValue" SG_ 269 ABS_ACTIVE 0;
+BA_ "GenSigEnvVarType" SG_ 269 ABS_ACTIVE 0;
 BA_ "GenSigSendType" SG_ 312 VACCUM_PUMP_LIFE 0;
-BA_ "GenSigTimeoutTime_IS" SG_ 312 VACCUM_CONTROL 200;
+BA_ "GenSigTimeoutTime_IS" SG_ 312 VACCUM_PUMP_LIFE 200;
 BA_ "GenSigSendType" SG_ 312 VACCUM_CONTROL 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 312 VACCUM_CONTROL 200;
 BA_ "GenSigSendType" SG_ 312 WHL_RR_SPD 7;
 BA_ "GenSigSendType" SG_ 312 WHL_RL_SPD 7;
-BA_ "SignalType" SG_ 832 TRANSFER_MODE_IC "ENM";
-BA_ "GenSigEnvVarType" SG_ 832 TRANSFER_MODE_IC 0;
-BA_ "GenSigEVName" SG_ 832 TRANSFER_MODE_IC "@Msgname@Signame";
-BA_ "GenSigSendType" SG_ 832 TRANSFER_MODE_IC 7;
-BA_ "GenSigInactiveValue" SG_ 832 TRANSFER_MODE_IC 0;
 BA_ "SigCreator" SG_ 832 TRANSFER_MODE_IC "M&M-IVN";
-BA_ "GenSigEnvVarType" SG_ 832 SEAT_BELT_REMAINDER_FL_REAR 0;
-BA_ "GenSigInactiveValue" SG_ 832 SEAT_BELT_REMAINDER_FL_REAR 0;
+BA_ "GenSigInactiveValue" SG_ 832 TRANSFER_MODE_IC 0;
+BA_ "GenSigSendType" SG_ 832 TRANSFER_MODE_IC 7;
+BA_ "GenSigEVName" SG_ 832 TRANSFER_MODE_IC "@Msgname@Signame";
+BA_ "GenSigEnvVarType" SG_ 832 TRANSFER_MODE_IC 0;
+BA_ "SignalType" SG_ 832 TRANSFER_MODE_IC "ENM";
 BA_ "SigCreator" SG_ 832 SEAT_BELT_REMAINDER_FL_REAR "M&M-IVN";
-BA_ "GenSigSendType" SG_ 840 INDC_PARK_BRK 7;
-BA_ "GenSigInactiveValue" SG_ 840 INDC_PARK_BRK 0;
+BA_ "GenSigInactiveValue" SG_ 832 SEAT_BELT_REMAINDER_FL_REAR 0;
+BA_ "GenSigEnvVarType" SG_ 832 SEAT_BELT_REMAINDER_FL_REAR 0;
 BA_ "SigCreator" SG_ 840 INDC_PARK_BRK "M&M-IVN";
-BA_ "GenSigSendType" SG_ 840 INDC_REAR_FOG 7;
-BA_ "GenSigInactiveValue" SG_ 840 INDC_REAR_FOG 0;
+BA_ "GenSigInactiveValue" SG_ 840 INDC_PARK_BRK 0;
+BA_ "GenSigSendType" SG_ 840 INDC_PARK_BRK 7;
 BA_ "SigCreator" SG_ 840 INDC_REAR_FOG "M&M-IVN";
-BA_ "GenSigSendType" SG_ 840 STS_TRAILER 7;
-BA_ "GenSigInactiveValue" SG_ 840 STS_TRAILER 0;
+BA_ "GenSigInactiveValue" SG_ 840 INDC_REAR_FOG 0;
+BA_ "GenSigSendType" SG_ 840 INDC_REAR_FOG 7;
 BA_ "SigCreator" SG_ 840 STS_TRAILER "M&M-IVN";
-BA_ "GenSigSendType" SG_ 840 STS_LOW_BEAM 7;
-BA_ "GenSigInactiveValue" SG_ 840 STS_LOW_BEAM 0;
+BA_ "GenSigInactiveValue" SG_ 840 STS_TRAILER 0;
+BA_ "GenSigSendType" SG_ 840 STS_TRAILER 7;
 BA_ "SigCreator" SG_ 840 STS_LOW_BEAM "M&M-IVN";
-BA_ "GenSigSendType" SG_ 840 STS_HIGH_BEAM 7;
-BA_ "GenSigInactiveValue" SG_ 840 STS_HIGH_BEAM 0;
+BA_ "GenSigInactiveValue" SG_ 840 STS_LOW_BEAM 0;
+BA_ "GenSigSendType" SG_ 840 STS_LOW_BEAM 7;
 BA_ "SigCreator" SG_ 840 STS_HIGH_BEAM "M&M-IVN";
-BA_ "GenSigSendType" SG_ 840 INDC_TURN_FLSHR 7;
-BA_ "GenSigInactiveValue" SG_ 840 INDC_TURN_FLSHR 0;
+BA_ "GenSigInactiveValue" SG_ 840 STS_HIGH_BEAM 0;
+BA_ "GenSigSendType" SG_ 840 STS_HIGH_BEAM 7;
 BA_ "SigCreator" SG_ 840 INDC_TURN_FLSHR "M&M-IVN";
-BA_ "GenSigSendType" SG_ 840 STS_SEAT_BLT_PSGR 7;
-BA_ "GenSigInactiveValue" SG_ 840 STS_SEAT_BLT_PSGR 0;
-BA_ "SigCreator" SG_ 840 STS_SEAT_BLT_PSGR "M&M-IVN";
-BA_ "GenSigSendType" SG_ 840 STS_SEAT_BLT_DRV 7;
-BA_ "GenSigInactiveValue" SG_ 840 STS_SEAT_BLT_DRV 0;
-BA_ "SigCreator" SG_ 840 STS_SEAT_BLT_DRV "M&M-IVN";
-BA_ "GenSigSendType" SG_ 840 STS_DOOR 7;
+BA_ "GenSigInactiveValue" SG_ 840 INDC_TURN_FLSHR 0;
+BA_ "GenSigSendType" SG_ 840 INDC_TURN_FLSHR 7;
+BA_ "SigCreator" SG_ 840 STS_SEAT_BLT_PSGR_MBFM "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 840 STS_SEAT_BLT_PSGR_MBFM 0;
+BA_ "GenSigSendType" SG_ 840 STS_SEAT_BLT_PSGR_MBFM 7;
+BA_ "SigCreator" SG_ 840 STS_SEAT_BLT_DRV_MBFM "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 840 STS_SEAT_BLT_DRV_MBFM 0;
+BA_ "GenSigSendType" SG_ 840 STS_SEAT_BLT_DRV_MBFM 7;
+BA_ "SigCreator" SG_ 840 STS_DOOR "M&M-IVN";
 BA_ "GenSigInactiveValue" SG_ 840 STS_DOOR 0;
 BA_ "SigCreator" SG_ 840 STS_DOOR "M&M-IVN";
 BA_ "GenSigSendType" SG_ 1848 DIAG_SRS_RES_DATA 7;
@@ -5646,16 +5645,16 @@ VAL_ 981 BMS_EVWARNING_TT 3 "Reserved" 2 "EV Warning Blink" 1 "EV Warning   On" 
 VAL_ 779 TIME_GAP_FRM 255 "NO Object Detected / Default" ;
 VAL_ 1585 TRANSFER_MODE_ICC 3 "Signal Invalid" 2 "4WD Low" 1 "4WD High" 0 "2WD / Default Value" ;
 VAL_ 1585 ICC_ALERT_MSG 7 "Reserved" 6 "Reserved" 5 "Reserved" 4 "Reserved" 3 "Transfer Mode Entered" 2 "Transfer mod Shifting InProgress" 1 "Terrain Mode Inhibited" 0 "No Alert/ Default" ;
-VAL_ 1170 IBS_BATT_TEMP 65535 "Signal Invalid" 0 "Default" ;
-VAL_ 1170 IBS_BATT_VOLT 65535 "Signal Invalid" 4 "Default" ;
-VAL_ 1170 IBS_CURRENT 65535 "Signal Invalid" 0 "Default" ;
-VAL_ 1169 BATT_RESET_FLG 1 "True" 0 "False / Default" ;
-VAL_ 1169 STS_ESS_DEACTIVATION 7 "Reserved" 6 "Reserved" 5 "Reserved" 4 "Preemptive Start" 3 "ESS Deactivation" 2 "ESS Start Inhibit" 1 "ESS Stop Inhibit" 0 "Default" ;
-VAL_ 1169 BATT_CHARGE_LAMP_INDC 3 "Signal Invalid" 2 "Reserved" 1 "ON/Default" 0 "OFF" ;
-VAL_ 1169 ALTERNATOR_MODE 7 "Signal Invalid" 6 "Reserved" 5 "Reserved" 4 "Reserved" 3 "Redun" 2 "Cutoff" 1 "Regen" 0 "Normal/default" ;
-VAL_ 1169 IBS_SOF 255 "Signal Invalid" 0 "Default" ;
-VAL_ 1169 IBS_SOH 255 "Signal Invalid" 0 "Default" ;
-VAL_ 1169 IBS_SOC 255 "Signal Invalid" 0 "Default" ;
+VAL_ 1170 IBS_BATT_TEMP_MBFM 65535 "Signal Invalid" 0 "Default" ;
+VAL_ 1170 IBS_BATT_VOLT_MBFM 65535 "Signal Invalid" 4 "Default" ;
+VAL_ 1170 IBS_CURRENT_MBFM 65535 "Signal Invalid" 0 "Default" ;
+VAL_ 1169 BATT_RESET_FLG_MBFM 1 "True" 0 "False / Default" ;
+VAL_ 1169 STS_ESS_DEACTIVATION_MBFM 7 "Reserved" 6 "Reserved" 5 "Reserved" 4 "Preemptive Start" 3 "ESS Deactivation" 2 "ESS Start Inhibit" 1 "ESS Stop Inhibit" 0 "Default" ;
+VAL_ 1169 BATT_CHARGE_LAMP_INDC_MBFM 3 "Signal Invalid" 2 "Reserved" 1 "ON/Default" 0 "OFF" ;
+VAL_ 1169 ALTERNATOR_MODE_MBFM 7 "Signal Invalid" 6 "Reserved" 5 "Reserved" 4 "Reserved" 3 "Redun" 2 "Cutoff" 1 "Regen" 0 "Normal/default" ;
+VAL_ 1169 IBS_SOF_MBFM 255 "Signal Invalid" 0 "Default" ;
+VAL_ 1169 IBS_SOH_MBFM 255 "Signal Invalid" 0 "Default" ;
+VAL_ 1169 IBS_SOC_MBFM 255 "Signal Invalid" 0 "Default" ;
 VAL_ 870 PKE_PACK_MCM 1 "Received" 0 "Other" ;
 VAL_ 870 PKE_NACK_MCM 1 "Received" 0 "Other" ;
 VAL_ 870 CURRENT_CYL_AUTH_STS_MCM 1 "Authentication Fail" 0 "Authentication Pass" ;
@@ -5722,7 +5721,7 @@ VAL_ 563 INDC_REGEN 3 "Reserved" 2 "Regen TT Blink/regen in progress" 1 "Regen T
 VAL_ 295 ACC_PED_ACTUAL 255 "Signal Invalid" 0 "Default" ;
 VAL_ 295 ENG_LOSSES 2047 "Signal invalid" 2046 "Default value" ;
 VAL_ 295 BRK_PEDAL1 3 "Signal Invalid" 2 "Reserved" 1 "Depressed" 0 "Not Pressed / Default" ;
-VAL_ 375 TGS_LEVER 15 "Signal Invalid" 14 "Middle Position" 13 "Default Value" 12 "M - Forward Drive Position" 11 "Tip -" 10 "Tip +" 9 "Park " 8 "Reverse" 7 "Neutral" 6 "Drive" 5 "Reserved" 4 "Reserved" 3 "Reserved" 2 "Reserved" 1 "Reserved" 0 "Reserved" ;
+VAL_ 375 TGS_LEVER_AMT 15 "Signal Invalid" 14 "Middle Position" 13 "Default Value" 12 "M - Forward Drive Position" 11 "Tip -" 10 "Tip +" 9 "Park " 8 "Reverse" 7 "Neutral" 6 "Drive" 5 "Reserved" 4 "Reserved" 3 "Reserved" 2 "Reserved" 1 "Reserved" 0 "Reserved" ;
 VAL_ 375 AMT_BUZZER 1 "BUZZER ON" 0 "BUZZER OFF / Default Value" ;
 VAL_ 375 AMT_MIL 3 "Lamp ON" 2 "Reserved" 1 "Lamp Blinking" 0 "Lamp OFF / Default " ;
 VAL_ 375 ALERT_AMT 7 "Reserved" 6 "Reserved" 5 "1st Gear not Enguage" 4 "Gear lock out" 3 "Operation Not Allowed" 2 "Press Brake" 1 "Put Vehicle in Neutral" 0 "Default Value" ;
@@ -5777,7 +5776,7 @@ VAL_ 1077 OVR_SPD 15 "Signal Invalid" 10 "Default Value" ;
 VAL_ 1077 CLTH_OVRRIDE 15 "Signal Invalid" 10 "Default Value" ;
 VAL_ 1077 AGG_BRK 15 "Signal Invalid" 10 "Default Value" ;
 VAL_ 1077 AGG_ACC 15 "Signal Invalid" 10 "Default Value" ;
-VAL_ 1077 ECO_INDEX 127 "Signal Invalid" 100 "Default Value" ;
+VAL_ 1077 ECO_INDEX_IS11 127 "Signal Invalid" 100 "Default Value" ;
 VAL_ 1077 STS_TRIP 1 "Trip Reset completed" 0 "Default Value" ;
 VAL_ 1077 COMM_ERR_FLG 1 "Flag Enable" 0 "Flag Disable / Default Value" ;
 VAL_ 1077 TPMS_FLG 1 "Flag Enable" 0 "Flag Disable / Default Value" ;
@@ -6144,7 +6143,7 @@ VAL_ 1720 NM_MTO_DTC_STS 3 "Reserved" 2 "MTO DTC in Healed State" 1 "MTO DTC in 
 VAL_ 1720 NM_FC_DTC_STS 3 "Reserved" 2 "FC DTC in Healed State" 1 "FC DTC in Current State" 0 "Default" ;
 VAL_ 1720 NM_ACTIVE_STS 7 "NM ACTIVE" 6 "NM OFF at Ignition OFF" 5 "NM OFF due to Busoff" 4 "NM OFF due to OV" 3 "NM OFF due to UV" 2 "NM OFF due to Cranking T50/ESS" 1 "NM OFF due to VC" 0 "NM OFF at Ignition ON / Default" ;
 VAL_ 1655 CLOCK_AM_PM 1 "AM" 0 "PM" ;
-VAL_ 1655 CLOCK_FORMAT 1 "24 Hour mode" 0 "12 Hour mode / Default" ;
+VAL_ 1655 CLOCK_FORMAT_TGU 1 "24 Hour mode" 0 "12 Hour mode / Default" ;
 VAL_ 339 TGU_CHARGINGENDTIME_FORMAT 1 "PM" 0 "AM" ;
 VAL_ 339 TGU_CHARGINGSTARTTIME_FORMAT 1 "PM" 0 "AM" ;
 VAL_ 339 TGU_CHRG_STRT_TIME_HOURS 0 "Default" ;
@@ -6181,19 +6180,19 @@ VAL_ 338 TGU_CO2 0 "Default" ;
 VAL_ 338 TGU_EV_KILOMETERS 0 "Default" ;
 VAL_ 338 TGU_FRESHDATAFLAG 1 "FreshData" 0 "Default" ;
 VAL_ 338 TGU_EV_PARAM_INDEX 4 "Index 4" 3 "Index 3" 2 "Index 2" 1 "Index 1" 0 "Index 0" ;
-VAL_ 1761 NM_VIN_CHECK_STS 1 "Check done" 0 "Check not done/Default" ;
-VAL_ 1761 NM_VIN_DTC_STS 3 "Reserved" 2 "VIN DTC Healed State" 1 "VIN DTC Current State" 0 "No DTC / Default" ;
-VAL_ 1761 NM_VC_DTC_STS 3 "Reserved" 2 "VC DTC in Healed State" 1 "VC DTC in Current State" 0 "Default" ;
-VAL_ 1761 NM_MCF_DTC_STS 3 "Reserved" 2 "MCF DTC Healed State" 1 "MCF DTC Current State" 0 "Default/No DTC" ;
-VAL_ 1761 NM_VBATT 0 "Default" ;
-VAL_ 1761 NM_UV_STS 1 "Active" 0 "Inactive / Default" ;
-VAL_ 1761 NM_STS_IGN 1 "IGN ON" 0 "IGN OFF / Default" ;
-VAL_ 1761 NM_SCF_DTC_STS 3 "Reserved" 2 "SCF DTC Healed State" 1 "SCF DTC Current State" 0 "Default /No DTC" ;
-VAL_ 1761 NM_OV_STS 1 "Active" 0 "Inactive / Default" ;
-VAL_ 1761 NM_NA_DTC_STS 3 "Reserved" 2 "NA DTC Healed State" 1 "NA DTC Current State" 0 "Default / no DTC " ;
-VAL_ 1761 NM_MTO_DTC_STS 3 "Reserved" 2 "MTO DTC in Healed State" 1 "MTO DTC in Current State" 0 "Default / No DTC" ;
-VAL_ 1761 NM_FC_DTC_STS 3 "Reserved" 2 "FC DTC in Healed State" 1 "FC DTC in Current State" 0 "Default" ;
-VAL_ 1761 NM_ACTIVE_STS 7 "NM ACTIVE" 6 "NM OFF at Ignition OFF" 5 "NM OFF due to Busoff" 4 "NM OFF due to OV" 3 "NM OFF due to UV" 2 "NM OFF due to Cranking T50/ESS" 1 "NM OFF due to VC" 0 "NM OFF at Ignition ON / Default" ;
+VAL_ 1761 NM_VIN_CHECK_STS_TGU 1 "Check done" 0 "Check not done/Default" ;
+VAL_ 1761 NM_VIN_DTC_STS_TGU 3 "Reserved" 2 "VIN DTC Healed State" 1 "VIN DTC Current State" 0 "No DTC / Default" ;
+VAL_ 1761 NM_VC_DTC_STS_TGU 3 "Reserved" 2 "VC DTC in Healed State" 1 "VC DTC in Current State" 0 "Default" ;
+VAL_ 1761 NM_MCF_DTC_STS_TGU 3 "Reserved" 2 "MCF DTC Healed State" 1 "MCF DTC Current State" 0 "Default/No DTC" ;
+VAL_ 1761 NM_VBATT_TGU 0 "Default" ;
+VAL_ 1761 NM_UV_STS_TGU 1 "Active" 0 "Inactive / Default" ;
+VAL_ 1761 NM_STS_IGN_TGU 1 "IGN ON" 0 "IGN OFF / Default" ;
+VAL_ 1761 NM_SCF_DTC_STS_TGU 3 "Reserved" 2 "SCF DTC Healed State" 1 "SCF DTC Current State" 0 "Default /No DTC" ;
+VAL_ 1761 NM_OV_STS_TGU 1 "Active" 0 "Inactive / Default" ;
+VAL_ 1761 NM_NA_DTC_STS_TGU 3 "Reserved" 2 "NA DTC Healed State" 1 "NA DTC Current State" 0 "Default / no DTC " ;
+VAL_ 1761 NM_MTO_DTC_STS_TGU 3 "Reserved" 2 "MTO DTC in Healed State" 1 "MTO DTC in Current State" 0 "Default / No DTC" ;
+VAL_ 1761 NM_FC_DTC_STS_TGU 3 "Reserved" 2 "FC DTC in Healed State" 1 "FC DTC in Current State" 0 "Default" ;
+VAL_ 1761 NM_ACTIVE_STS_TGU 7 "NM ACTIVE" 6 "NM OFF at Ignition OFF" 5 "NM OFF due to Busoff" 4 "NM OFF due to OV" 3 "NM OFF due to UV" 2 "NM OFF due to Cranking T50/ESS" 1 "NM OFF due to VC" 0 "NM OFF at Ignition ON / Default" ;
 VAL_ 999 BMS_BatteryMaxCellVoltage 16383 "Invalid Value" 3650 "Default Value" ;
 VAL_ 999 BMS_BatteryMinCellVoltage 16383 "Invalid Value" 3650 "Default Value" ;
 VAL_ 999 BMS_BatteryDisconnectSta 15 "Reserved" 14 "Reserved" 13 "Reserved" 12 "Reserved" 11 "Reserved" 10 "Reserved" 9 "Reserved" 8 "Fail - Over Battery pack current" 7 "Fail - HV diag failed" 6 "Fail - Precharge diag failed" 5 "Pass - Emergency out" 4 "Fail - Both weld" 3 "Pass - -ve weld only" 2 "Pass - +ve weld only" 1 "Pass - No Weld" 0 "Init/Default" ;
@@ -6210,7 +6209,7 @@ VAL_ 1652 CHARGING_ON_OFF_REQ 0 "DEFAULT" 1 "CHARGING ENABLE" 2 "CHARGING DISABL
 VAL_ 1652 TGU_REVIVE_REQ 0 "NO REQUEST/DEFAULT" 1 "REVIVE REQUEST" ;
 VAL_ 1652 REMOTE_DOOR_LOCK_UNLOCK 3 "RESERVED" 2 "DOOR UNLOCK REQUEST" 1 "DOOR LOCK REQUEST" 0 "DEFAULT MODE" ;
 VAL_ 374 ENGINE_STOP_AMT 1 "Request to stop Engine" 0 "No Request / Default" ;
-VAL_ 374 TGS_MODE 3 "Signal Invalid" 2 "Warm Up" 1 "Manual" 0 "Normal / Default Value" ;
+VAL_ 374 TGS_MODE_AMT 3 "Signal Invalid" 2 "Warm Up" 1 "Manual" 0 "Normal / Default Value" ;
 VAL_ 374 TCU_SHIFT_MODE 3 "Signal Invalid" 2 "Reserved" 1 "Automatic Mode" 0 "MAnual Mode / Default" ;
 VAL_ 374 GEAR_ACTUAL_AMT 15 "Signal Invalid" 14 "Drive Lock Out (Neutral)" 13 "Drive Limp Home (4th)" 12 "Reverse Lock Out (Neutral)" 11 "Reverse Limp Home" 10 "Reverse (Electronic Engagement)" 9 "Manual 1st (+ve/-ve Torque)" 8 "Reserved" 7 "Reserved" 6 "6th" 5 "5th" 4 "4th" 3 "3rd" 2 "2nd" 1 "1st (Positive torque only)" 0 "Neutral / Default Value" ;
 VAL_ 264 ALTERNATOR_CUTOFF_REQ 1 "Active" 0 "Not Active / Default" ;
@@ -6282,7 +6281,7 @@ VAL_ 285 BMS_Reason_HV_Disconnect_Request 28 "PCB TEMPERATURE_BEYOND_LIMIT" 27 "
 VAL_ 285 BMS_Reason_Derating 31 "CCLM DERATE  " 30 "TPS FAULT" 29 "LIN timeout Failure" 28 "BMScell vlt snsr fail cutoff BMU" 27 "Battery Disconnect Fail" 26 "BATTER PACK POWER LIMIT ERROR" 25 "Isolation_Fault_yellow" 24 " Isolation_Time_Out" 23 "Coolant sensor threshold fault" 22 "PUMP_OVERLOAD_PROTECTION" 21 "PUMP_UNDER_AND_OVER_VOLTAGE" 20 "PUMP_OVER_TEMP_SHUTDOWN" 19 "PUMP_OVER_TEMPERATURE_DERATED" 18 "PUMP_OVER_CURRENT_DERATED" 17 "COOLANT_OUTLET_LOW_TEMP" 16 "COOLANT_OUTLET_HIGH_TEMP" 15 "COOLANT_INLET_LOW_TEMP" 14 "COOLANT_INLET_HIGH_TEMP" 13 "BMS_CELL_WAER_DETECTION_FAULT" 12 "BMU OPEN WIRE FAULT" 11 "Module under temperature derate" 10 "Module Over temperature derate" 9 "MOD_TEMP_DIFF" 8 "MULTI_MOD_2_TEMP_FAULT" 7 "1_MOD_2_TEMP_FAULT" 6 "Battery Under Temp Derated" 5 "Battery Over Temperature derated" 4 "Battery Under voltage Derated" 3 "Battery Over voltage Derated" 2 "Cell Under Voltage Derate" 1 "Cell Over Voltage Derate" 0 "Reserved" ;
 VAL_ 920 STS_HIGHBEAM_BOOSTER 1 "HIGHBEAM BOOSTER ON" 0 "HIGHBEAM BOOSTER OFF" ;
 VAL_ 920 HEADLAMP_AUTO_LEVEL 1 "HL Auto level Enable" 0 "HL Auto level Disbabl/DV" ;
-VAL_ 921 STS_HIGHBEAM_BOOSTER 1 "HIGHBEAM BOOSTER ON" 0 "HIGHBEAM BOOSTER OFF" ;
+VAL_ 921 STS_HIGHBEAM_BOOSTER_1 1 "HIGHBEAM BOOSTER ON" 0 "HIGHBEAM BOOSTER OFF" ;
 VAL_ 771 PASSIVE_VENT_FATC_STS 1 "Passive Ventilation Active" 0 "Passive Vent not active / DV" ;
 VAL_ 771 DISP_AMBT_TEMP_FATC 0 "Default Value" 255 "Invalid value" ;
 VAL_ 1711 FOD_ALERT 1 "Foreign Object Detected" 0 "No Foreign objct detctd/ Default" ;
@@ -6479,7 +6478,7 @@ VAL_ 587 ACC_MODE 3 "Shutoff" 2 "Override" 1 "Enguaged" 0 " OFF/StandBy / Defaul
 VAL_ 928 FPAS_SPAS_ACTIVE_STS 1 "TRUE" 0 "FLASE / Default" ;
 VAL_ 928 FR_SEGMENT 15 "Sensor error" 14 "Reserved" 13 "Reserved" 12 "Reserved" 11 "Reserved" 10 "Reserved" 9 "Reserved" 8 "Reserved" 7 "Reserved" 6 "Display 6 Segment" 5 "Display 5 Segment" 4 "Display 4 Segment" 3 "Display 3 Segment" 2 "Display 2 Segment" 1 "Display 1 Segment" 0 "Default / No Display Segment" ;
 VAL_ 928 RL_SEG_WARN 1 "Warning" 0 "No Warning/Default" ;
-VAL_ 928 RPAS_ACTIVE_STS 1 "TRUE" 0 "FLASE / Default" ;
+VAL_ 928 RPAS_ACTIVE_STS1 1 "TRUE" 0 "FLASE / Default" ;
 VAL_ 928 RL_SEGMENT 15 "Sensor error" 14 "Reserved" 13 "Reserved" 12 "Reserved" 11 "Reserved" 10 "Reserved" 9 "Reserved" 8 "Reserved" 7 "Reserved" 6 "Display 6 Segment" 5 "Display 5 Segment" 4 "Display 4 Segment" 3 "Display 3 Segment" 2 "Display 2 Segment" 1 "Display 1 Segment" 0 "Default / No Display Segment" ;
 VAL_ 928 FR_SEG_WARN 1 "Warning" 0 "No Warning/Default" ;
 VAL_ 928 FMR_SEG_WARN 1 "Warning" 0 "No Warning/Default" ;
@@ -6526,7 +6525,7 @@ VAL_ 310 GEAR_TARGET 15 "Signal invalid" 14 "Reserved" 13 "Reserved" 12 "Reserve
 VAL_ 310 GEAR_ACTUAL 15 "Signal invalid" 14 "Reserved" 13 "Reserved" 12 "Reserved" 11 "Reserved" 10 "Reverse Gear" 9 "Reserved" 8 "Reserved" 7 "Reserved" 6 "6th" 5 "5th" 4 "4th" 3 "3rd" 2 "2nd" 1 "1st" 0 "Neutral / Default value" ;
 VAL_ 643 IGN_STS 1 "IGN ON" 0 "IGN OFF/Default" ;
 VAL_ 643 BATT_VOLTAGE 0 "Default" ;
-VAL_ 322 DRIVER_DEMAND_TRQ 2047 "Signal Invalid" 0 "Default" ;
+VAL_ 322 DRIVER_DEMAND_TRQ_EMS36 2047 "Signal Invalid" 0 "Default" ;
 VAL_ 322 ENG_TRQ_AFTR_RED1 2047 "Signal Invalid" 0 "Default Value" ;
 VAL_ 322 ACC_PED1 255 "Signal Invalid" 0 "Default" ;
 VAL_ 322 ENG_SPD1 65535 "Signal Invalid" 0 "Default" ;
@@ -6601,8 +6600,8 @@ VAL_ 971 STS_HEAT_VENT_IS 7 "Reserved" 6 "Reserved" 5 "Reserved" 4 "Auto Vent ON
 VAL_ 971 STS_SELECT_UNLOCK 1 "Enable" 0 "Disable/DV" ;
 VAL_ 971 FR_SEAT_HEAT_VENT_LEVEL_IS 3 "Level 3" 2 "Level 2" 1 "Level 1" 0 "Default / OFF" ;
 VAL_ 971 FL_SEAT_HEAT_VENT_LEVEL_IS 3 "Level 3" 2 "Level 2" 1 "Level 1" 0 "Default / OFF" ;
-VAL_ 971 SET_TIRE_FILL_ASST_IC 1 "Enable/Default" 0 "Disable" ;
-VAL_ 971 TPMS_AUTOLEARN 1 "Enable/Default" 0 "Disable" ;
+VAL_ 971 SET_TIRE_FILL_ASST_IS 1 "Enable/Default" 0 "Disable" ;
+VAL_ 971 TPMS_AUTOLEARN_IS 1 "Enable/Default" 0 "Disable" ;
 VAL_ 971 INST_ECO_INDEX 127 "Signal Invalid" 100 "Default Value" ;
 VAL_ 971 ECO_INDEX 127 "Signal Invalid" 100 "Default Value" ;
 VAL_ 971 RES_DRIVESCORE_INFO 1 "Fresh Data" 0 "Default" ;
@@ -6710,29 +6709,29 @@ VAL_ 770 DISCHARGE_LINE_PRESSURE 511 "Signal Invalid" 0 "Default Value" ;
 VAL_ 770 STS_PTC_HEATER 3 "Heater Failure" 2 "Fault in Heater" 1 "ON" 0 "OFF / Default Value" ;
 VAL_ 770 REQ_ACC_ON 1 "AC Compressor ON" 0 "AC Compressor OFF / Default" ;
 VAL_ 770 COMPRESSURE_SPD 65535 "Signal Invalid" 0 "Blower OFF / Default Value" ;
-VAL_ 541 SPARE_TYRE_TEMP 255 "Signal invalid" 0 "Default Value" ;
-VAL_ 541 SPARE_TYRE_PRESSURE 255 "Signal Invalid" 0 "Default value" ;
-VAL_ 542 RR_TYRE_TEMP 255 "Signal invalid" 0 "Default Value" ;
-VAL_ 542 RR_TYRE_PRESSURE 255 "Signal invalid" 0 "Default Value" ;
-VAL_ 542 RL_TYRE_TEMP 255 "Signal invalid" 0 "Default Value" ;
-VAL_ 542 RL_TYRE_PRESSURE 255 "Signal invalid" 0 "Default Value" ;
-VAL_ 542 FR_TYRE_TEMP 255 "Signal invalid" 0 "Default Value" ;
-VAL_ 542 FR_TYRE_PRESSURE 255 "Signal invalid" 0 "Default Value" ;
-VAL_ 542 FL_TYRE_TEMP 255 "Signal invalid" 0 "Default Value" ;
-VAL_ 542 FL_TYRE_PRESSURE 255 "Signal invalid" 0 "Default Value" ;
-VAL_ 537 TPMS_SYSTEM_FAULT 0 "Default value" ;
-VAL_ 537 TPMS_SIGNAL_MISSING 0 "Default value" ;
+VAL_ 541 SPARE_TYRE_TEMP_TPMS 255 "Signal invalid" 0 "Default Value" ;
+VAL_ 541 SPARE_TYRE_PRESSURE_TPMS 255 "Signal Invalid" 0 "Default value" ;
+VAL_ 542 RR_TYRE_TEMP_TPMS 255 "Signal invalid" 0 "Default Value" ;
+VAL_ 542 RR_TYRE_PRESSURE_TPMS 255 "Signal invalid" 0 "Default Value" ;
+VAL_ 542 RL_TYRE_TEMP_TPMS 255 "Signal invalid" 0 "Default Value" ;
+VAL_ 542 RL_TYRE_PRESSURE_TPMS 255 "Signal invalid" 0 "Default Value" ;
+VAL_ 542 FR_TYRE_TEMP_TPMS 255 "Signal invalid" 0 "Default Value" ;
+VAL_ 542 FR_TYRE_PRESSURE_TPMS 255 "Signal invalid" 0 "Default Value" ;
+VAL_ 542 FL_TYRE_TEMP_TPMS 255 "Signal invalid" 0 "Default Value" ;
+VAL_ 542 FL_TYRE_PRESSURE_TPMS 255 "Signal invalid" 0 "Default Value" ;
+VAL_ 537 TPMS_SYSTEM_FAULT_TPMS 0 "Default value" ;
+VAL_ 537 TPMS_SIGNAL_MISSING_TPMS 0 "Default value" ;
 VAL_ 537 TPMS_PROGRAM_MODE 9 "signal invalid" 8 "Learning not completed" 7 "All tyre learned" 6 "Learn spare tyre" 5 "Learn RL tyre" 4 "Learn RR tyre" 3 "Learn FR tyre" 2 "Learn FL tyre" 1 "Enter programming mode" 0 "Normal mode / default" ;
 VAL_ 537 TPMS_MALFUNCTION 7 "Signal Invalid" 6 "TPMS sensor fault & ID not lea" 5 "TPMS sensor fault & Rx fault" 4 "TPMS sensor fault" 3 "TPMS ID not learned & Rx fault" 2 "TPMS ID not learned" 1 "TPMS Rx fault" 0 "Normal / default" ;
-VAL_ 537 TPMS_LEAKAGE_ALERT 0 "Default value" ;
-VAL_ 537 TPMS_ID_NOT_LEARNT 31 "All tyre ssor nt learn" 30 "(FR+RR+RL+spare) tyre ssor nt le" 29 "(FL+RR+RL+spare) tyre ssor nt le" 28 "(RR+RL+spare) tyre ssor nt learn" 27 "(FL+FR+RL+spare) tyre ssor nt le" 26 "(FR+RL+spare) tyre ssor nt learn" 25 "(FL+RL+spare) tyre ssor nt learn" 24 "(RL+spare) tyre sensor not learn" 23 "(FL+FR+RR+Spare) tyre ssor nt le" 22 "(FR+RR+Spare) tyre sensor not le" 21 "(FL+RR+Spare) tyre snsor not lea" 20 "(RR+Spare) tyre sensor not lea" 19 "(FL+FR+Spare) tyre snsor not lea" 18 "(FR+Spare) tyre sensor not learn" 17 "(FL+Spare) tyre sensor not learn" 16 "Spare tyre sensor not learned" 15 "(FL+FR+RR +RL)tyre snsor not lea" 14 "(FR+RR +RL)tyre sensor not lea" 13 "(FL+RR +RL)tyre sensor not lea" 12 "(RR +RL)tyre sensor not learned" 11 "(FL+FR +RL)tyre sensor not lea" 10 "(FR +RL)tyre sensor not learned" 9 "(FL +RL)tyre sensor not learned" 8 "RL tyre sensor not learned" 7 "(FL+FR +RR)tyre sensor not le" 6 "(FR +RR)tyre sensor not learned" 5 "(FL +RR)tyre sensor not learned" 4 "RR tyre sensor not learned" 3 "(FL +FR)tyre sensor not learned" 2 "FR tyre sensor not learned" 1 "FL tyre sensor not learned" 0 "All sensor learned / Default" ;
-VAL_ 537 STS_TPMS_LED 7 "Reserved" 6 "Reserved" 5 "Reserved" 4 "Reserved" 3 "Continously ON" 2 "Blinking pattern 2" 1 "Blinking pattern 1" 0 "OFF / Default value" ;
-VAL_ 537 SPARE_TYRE_SWAP 7 "Signal Invalid" 4 "RL tyre swapped" 3 "RR tyre swapped" 2 "FR tyre swapped" 1 "FL tyre swapped" 0 "No spare tyre swap / default " ;
+VAL_ 537 TPMS_LEAKAGE_ALERT_TPMS 0 "Default value" ;
+VAL_ 537 TPMS_ID_NOT_LEARNT_TPMS 31 "All tyre ssor nt learn" 30 "(FR+RR+RL+spare) tyre ssor nt le" 29 "(FL+RR+RL+spare) tyre ssor nt le" 28 "(RR+RL+spare) tyre ssor nt learn" 27 "(FL+FR+RL+spare) tyre ssor nt le" 26 "(FR+RL+spare) tyre ssor nt learn" 25 "(FL+RL+spare) tyre ssor nt learn" 24 "(RL+spare) tyre sensor not learn" 23 "(FL+FR+RR+Spare) tyre ssor nt le" 22 "(FR+RR+Spare) tyre sensor not le" 21 "(FL+RR+Spare) tyre snsor not lea" 20 "(RR+Spare) tyre sensor not lea" 19 "(FL+FR+Spare) tyre snsor not lea" 18 "(FR+Spare) tyre sensor not learn" 17 "(FL+Spare) tyre sensor not learn" 16 "Spare tyre sensor not learned" 15 "(FL+FR+RR +RL)tyre snsor not lea" 14 "(FR+RR +RL)tyre sensor not lea" 13 "(FL+RR +RL)tyre sensor not lea" 12 "(RR +RL)tyre sensor not learned" 11 "(FL+FR +RL)tyre sensor not lea" 10 "(FR +RL)tyre sensor not learned" 9 "(FL +RL)tyre sensor not learned" 8 "RL tyre sensor not learned" 7 "(FL+FR +RR)tyre sensor not le" 6 "(FR +RR)tyre sensor not learned" 5 "(FL +RR)tyre sensor not learned" 4 "RR tyre sensor not learned" 3 "(FL +FR)tyre sensor not learned" 2 "FR tyre sensor not learned" 1 "FL tyre sensor not learned" 0 "All sensor learned / Default" ;
+VAL_ 537 STS_TPMS_LED_TPMS 7 "Reserved" 6 "Reserved" 5 "Reserved" 4 "Reserved" 3 "Continously ON" 2 "Blinking pattern 2" 1 "Blinking pattern 1" 0 "OFF / Default value" ;
+VAL_ 537 SPARE_TYRE_SWAP_TPMS 7 "Signal Invalid" 4 "RL tyre swapped" 3 "RR tyre swapped" 2 "FR tyre swapped" 1 "FL tyre swapped" 0 "No spare tyre swap / default " ;
 VAL_ 537 REQ_TFA_PATTERN 5 "Pattern 5" 4 "Pattern 4" 3 "Pattern 3" 2 "Pattern 2" 1 "Pattern 1" 0 "Default" ;
-VAL_ 537 REQ_TFA_DISPLAY 1 "TFA display request" 0 "No Request / Default" ;
-VAL_ 537 LOW_TYRE_PRESSURE 31 "All tyre low pressure" 30 "(FR+RR+RL+spare) tyre low press" 29 "(FL+RR+RL+spare) tyre low press" 28 "(RR+RL+spare) tyre low pressure" 27 "(FL+FR+RL+spare) tyre low press" 26 "(FR+RL+spare) tyre low pressure" 25 "(FL+RL+spare) tyre low pressure" 24 "(RL+spare) tyre low pressure" 23 "(FL+FR+RR+Spare) tyre low press" 22 "(FR+RR+Spare) tyre low press" 21 "(FL+RR+Spare) tyre low pressure" 20 "(RR+Spare) tyre low pressure" 19 "(FL+FR+Spare) tyre low pressure" 18 "(FR+Spare) tyre low pressure" 17 "(FL+Spare) tyre low pressure" 16 "Spare tyre low pressure" 15 "(FL+FR+RR +RL)tyre low pressure" 14 "(FR+RR +RL)tyre low pressure" 13 "(FL+RR +RL)tyre low pressure" 12 "(RR +RL)tyre low pressure" 11 "(FL+FR +RL)tyre low pressure" 10 "(FR +RL)tyre low pressure" 9 "(FL +RL)tyre low pressure" 8 "RL tyre low pressure" 7 "(FL+FR +RR)tyre low pressure" 6 "(FR +RR)tyre low pressure" 5 "(FL +RR)tyre low pressure" 4 "RR tyre low pressure" 3 "(FL +FR)tyre low pressure" 2 "FR tyre low pressure" 1 "FL tyre low pressure" 0 "All tyre normal / Default value" ;
-VAL_ 537 HIGH_TYRE_TEMPERATURE 31 "All tyre high  temp" 30 "(FR+RR+RL+spare) tyre high  temp" 29 "(FL+RR+RL+spare) tyre high  temp" 28 "(RR+RL+spare) tyre high  temp" 27 "(FL+FR+RL+spare) tyre high  temp" 26 "(FR+RL+spare) tyre high  temp" 25 "(FL+RL+spare) tyre high  temp" 24 "(RL+spare) tyre high  temp" 23 "(FL+FR+RR+Spare) tyre high  temp" 22 "(FR+RR+Spare) tyre high  temp" 21 "(FL+RR+Spare) tyre high  temp" 20 "(RR+Spare) tyre high  temp" 19 "(FL+FR+Spare) tyre high  temp" 18 "(FR+Spare) tyre high  temp" 17 "(FL+Spare) tyre high  temp" 16 "Spare tyre high  temp" 15 "(FL+FR+RR +RL)tyre high  temp" 14 "(FR+RR +RL)tyre high  temp" 13 "(FL+RR +RL)tyre high  temp" 12 "(RR +RL)tyre high  temp" 11 "(FL+FR +RL)tyre high  temp" 10 "(FR +RL)tyre high  temp" 9 "(FL +RL)tyre high  temp" 8 "RL tyre high  temp" 7 "(FL+FR +RR)tyre high  temp" 6 "(FR +RR)tyre high  temp" 5 "(FL +RR)tyre high  temp" 4 "RR tyre high  temp" 3 "(FL +FR)tyre high  temp" 2 "FR tyre high temp" 1 "FL tyre high temp" 0 "All tyre normal / Default value" ;
-VAL_ 537 HIGH_TYRE_PRESSURE 31 "All tyre high pressure" 30 "(FR+RR+RL+spare) tyre high press" 29 "(FL+RR+RL+spare) tyre high press" 28 "(RR+RL+spare) tyre high pressure" 27 "(FL+FR+RL+spare) tyre high press" 26 "(FR+RL+spare) tyre high pressure" 25 "(FL+RL+spare) tyre high pressure" 24 "(RL+spare) tyre high pressure" 23 "(FL+FR+RR+Spare) tyre high press" 22 "(FR+RR+Spare) tyre high press" 21 "(FL+RR+Spare) tyre high pressure" 20 "(RR+Spare) tyre high pressure" 19 "(FL+FR+Spare) tyre high pressure" 18 "(FR+Spare) tyre high pressure" 17 "(FL+Spare) tyre high pressure" 16 "Spare tyre high pressure" 15 "(FL+FR+RR +RL)tyre high pressure" 14 "(FR+RR +RL)tyre high pressure" 13 "(FL+RR +RL)tyre high pressure" 12 "(RR +RL)tyre high pressure" 11 "(FL+FR +RL)tyre high pressure" 10 "(FR +RL)tyre high pressure" 9 "(FL +RL)tyre high pressure" 8 "RL tyre high pressure" 7 "(FL+FR +RR)tyre high pressure" 6 "(FR +RR)tyre high pressure" 5 "(FL +RR)tyre high pressure" 4 "RR tyre high pressure" 3 "(FL +FR)tyre high pressure" 2 "FR tyre high pressure" 1 "FL tyre high pressure" 0 "All tyre normal / Default value" ;
+VAL_ 537 REQ_TFA_DISPLAY_TPMS 1 "TFA display request" 0 "No Request / Default" ;
+VAL_ 537 LOW_TYRE_PRESSURE_TPMS 31 "All tyre low pressure" 30 "(FR+RR+RL+spare) tyre low press" 29 "(FL+RR+RL+spare) tyre low press" 28 "(RR+RL+spare) tyre low pressure" 27 "(FL+FR+RL+spare) tyre low press" 26 "(FR+RL+spare) tyre low pressure" 25 "(FL+RL+spare) tyre low pressure" 24 "(RL+spare) tyre low pressure" 23 "(FL+FR+RR+Spare) tyre low press" 22 "(FR+RR+Spare) tyre low press" 21 "(FL+RR+Spare) tyre low pressure" 20 "(RR+Spare) tyre low pressure" 19 "(FL+FR+Spare) tyre low pressure" 18 "(FR+Spare) tyre low pressure" 17 "(FL+Spare) tyre low pressure" 16 "Spare tyre low pressure" 15 "(FL+FR+RR +RL)tyre low pressure" 14 "(FR+RR +RL)tyre low pressure" 13 "(FL+RR +RL)tyre low pressure" 12 "(RR +RL)tyre low pressure" 11 "(FL+FR +RL)tyre low pressure" 10 "(FR +RL)tyre low pressure" 9 "(FL +RL)tyre low pressure" 8 "RL tyre low pressure" 7 "(FL+FR +RR)tyre low pressure" 6 "(FR +RR)tyre low pressure" 5 "(FL +RR)tyre low pressure" 4 "RR tyre low pressure" 3 "(FL +FR)tyre low pressure" 2 "FR tyre low pressure" 1 "FL tyre low pressure" 0 "All tyre normal / Default value" ;
+VAL_ 537 HIGH_TYRE_TEMPERATURE_TPMS 31 "All tyre high  temp" 30 "(FR+RR+RL+spare) tyre high  temp" 29 "(FL+RR+RL+spare) tyre high  temp" 28 "(RR+RL+spare) tyre high  temp" 27 "(FL+FR+RL+spare) tyre high  temp" 26 "(FR+RL+spare) tyre high  temp" 25 "(FL+RL+spare) tyre high  temp" 24 "(RL+spare) tyre high  temp" 23 "(FL+FR+RR+Spare) tyre high  temp" 22 "(FR+RR+Spare) tyre high  temp" 21 "(FL+RR+Spare) tyre high  temp" 20 "(RR+Spare) tyre high  temp" 19 "(FL+FR+Spare) tyre high  temp" 18 "(FR+Spare) tyre high  temp" 17 "(FL+Spare) tyre high  temp" 16 "Spare tyre high  temp" 15 "(FL+FR+RR +RL)tyre high  temp" 14 "(FR+RR +RL)tyre high  temp" 13 "(FL+RR +RL)tyre high  temp" 12 "(RR +RL)tyre high  temp" 11 "(FL+FR +RL)tyre high  temp" 10 "(FR +RL)tyre high  temp" 9 "(FL +RL)tyre high  temp" 8 "RL tyre high  temp" 7 "(FL+FR +RR)tyre high  temp" 6 "(FR +RR)tyre high  temp" 5 "(FL +RR)tyre high  temp" 4 "RR tyre high  temp" 3 "(FL +FR)tyre high  temp" 2 "FR tyre high temp" 1 "FL tyre high temp" 0 "All tyre normal / Default value" ;
+VAL_ 537 HIGH_TYRE_PRESSURE_TPMS 31 "All tyre high pressure" 30 "(FR+RR+RL+spare) tyre high press" 29 "(FL+RR+RL+spare) tyre high press" 28 "(RR+RL+spare) tyre high pressure" 27 "(FL+FR+RL+spare) tyre high press" 26 "(FR+RL+spare) tyre high pressure" 25 "(FL+RL+spare) tyre high pressure" 24 "(RL+spare) tyre high pressure" 23 "(FL+FR+RR+Spare) tyre high press" 22 "(FR+RR+Spare) tyre high press" 21 "(FL+RR+Spare) tyre high pressure" 20 "(RR+Spare) tyre high pressure" 19 "(FL+FR+Spare) tyre high pressure" 18 "(FR+Spare) tyre high pressure" 17 "(FL+Spare) tyre high pressure" 16 "Spare tyre high pressure" 15 "(FL+FR+RR +RL)tyre high pressure" 14 "(FR+RR +RL)tyre high pressure" 13 "(FL+RR +RL)tyre high pressure" 12 "(RR +RL)tyre high pressure" 11 "(FL+FR +RL)tyre high pressure" 10 "(FR +RL)tyre high pressure" 9 "(FL +RL)tyre high pressure" 8 "RL tyre high pressure" 7 "(FL+FR +RR)tyre high pressure" 6 "(FR +RR)tyre high pressure" 5 "(FL +RR)tyre high pressure" 4 "RR tyre high pressure" 3 "(FL +FR)tyre high pressure" 2 "FR tyre high pressure" 1 "FL tyre high pressure" 0 "All tyre normal / Default value" ;
 VAL_ 970 TPMS_PRESSURE_FORMAT_IS 1 "kpa" 0 "Default Value/psi" ;
 VAL_ 970 TEMPERATURE_FORMAT_IS 1 "Deg F" 0 "Deg C/ Default Value" ;
 VAL_ 970 CALENDER_FORMAT_IS 1 "MM/DD/YY" 0 "DD/MM/YY" ;
@@ -6924,8 +6923,8 @@ VAL_ 840 STS_REAR_DEFOG_LOAD 1 "ON" 0 "OFF / Default" ;
 VAL_ 840 STS_LOW_BEAM 0 "Lamp OFF / Default value" 1 "Lamp ON" ;
 VAL_ 840 STS_HIGH_BEAM 1 "Lamp ON" 0 "Lamp OFF / Default value" ;
 VAL_ 840 INDC_TURN_FLSHR 3 "HAZARD" 2 "RIGHT TURN" 1 "LEFT TURN" 0 "Lamp OFF / Default value" ;
-VAL_ 840 STS_SEAT_BLT_PSGR 3 "Reserved" 2 "Buckle Faulty" 1 "Buckled" 0 "Not Buckled / Default value" ;
-VAL_ 840 STS_SEAT_BLT_DRV 3 "Reserved" 2 "Buckle Faulty" 1 "Buckled" 0 "Not Buckled / Default value" ;
+VAL_ 840 STS_SEAT_BLT_PSGR_MBFM 3 "Reserved" 2 "Buckle Faulty" 1 "Buckled" 0 "Not Buckled / Default value" ;
+VAL_ 840 STS_SEAT_BLT_DRV_MBFM 3 "Reserved" 2 "Buckle Faulty" 1 "Buckled" 0 "Not Buckled / Default value" ;
 VAL_ 840 STS_DOOR 63 "All Door Open" 32 "Only RR Door Open" 16 "Only RL Door Open" 8 "Only FR Door Open" 4 "Only FL Door Open" 2 "Only Hood Open" 1 "Only Back Door Open" 0 "All Closed / Default" ;
 VAL_ 840 STS_PARKLAMP 3 "Reserved" 2 "Reserved" 1 "ON" 0 "OFF / Default" ;
 VAL_ 840 INDC_FRNT_FOG 1 "ON" 0 "OFF/DV" ;
@@ -6956,7 +6955,7 @@ VAL_ 778 ALERT_MSGS 45 "RESERVED" 44 "Coolant low temperature" 43 "Stop & leave 
 VAL_ 778 PRESS_BRAKE 0 "NOT READY/DEFAULT/NO TT" 1 "READY/DISPLAY TT" ;
 VAL_ 778 EV_READY_TT 3 "RESERVED" 2 "BLINKING" 1 "ON" 0 "OFF/DEFAULT" ;
 VAL_ 778 DRIVE_EFFICIENCY 255 "Signal Invalid" 100 "Default value" ;
-VAL_ 778 TIME_TO_CHARGE 255 "signal invalid" 0 "default" ;
+VAL_ 778 TIME_TO_CHARGE_VCU 255 "signal invalid" 0 "default" ;
 VAL_ 778 STATE_OF_CHARGE 255 "Signal Invalid" 0 "Default Value" ;
 VAL_ 778 INDC_DRIVE_ENABLE 3 "Signal Invalid" 2 "Reserved" 1 "Drive enabled/Activate Vehicle" 0 "Default/Vehicle not enabled" ;
 VAL_ 778 AEE_RESET_REQ_FB 1 "Reset success" 0 "Default value/Request failed" ;

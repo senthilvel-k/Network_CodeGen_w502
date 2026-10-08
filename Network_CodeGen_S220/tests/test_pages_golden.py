@@ -8,11 +8,6 @@ from support import (EXPECTED, PAGE_FILES, ROOT, _fail_with_diff, assert_same_fi
 
 # Pages archived in each saved .cfg were produced by the legacy tool in that session.
 MSG_SIG_PAGES = [f for f in PAGE_FILES if not f.startswith("CanFilter")]
-# The 40024 signal pages list signal names; 47 of them were renamed in the "_Edited" DBC that
-# the legacy run used and that is not in the repo (see tools/build_fixtures.py).
-NOT_COMPARABLE = {(fx, page) for fx in ("s2xx_40024", "s2xx_40024_a")
-                  for page in ("CanDbcSigConfiguration.html", "CanDbcSigConfiguration.js")}
-
 
 def _archived(name, fname):
     meta = json.loads((load_fixture(name).dir / "fixture.json").read_text(encoding="utf-8"))
@@ -24,8 +19,6 @@ def _archived(name, fname):
 @pytest.mark.parametrize("fname", MSG_SIG_PAGES)
 @pytest.mark.parametrize("name", fixture_names())
 def test_page_output_matches_archived_legacy_page(generated, name, fname):
-    if (name, fname) in NOT_COMPARABLE:
-        pytest.skip("INCOMPLETE: legacy run used an _Edited DBC that is not in the repo")
     actual = (generated(name, "pages") / fname).read_bytes()
     expected = _archived(name, fname)
     if actual != expected:

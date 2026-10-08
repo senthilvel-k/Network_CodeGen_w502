@@ -2,76 +2,23 @@
 
 Flow per the index page: Load DBC -> TX/RX message page -> Save -> signal page -> Save ->
 code gen -> 11 files in CODE_GEN. Runs from a copy of the app in a folder whose path has spaces."""
-import importlib
 import json
-import os
-import shutil
 import sys
 
 import pytest
 
-from support import CODE_FILES, LEGACY_REFS, ROOT, load_fixture, normalize_header
+from gui_support import js, navigate, start_app_copy, wait_alert, wait_ready
+from support import CODE_FILES, LEGACY_REFS, normalize_header
 
 pytestmark = pytest.mark.gui
-APP_ITEMS = ["CoGeNT.pyw", "back_end.py", "Dbc_Parser.py", "Can_dbc_gen.py", "Can_filter_python_gen.py",
-             "can_rx_filt_gen.py", "msg.py", "il_par_h_generation.py", "il_par_c_generation.py",
-             "vnim_app_signals_par.py", "cogent_io.py", "py2compat.py", "batman.ico", "cogent_gui",
-             "html", "js", "style"]
 FIXTURE = "s237_36144_2"
 
 
 @pytest.fixture(scope="module")
 def app_copy(tmp_path_factory):
-    home = tmp_path_factory.mktemp("gui") / "CoGeNT app copy & spaces"
-    home.mkdir()
-    for item in APP_ITEMS:
-        src = ROOT / item
-        (shutil.copytree if src.is_dir() else shutil.copyfile)(src, home / item)
-    fx = load_fixture(FIXTURE)
-    shutil.copytree(fx.data_dir, home / "data")
-    dbc_dir = home / "input DBC files"
-    dbc_dir.mkdir()
-    shutil.copyfile(fx.dbc, dbc_dir / fx.dbc.name)
-    old_cwd, old_path = os.getcwd(), list(sys.path)
-    os.chdir(home)
-    sys.path.insert(0, str(home))
-    for mod in ("back_end", "Dbc_Parser", "py2compat", "cogent_io", "Can_dbc_gen", "Can_filter_python_gen",
-                "can_rx_filt_gen", "msg", "il_par_h_generation", "il_par_c_generation", "vnim_app_signals_par"):
-        sys.modules.pop(mod, None)
-    back_end = importlib.import_module("back_end")
-    back_end.app.alert_handler = lambda msg: None
-    yield back_end, home, fx, dbc_dir / fx.dbc.name
-    back_end.app.window.close()  # window lives for the whole module, not one test
-    os.chdir(old_cwd)
-    sys.path[:] = old_path
-
-
-def js(qtbot, gui, expr):
-    box = []
-    gui.page.runJavaScript(expr, 0, box.append)
-    qtbot.waitUntil(lambda: bool(box), timeout=10000)
-    return box[0]
-
-
-def wait_ready(qtbot, gui, timeout=20000):
-    state = {"ok": False}
-
-    def poll():
-        gui.page.runJavaScript("window.__cogentReady === true", 0,
-                               lambda r: state.__setitem__("ok", r is True))
-        return state["ok"]
-
-    qtbot.waitUntil(poll, timeout=timeout)
-
-
-def navigate(qtbot, gui, click_expr, timeout=180000):
-    with qtbot.waitSignal(gui.page.loadFinished, timeout=timeout):
-        js(qtbot, gui, click_expr + "; 1")
-    wait_ready(qtbot, gui)
-
-
-def wait_alert(qtbot, gui, text, timeout=180000):
-    qtbot.waitUntil(lambda: text in gui.alerts, timeout=timeout)
+    back_end, home, fx, dbc, restore = start_app_copy(tmp_path_factory, FIXTURE)
+    yield back_end, home, fx, dbc
+    restore()  # window lives for the whole module, not one test
 
 
 def test_full_generate_flow_matches_legacy_run(qtbot, app_copy):
@@ -182,10 +129,11 @@ def test_generation_error_then_message_page_still_opens(qtbot, app_copy):
     gui.alerts.clear()
     navigate(qtbot, gui, "BackEnd.default_page()")
     navigate(qtbot, gui, "document.querySelector('input[name=code_generate]').click()")
-    wait_alert(qtbot, gui, "ERROR! Please check the database file")
+    text = wait_alert(qtbot, gui, "Code generation failed")
+    assert "CanDbcMsgConfiguration.data" in text and "Traceback" not in text
     assert (home / "CODE_GEN" / "errorlog.txt").exists()
     assert not getattr(sys.stdout, "closed", False)  # stdout not left on a generator file
     gui.alerts.clear()
     navigate(qtbot, gui, "document.querySelector('a[href=\"BackEnd.Can_dbc0_msg\"]').click()")
-    assert not any("@1" in a for a in gui.alerts)
+    assert gui.alerts == []
     assert gui.template[0] == "CAN_DBC_msg.html"

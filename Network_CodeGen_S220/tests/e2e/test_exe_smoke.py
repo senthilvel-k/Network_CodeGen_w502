@@ -25,7 +25,8 @@ from pywinauto import Application  # noqa: E402
 
 pytestmark = pytest.mark.e2e
 EXE_DIR = ROOT / "dist_py3" / "CoGeNT"
-FIXTURE = "s237_36144_2"
+# s2xx_40024: the real "_Edited" 40024 DBC with the configuration saved in CODE_GEN/DBC_40024_2
+FIXTURES = ["s237_36144_2", "s2xx_40024"]
 
 
 def _free_port():
@@ -97,12 +98,13 @@ def _on_page(cdp, page_name):
     cdp.wait(f"location.href.endsWith('/{page_name}') && window.__cogentReady === true")
 
 
-def test_exe_generates_code_like_legacy(tmp_path):
+@pytest.mark.parametrize("fixture_name", FIXTURES)
+def test_exe_generates_code_like_legacy(tmp_path, fixture_name):
     if not (EXE_DIR / "CoGeNT.exe").exists():
         pytest.skip("build first: pyinstaller CoGeNT.spec --distpath dist_py3 --workpath build_py3")
     home = tmp_path / "CoGeNT exe copy"
     shutil.copytree(EXE_DIR, home)
-    fx = load_fixture(FIXTURE)
+    fx = load_fixture(fixture_name)
     shutil.copytree(fx.data_dir, home / "data", dirs_exist_ok=True)
     dbc = tmp_path / "input DBC" / fx.dbc.name
     dbc.parent.mkdir()
@@ -133,7 +135,7 @@ def test_exe_generates_code_like_legacy(tmp_path):
         cdp.eval("document.querySelector('input[name=code_generate]').click(); true")
         _dismiss_alert(win, "Code Generated in CODE_GEN folder")
         assert not (home / "CODE_GEN" / "errorlog.txt").exists()
-        legacy_dir = LEGACY_REFS[FIXTURE][0]
+        legacy_dir = LEGACY_REFS[fixture_name][0]
         for name in CODE_FILES:
             assert (home / "CODE_GEN" / name).stat().st_size > 0, name
             assert normalize_header((home / "CODE_GEN" / name).read_bytes()) == \
