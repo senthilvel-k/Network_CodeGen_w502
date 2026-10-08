@@ -1,0 +1,36 @@
+{
+ "dbc": "S2XX_SMART_CORE_SVNID_40024_25_02_2026_Edited_reconstructed.dbc",
+ "node": "SMART_CORE",
+ "source_cfg": "CODE_GEN/DBC_40024_2/26-02-2026_17-37-49.cfg",
+ "source_dbc": "CODE_GEN/DBC_40024_2/S2XX_SMART_CORE_SVNID_40024_25_02_2026.dbc",
+ "dbc_patches": [
+  [
+   "BO_ 2015 GLOBAL_DIAG_REQ: 8 SMART_CORE",
+   "BO_ 2015 GLOBAL_DIAG_REQ: 8 Vector__XXX"
+  ],
+  [
+   "BO_ 1919 MGM_DIAG_RES: 8 SMART_CORE",
+   "BO_ 1919 MGM_DIAG_RES: 8 Vector__XXX"
+  ],
+  [
+   "BO_ 344 BMS_IVT_Msg_Result_U1:",
+   "BO_ 344 BMS_IVT_MSG_RESULT_U1:"
+  ],
+  [
+   "BO_ 345 BMS_IVT_Msg_Result_U2:",
+   "BO_ 345 BMS_IVT_MSG_RESULT_U2:"
+  ],
+  [
+   "BO_ 352 BMS_IVT_Msg_Result_U3:",
+   "BO_ 352 BMS_IVT_MSG_RESULT_U3:"
+  ],
+  [
+   " SG_ SBW1_CRC_ :",
+   " SG_ SBW1_CRC :"
+  ],
+  [
+   " SG_ TCU6_CRC_ :",
+   " SG_ TCU6_CRC :"
+  ]
+ ]
+}

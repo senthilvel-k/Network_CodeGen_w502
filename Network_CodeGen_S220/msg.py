@@ -1,5 +1,7 @@
 import sys,json
 import os
+from cogent_io import open_output, close_output
+from py2compat import py2_print as print, Py2Dict  # Python 2 print/dict-order semantics
 dbc=None
 
 msg_code_gen_dir = './CODE_GEN'
@@ -56,7 +58,7 @@ def message_structure_generation(Dbc_Msg):
   message_list=[]
   message_enable_dictionary = {}
   vnim_msg_cfg_data={}
-  vnim_cfg_file = open(msg_data_dir+"CanDbcMsgConfiguration.data",'r')
+  vnim_cfg_file = open(msg_data_dir+"CanDbcMsgConfiguration.data",'r',encoding='utf-8')
   vnim_msg_cfg_data = json.loads(vnim_cfg_file.read())
   vnim_cfg_file.close()
   
@@ -93,7 +95,7 @@ def message_structure_generation(Dbc_Msg):
           for signals in sorted_bit:
             
             signal_occur=0
-            layout_row=int(signals['Endbit'])/8
+            layout_row=int(signals['Endbit'])//8
             layout_col=int(signals['Endbit'])%8
             signal_length=int(signals['Len'])
             endbit=int(signals['Endbit'])
@@ -101,9 +103,9 @@ def message_structure_generation(Dbc_Msg):
             byte_no=0
             
             if signal_length%8 == 0:
-              byte_no_1=(signal_length/8)-1
+              byte_no_1=(signal_length//8)-1
             else:
-              byte_no_1=signal_length/8
+              byte_no_1=signal_length//8
             #print signals['Order']
             if signals['Order'] == 'Intel':
               for sig_len in range(int(signals['Len'])):
@@ -129,9 +131,9 @@ def message_structure_generation(Dbc_Msg):
                       layout_row=layout_row+1
               signal_occur+=endbit+signal_length
               if signal_occur%8 !=0:
-                signal_occur=(signal_occur/8)
+                signal_occur=(signal_occur//8)
               else:
-                signal_occur=(signal_occur/8)-1
+                signal_occur=(signal_occur//8)-1
               intel_max.append(signal_occur)
               
             elif signals['Order'] == 'Motorola':
@@ -156,9 +158,9 @@ def message_structure_generation(Dbc_Msg):
                     layout_row=layout_row+1
                     byte_no_1-=1
               if start_bit_1%8 != 0:
-                start_bit_1=(start_bit_1/8)+1
+                start_bit_1=(start_bit_1//8)+1
               else:
-                start_bit_1=start_bit_1/8
+                start_bit_1=start_bit_1//8
               moto_max.append(start_bit_1)
 
                 
@@ -216,13 +218,13 @@ def message_structure_generation(Dbc_Msg):
   #for printing the structure in the file 
   for s in struct_intel:
     cl=cl+1
-    print '\n/* '+message_list[cl]+' */'
-    print 'typedef struct {'
+    print('\n/* '+message_list[cl]+' */')
+    print('typedef struct {')
     for i in s:
       for j in i:
         #pass
-        print '  '+datatype_8+' '+ j +';'
-    print '}'+message_list[cl]+'_msgType;\n'
+        print('  '+datatype_8+' '+ j +';')
+    print('}'+message_list[cl]+'_msgType;\n')
   
   
   
@@ -230,7 +232,7 @@ def message_structure_generation(Dbc_Msg):
 def msg_struct_gen_multiplex(mes):
   global dbc,msg_data_dir,datatype_16,datatype_8,tp_generic_config,nm_generic_config,il_generic_config
   
-  vnim_cfg_file = open(msg_data_dir+"CanDbcMsgConfiguration.data",'r')
+  vnim_cfg_file = open(msg_data_dir+"CanDbcMsgConfiguration.data",'r',encoding='utf-8')
   vnim_msg_cfg_data = json.loads(vnim_cfg_file.read())
   vnim_cfg_file.close()
   #print mes
@@ -278,21 +280,21 @@ def msg_struct_gen_multiplex(mes):
 
         multiplex_sig_lst.append(signals['Sig_name'])
         signal_occur=0
-        layout_row=int(signals['Endbit'])/8
+        layout_row=int(signals['Endbit'])//8
         layout_col=int(signals['Endbit'])%8
         signal_length=int(signals['Len'])
         endbit=int(signals['Endbit'])
         byte_no=0
         
         if signal_length%8 == 0:
-          byte_no_1=(signal_length/8)-1
+          byte_no_1=(signal_length//8)-1
         else:
-          byte_no_1=signal_length/8
+          byte_no_1=signal_length//8
           
         if int(signals['Len'])%8 == 0:
-          temp_len=(int(signals['Len'])/8)
+          temp_len=(int(signals['Len'])//8)
         else:
-          temp_len =(int(signals['Len'])/8)+1
+          temp_len =(int(signals['Len'])//8)+1
         multiplex_max_len.append(temp_len)
         ms=[[0 for i in range(8)] for i in range(temp_len)] # two dimensional list for creating the layout for each signal
         #print signals['Order']
@@ -315,9 +317,9 @@ def msg_struct_gen_multiplex(mes):
                   layout_row=layout_row+1
           signal_occur+=endbit+signal_length
           if signal_occur%8 !=0:
-            signal_occur=(signal_occur/8)
+            signal_occur=(signal_occur//8)
           else:
-            signal_occur=(signal_occur/8)-1
+            signal_occur=(signal_occur//8)-1
           intel_max.append(signal_occur)
           
         elif signals['Order'] == 'Motorola':
@@ -342,9 +344,9 @@ def msg_struct_gen_multiplex(mes):
                 layout_row=layout_row+1
                 byte_no_1-=1
           if start_bit_1%8 != 0:
-            start_bit_1=(start_bit_1/8)+1
+            start_bit_1=(start_bit_1//8)+1
           else:
-            start_bit_1=start_bit_1/8
+            start_bit_1=start_bit_1//8
           moto_max.append(start_bit_1)
         
       merged_list=intel_max+moto_max
@@ -401,19 +403,19 @@ def msg_struct_gen_multiplex(mes):
       #for printing the structure in the file 
       for s in struct_intel:
         cl=cl+1
-        print 'typedef struct {'
+        print('typedef struct {')
         for i in s:
           for j in i:
-            print '  '+datatype_8+' '+ j +';'
-        print '}'+mul_msg['Multiplexor']+'_'+str(multilexor_index)+'_sigType;\n'
+            print('  '+datatype_8+' '+ j +';')
+        print('}'+mul_msg['Multiplexor']+'_'+str(multilexor_index)+'_sigType;\n')
       
-  print 'typedef union '
-  print '{'
-  print '   '+datatype_8+'          sig_buffer['+str(max(multiplex_max_len))+'];'
+  print('typedef union ')
+  print('{')
+  print('   '+datatype_8+'          sig_buffer['+str(max(multiplex_max_len))+'];')
   for multilexor_index in range(mul_msg['Multiplex_maxval']+1):
     #for mx_sig in mul_msg['Multiplex_group']['Group_list']:
-    print '   '+mul_msg['Multiplexor']+'_'+str(multilexor_index)+'_sigType  '+mul_msg['Multiplexor'].lower()+'_'+str(multilexor_index)+';'
-  print '}'+mul_msg['Multiplex_group_Name']+'_Sigbuf;'
+    print('   '+mul_msg['Multiplexor']+'_'+str(multilexor_index)+'_sigType  '+mul_msg['Multiplexor'].lower()+'_'+str(multilexor_index)+';')
+  print('}'+mul_msg['Multiplex_group_Name']+'_Sigbuf;')
   
   #done for single signal EMS5_500
   #{'Sig_name': 'VIN_DATA_1', 'Len': '56','Mul_order': '1', 'Endbit': '0', 'Order': 'Intel'}
@@ -435,21 +437,21 @@ def msg_struct_gen_multiplex(mes):
   ms=[[0 for i in range(8)] for i in range(8)] # two dimensional list for creating the layout for each signal
   for signals in sorted_bit:
       signal_occur=0
-      layout_row=int(signals['Endbit'])/8
+      layout_row=int(signals['Endbit'])//8
       layout_col=int(signals['Endbit'])%8
       signal_length=int(signals['Len'])
       endbit=int(signals['Endbit'])
       byte_no=0
       
       if signal_length%8 == 0:
-        byte_no_1=(signal_length/8)-1
+        byte_no_1=(signal_length//8)-1
       else:
-        byte_no_1=signal_length/8
+        byte_no_1=signal_length//8
         
       if int(signals['Len'])%8 == 0:
-        temp_len=(int(signals['Len'])/8)
+        temp_len=(int(signals['Len'])//8)
       else:
-        temp_len =(int(signals['Len'])/8)+1
+        temp_len =(int(signals['Len'])//8)+1
       multiplex_max_len.append(temp_len)
       #ms=[[0 for i in range(8)] for i in range(temp_len)] # two dimensional list for creating the layout for each signal
       #print signals['Order']
@@ -472,9 +474,9 @@ def msg_struct_gen_multiplex(mes):
                 layout_row=layout_row+1
         signal_occur+=endbit+signal_length
         if signal_occur%8 !=0:
-          signal_occur=(signal_occur/8)
+          signal_occur=(signal_occur//8)
         else:
-          signal_occur=(signal_occur/8)-1
+          signal_occur=(signal_occur//8)-1
         intel_max.append(signal_occur)
         
       elif signals['Order'] == 'Motorola':
@@ -499,9 +501,9 @@ def msg_struct_gen_multiplex(mes):
               layout_row=layout_row+1
               byte_no_1-=1
         if start_bit_1%8 != 0:
-          start_bit_1=(start_bit_1/8)+1
+          start_bit_1=(start_bit_1//8)+1
         else:
-          start_bit_1=start_bit_1/8
+          start_bit_1=start_bit_1//8
         moto_max.append(start_bit_1)
       
       merged_list=intel_max+moto_max
@@ -559,16 +561,16 @@ def msg_struct_gen_multiplex(mes):
       #index_start =
       #index_stop =
       mul_sig_index = 6
-      print '\n/* '+mes['Msg_name']+' */'
-      print 'typedef struct {'
-      print '  '+mul_msg['Multiplex_group_Name']+'_Sigbuf  '+mul_msg['Multiplex_group_Name'].lower()+';'
+      print('\n/* '+mes['Msg_name']+' */')
+      print('typedef struct {')
+      print('  '+mul_msg['Multiplex_group_Name']+'_Sigbuf  '+mul_msg['Multiplex_group_Name'].lower()+';')
       for s in struct_intel:
         cl=cl+1
         for i in s:
           if s.index(i) > mul_sig_index:
             for j in i:
-              print '  '+datatype_8+' '+ j +';'
-        print '}'+mes['Msg_name']+'_msgType;\n'
+              print('  '+datatype_8+' '+ j +';')
+        print('}'+mes['Msg_name']+'_msgType;\n')
   
   
 def msg_struct_generation(): 
@@ -576,10 +578,9 @@ def msg_struct_generation():
   #dir = './CODE_GEN'
   if not os.path.exists(msg_code_gen_dir):
       os.mkdir(msg_code_gen_dir)
-  f=open('./CODE_GEN/nw_il_msg.h','w')
+  f=open_output("nw_il_msg.h")
 
   
-  sys.stdout = f
   
   header = '''#if !defined(NW_IL_MSG_H)
 #define NW_IL_MSG_H
@@ -614,29 +615,29 @@ def msg_struct_generation():
 //  P U B L I C   T Y P E   D E F I N I T I O N S
 // =========================================================================*/
 '''
-  print header,'\n'
+  print(header,'\n')
 
-  print '''/*===========================================================================
+  print('''/*===========================================================================
     Interaction Layer Transmit Message Structure
-   =========================================================================*/\n\n'''
+   =========================================================================*/\n\n''')
   il_msg_tx=dbc.get_msg_type(all_parser,'tx')
   il_sorted_mes_tx = sorted(il_msg_tx,key = lambda x: x['Msg_name'])
   message_structure_generation(il_sorted_mes_tx)
-  print '''\n\n/*===========================================================================
+  print('''\n\n/*===========================================================================
     Interaction Layer Receive Message structure
-   =========================================================================*/\n'''
+   =========================================================================*/\n''')
 
   il_msg_rx=dbc.get_msg_type(all_parser,'rx')
   #print il_msg_rx
   il_sorted_mes_rx = sorted(il_msg_rx,key = lambda x: x['Msg_name'])
   message_structure_generation(il_sorted_mes_rx)
 
-  print'''#endif'''
-  print footer
+  print('''#endif''')
+  print(footer)
 
-  print '''/* End of file ============================================================ */'''
+  print('''/* End of file ============================================================ */''')
 
-  f.close()
+  close_output(f)
 
 if __name__ == '__main__':
     pass

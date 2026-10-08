@@ -1,0 +1,5 @@
+# CoGeNT-specific (repo-root .gitignore already covers venv/, .venv/, build/, dist/, *.pyc, __pycache__/)
+CODE_GEN/errorlog.txt
+.pytest_cache/
+dist_py3/
+build_py3/

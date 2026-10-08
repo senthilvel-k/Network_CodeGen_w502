@@ -1,8 +1,8 @@
                    
-import htmlPy
+from cogent_gui import webgui as htmlPy
 import json
 import os
-from PySide import QtGui
+from PySide6 import QtGui, QtWidgets
 
 ''' This the Backend HTML application controlling the GUI portion '''
 
@@ -47,11 +47,11 @@ class BackEnd(htmlPy.Object):
         cfg_name=dir+cfg_name
         zip1=zipfile.ZipFile(cfg_name,'w',compression=zipfile.ZIP_DEFLATED)
         
-        for files in glob.glob('.\html\*.html'):
+        for files in glob.glob(r'.\html\*.html'):
             zip1.write(files)
-        for files in glob.glob('.\data\*.data'):
+        for files in glob.glob(r'.\data\*.data'):
             zip1.write(files)
-        for files in glob.glob('.\js\*.js'):
+        for files in glob.glob(r'.\js\*.js'):
             zip1.write(files)
         self.default_page()
         zip1.close()
@@ -60,15 +60,14 @@ class BackEnd(htmlPy.Object):
     @htmlPy.Slot()
     def load_cfg(self):
         import zipfile
-        from PySide import QtGui
-        window = QtGui.QMainWindow()
-        file_val = QtGui.QFileDialog.getOpenFileName(window, "Select file", ".",selectedFilter='*.cfg')[0]
+        window = QtWidgets.QMainWindow()
+        file_val = QtWidgets.QFileDialog.getOpenFileName(window, "Select file", ".", "Config files (*.cfg);;All files (*.*)")[0]
         try:
             zip1 = zipfile.ZipFile(file_val)
             zip1.extractall()
             zip1.close()
             
-            with open(self.__data_dir+"dbc_details.data",'r') as data_file:
+            with open(self.__data_dir+"dbc_details.data",'r',encoding='utf-8') as data_file:
                 dbc_details = json.loads(data_file.read())
             if dbc_details["ch0_file"] !='':
                 self.__dbc=dbc_details["ch0_file"]
@@ -85,8 +84,7 @@ class BackEnd(htmlPy.Object):
     @htmlPy.Slot()
     def unlock(self):
         if self.__unlock != 1:
-            app.evaluate_javascript("var pass=prompt('Enter the password to unlock');")
-            self.__password=app.evaluate_javascript("pass")
+            self.__password, _ok = QtWidgets.QInputDialog.getText(app.window, "Unlock", "Enter the password to unlock", QtWidgets.QLineEdit.EchoMode.Password)
             if self.__password == "canstack":
                 self.__unlock = 1
                 app.evaluate_javascript("alert('Generic configuration unlocked.')")
@@ -101,9 +99,8 @@ class BackEnd(htmlPy.Object):
     @htmlPy.Slot()
     def file_browse(self):
         #print "button"
-        from PySide import QtGui
-        window = QtGui.QMainWindow()
-        file_val = QtGui.QFileDialog.getOpenFileName(window, "Select file", ".",selectedFilter='*.dbc')[0]
+        window = QtWidgets.QMainWindow()
+        file_val = QtWidgets.QFileDialog.getOpenFileName(window, "Select file", ".", "DBC files (*.dbc);;All files (*.*)")[0]
         #print file_val
         
         temp_str = "var s=function(){document.getElementById('file_path').value='"+file_val+"';return false;};s();"
@@ -128,10 +125,10 @@ class BackEnd(htmlPy.Object):
     def upload_dbc(self,json_data):
         
         #print json
-        data_file =open(self.__data_dir+'dbc_details.data','w')
+        data_file =open(self.__data_dir+'dbc_details.data','w',encoding='utf-8')
         data_file.write(json_data)
         data_file.close()
-        data_file=open(self.__data_dir+"dbc_details.data",'r')
+        data_file=open(self.__data_dir+"dbc_details.data",'r',encoding='utf-8')
         dbc_details = json.loads(data_file.read())
         #print dbc_details
         data_file.close()
@@ -230,7 +227,11 @@ class BackEnd(htmlPy.Object):
                     app.evaluate_javascript("alert('Code Generated in CODE_GEN folder')")
                     
                 except Exception as e:
-                    f = open('./CODE_GEN/errorlog.txt', 'w')
+                    import sys
+                    sys.stdout = sys.__stdout__
+                    if not os.path.exists('./CODE_GEN'):
+                        os.mkdir('./CODE_GEN')
+                    f = open('./CODE_GEN/errorlog.txt', 'w', encoding='utf-8')
                     f.write(str(e))
                     f.close()
                     app.evaluate_javascript("alert('ERROR! Please check the database file')")
@@ -255,10 +256,10 @@ class BackEnd(htmlPy.Object):
                 import Can_dbc_gen as dbc_gen
                 dbc_gen.html_mes(self.__dbc,self.__node)
                 self.__msg_saved=1
-                html_file=open(self.__html_dir+'CanDbcMsgConfiguration.html')
-                jscript_file=open(self.__java_dir+'CanDbcMsgConfiguration.js')
+                html_file=open(self.__html_dir+'CanDbcMsgConfiguration.html',encoding='latin-1')
+                jscript_file=open(self.__java_dir+'CanDbcMsgConfiguration.js',encoding='latin-1')
                 try: 
-                    data_file =open(self.__data_dir+'CanDbcMsgConfiguration.data')
+                    data_file =open(self.__data_dir+'CanDbcMsgConfiguration.data',encoding='latin-1')
                     #print "adfsfasfasfasdfasdfasdf"
                 except:
                     data_file=None
@@ -268,7 +269,6 @@ class BackEnd(htmlPy.Object):
         data=""" 
                 
                 if data_file !=None:
-                    print final_data
                     final_data=final_data+(''.join( data_file.readlines() ))+ """;"""+(''.join( jscript_file.readlines() ))+"""\nString.prototype.endsWith = function(suffix) {
             return this.indexOf(suffix, this.length - suffix.length) !== -1;
         };
@@ -451,7 +451,7 @@ class BackEnd(htmlPy.Object):
          }
          
 };</script>"""
-                new_file= open(self.__html_dir+'CAN_DBC_msg.html','w')
+                new_file= open(self.__html_dir+'CAN_DBC_msg.html','w',encoding='latin-1')
                 new_file.write(final_data)
                 new_file.close()
                 html_file.close()
@@ -471,7 +471,7 @@ class BackEnd(htmlPy.Object):
     @htmlPy.Slot(str, result=str)        
     def Can_dbc_msg_SaveButton(self,json_data):
         self.__msg_saved=0
-        data_file =open(self.__data_dir+'CanDbcMsgConfiguration.data','w')
+        data_file =open(self.__data_dir+'CanDbcMsgConfiguration.data','w',encoding='utf-8')
         data_file.write(json_data)
         data_file.close()
         self.default_page()
@@ -487,10 +487,10 @@ class BackEnd(htmlPy.Object):
                 
                 import Can_dbc_gen as dbc_gen
                 dbc_gen.html_sig(self.__dbc,self.__node)
-                html_file=open(self.__html_dir+'CanDbcSigConfiguration.html')
-                jscript_file=open(self.__java_dir+'CanDbcSigConfiguration.js')
+                html_file=open(self.__html_dir+'CanDbcSigConfiguration.html',encoding='latin-1')
+                jscript_file=open(self.__java_dir+'CanDbcSigConfiguration.js',encoding='latin-1')
                 try: 
-                    data_file =open(self.__data_dir+'CanDbcSigConfiguration.data')
+                    data_file =open(self.__data_dir+'CanDbcSigConfiguration.data',encoding='latin-1')
                 except:
                     data_file=' '
                 #print  html_file.readlines() 
@@ -592,7 +592,7 @@ class BackEnd(htmlPy.Object):
                     final_data=final_data+(''.join( data_file))+ """];"""
 
                 final_data+='''\n</script>'''
-                new_file= open(self.__html_dir+'CAN_DBC_sig.html','w')
+                new_file= open(self.__html_dir+'CAN_DBC_sig.html','w',encoding='latin-1')
                 new_file.write(final_data)
                 new_file.close()
                 html_file.close()
@@ -615,7 +615,7 @@ class BackEnd(htmlPy.Object):
     def Can_dbc0_sig_SaveButton(self,json_data):
         #print json_data
         self.__sig_saved=0
-        data_file =open(self.__data_dir+'CanDbcSigConfiguration.data','w')
+        data_file =open(self.__data_dir+'CanDbcSigConfiguration.data','w',encoding='utf-8')
         data_file.write(json_data)
         data_file.close()
         self.default_page()
@@ -632,12 +632,12 @@ class BackEnd(htmlPy.Object):
                 #file1=open('FF_Door.dbc','DDP')
 
                 filter.html(self.__dbc,self.__node)
-                html_file=open(self.__html_dir+'CanFilterConfiguration.html')
-                jscript_file=open(self.__java_dir+'CanFilterConfiguration.js')
+                html_file=open(self.__html_dir+'CanFilterConfiguration.html',encoding='latin-1')
+                jscript_file=open(self.__java_dir+'CanFilterConfiguration.js',encoding='latin-1')
                 #data_file =open(self.__data_dir+'CanFilterConfiguration.data')
                 
                 try: 
-                    data_file =open(self.__data_dir+'CanFilterConfiguration.data')
+                    data_file =open(self.__data_dir+'CanFilterConfiguration.data',encoding='latin-1')
                 except:
                     data_file=' '
                 #print  html_file.readlines() 
@@ -688,7 +688,7 @@ class BackEnd(htmlPy.Object):
          }'''
                 final_data+='''};\n</script>'''
                 
-                new_file= open(self.__html_dir+'Can_filter.html','w')
+                new_file= open(self.__html_dir+'Can_filter.html','w',encoding='latin-1')
                 new_file.write(final_data)
                 new_file.close()
                 html_file.close()
@@ -706,7 +706,7 @@ class BackEnd(htmlPy.Object):
     @htmlPy.Slot(str, result=str)        
     def Filter_SaveButton(self,json_data):
         self.__filter_saved=0
-        data_file =open(self.__data_dir+'CanFilterConfiguration.data','w')
+        data_file =open(self.__data_dir+'CanFilterConfiguration.data','w',encoding='utf-8')
         data_file.write(json_data)
         data_file.close()
         self.default_page()
@@ -724,7 +724,7 @@ class BackEnd(htmlPy.Object):
     @htmlPy.Slot()      
     def onpageload(self):
         #print "asdfads"
-        data_file=open("./data/dbc_details.data",'r')
+        data_file=open("./data/dbc_details.data",'r',encoding='utf-8')
         dbc_details = json.loads(data_file.read())
         #print dbc_details
         data_file.close()
@@ -743,14 +743,14 @@ class BackEnd(htmlPy.Object):
         app.evaluate_javascript(temp_str)
         
 
-app = htmlPy.AppGUI(title=u"CoGeNT")
+app = htmlPy.AppGUI(title="CoGeNT")
 app.maximized = True
 
 base_dir=os.path.abspath(os.path.dirname(__file__))
 
 app.template_path = os.path.join(base_dir, "html/")
 app.static_path = os.path.join(base_dir, "style/")
-app.window.setWindowIcon(QtGui.QIcon("batman.ico"))
+app.window.setWindowIcon(QtGui.QIcon(os.path.join(base_dir, "batman.ico")))
 app.right_click_setting(htmlPy.settings.DISABLE)
 app.bind(BackEnd())
 app.allow_overwrite=True
