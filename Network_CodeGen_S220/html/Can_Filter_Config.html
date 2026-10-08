@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>DRV</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script type="text/javascript" src="data.json"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="{{'styl.css'|staticfile }}">
+<script>
+function accordionfn(id) {
+    var x = document.getElementById(id);
+    if (x.className.indexOf("w3-show") == -1) {
+        x.className += " w3-show";
+    } else { 
+        x.className = x.className.replace(" w3-show", "");
+    }
+}</script>
+</head>
+<body onload="load()" class="w3-container w3-grey"><!--copy_start-->
+<div  class=" w3-black" style ="width:100%;height:100%;overflow:auto">
+
+<div class="w3-sidenav w3-black" style ="width:20%;height:100%;float:left;overflow:auto">
+    
+<div class="w3-card-4 w3-light-grey" style="width:100%;overflow:auto">
+    <header class="w3-container w3-light-green">
+        <h3>CAN MCAL Layer </h3>
+    </header>
+    <Br>
+    <div class="w3-container ">
+        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_DRIVER" id="DRV" data-bind="true">+ CAN MCAL Layer Configurations </a>
+    </div>
+  
+    <div class="w3-container ">
+        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_Filter" id="DRV" data-bind="true">+ CAN Filter Configurations </a>
+    </div>
+    <Br>
+   
+</div>
+
+<div class="w3-card-4 w3-light-grey" style="width:100%">
+    <header class="w3-container w3-light-green">
+        <h3>Can Dispatch Layer</h3>
+    </header>
+    <Br>
+    <div class="w3-container ">
+        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_DISP" id="DISP" data-bind="true">+Can Dispatch Layer Configurations </a>
+    </div>
+    <Br>
+   
+</div>
+
+<div class="w3-card-4 w3-light-grey" style="width:100%">
+    <header class="w3-container w3-light-green">
+        <h3>CAN Interaction Layer</h3>
+    </header>
+    <Br>
+    <div class="w3-container ">
+        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_IL" id="IL" data-bind="true">+CAN Interaction Layer Configurations </a>
+    </div>
+    <Br>
+   
+</div>
+
+<div class="w3-card-4 w3-light-grey" style="width:100%">
+    <header class="w3-container w3-light-green">
+        <h3>CAN Network Management</h3>
+    </header>
+    <Br>
+    <div class="w3-container ">
+        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_NM" id="NM" data-bind="true">+Network Mangement Layer Configurations </a>
+    </div>
+    <Br>
+   
+</div>
+
+<div class="w3-card-4 w3-light-grey" style="width:100%">
+    <header class="w3-container w3-light-green">
+        <h3>Can VNIM Layer</h3>
+    </header>
+    <Br>
+    <div class="w3-container ">
+        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_VNIM" id="VNIM" data-bind="true">+Can VNIM Layer Configurations </a>
+    </div>
+    <Br>
+   
+</div>
+
+<div class="w3-card-4 w3-light-grey" style="width:100%">
+    <header class="w3-container w3-light-green">
+        <h3>Can XCVR Layer </h3>
+    </header>
+    <Br>
+    <div class="w3-container ">
+        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_XCVR" id="XCR" data-bind="true">+Can XCVR Layer  Configurations </a>
+    </div>
+    <Br>
+   
+</div>
+
+<div class="w3-card-4 w3-light-grey" style="width:100%">
+    <header class="w3-container w3-light-green">
+        <h3>CAN Database </h3>
+    </header>
+    <Br>
+    <div class="w3-container ">
+        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_dbc0" id="DBC" data-bind="true">+CAN Database Configurations </a>
+    </div>
+    <Br>
+   
+</div>
+
+</div>
+ 
+ <div class=" w3-grey w3-padding-medium" style ="width:80%;float:right;overflow:auto">
+<form action="BackEnd.FLT_SaveButton" id="form" data-bind="true">
+<table  class ="w3-table w3-bordered  w3-border w3-hoverable">
+<thead>
+<tr>
+<th> Tx Messages </th>
+<th colspan="2">Channel 0</th>
+</tr>
+</thead><tr>
+<td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CAN_CFG_NUMBER_OF_CONTROLLERS_ACC')" ><b>CAN_CFG_NUMBER_OF_CONTROLLERS</b></label><Br>
+  <div id="CAN_CFG_NUMBER_OF_CONTROLLERS_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">  <BR>  <Div>
+<p class="w3-container w3-text-light-grey  w3-border-blue-grey ">NumberofCANChannelstobeusedfortheapplication.</p></div></div></td><td>
+<input class="w3-input w3-validate " onblur=" CAN_CFG_NUMBER_OF_CONTROLLERSvalidate()" style="width:30%" type="number" name="CAN_CFG_NUMBER_OF_CONTROLLERS"  id="CAN_CFG_NUMBER_OF_CONTROLLERS" min=0 max=255><Br>
+<script>
+function CAN_CFG_NUMBER_OF_CONTROLLERSvalidate() {
+var x = document.getElementById("CAN_CFG_NUMBER_OF_CONTROLLERS");
+if( x.value <0  || x.value > 255)
+{ document.getElementById("CAN_CFG_NUMBER_OF_CONTROLLERS").style.background="red";
+}
+else{
+document.getElementById("CAN_CFG_NUMBER_OF_CONTROLLERS").style.background="white";
+}
+}
+</script>
+</td>
+</tr>
+
+ </table>
+ 
+ <br>
+    <br>
+<input type="submit" value="Save and Back" id="form_submit">
+</form>
+</div> 
+</div> 
+</body>
+</html>
+
+
+
+

@@ -1,0 +1,268 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <title>DRV</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="data.json"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{'styl.css'|staticfile }}">
+    <script>
+    function accordionfn(id) {
+        var x = document.getElementById(id);
+        if (x.className.indexOf("w3-show") == -1) {
+            x.className += " w3-show";
+        } else { 
+            x.className = x.className.replace(" w3-show", "");
+        }
+    }</script>
+    </head>
+    <body onload="load()" class="w3-container w3-grey"><!--copy_start-->
+<div  class=" w3-dark-grey" style ="width:100%;height:100%;position:fixed">
+
+<div class="w3-sidenav w3-dark-grey" style ="width:15%;height:100%;float:left;overflow:auto">
+
+<div class="w3-card-4 w3-light-grey" style="width:100%;height:100%">
+    <header class="w3-container w3-light-green">
+        <h3>CAN Database </h3>
+    </header>
+    
+    <Br>
+            
+    <div class="w3-container ">
+        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_dbc0_msg" id="DRV" data-bind="true">+ TX/RX Message Configurations </a>
+    </div>
+  
+    <div class="w3-container ">
+        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_dbc0_sig" id="DRV" data-bind="true">+ TX/Rx signal Configurations </a>
+    </div>
+    <Br>
+   
+</div>
+
+</div>
+ 
+<div class=" w3-dark-grey w3-padding-medium" style ="width:85%;height:100%;float:right;overflow:auto">
+<form action="BackEnd.DRV_SaveButton" id="form" data-bind="true">
+<table  class ="w3-table  w3-bordered  w3-border w3-hoverable">
+    <thead>
+    <tr>
+    <th> Configurable options </th>
+    <th>Channel 0</th>
+    </tr>
+    </thead><tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CAN_CFG_NUMBER_OF_CONTROLLERS_ACC')" ><b>CAN_CFG_NUMBER_OF_CONTROLLERS</b></label><Br>
+      <div id="CAN_CFG_NUMBER_OF_CONTROLLERS_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey ">NumberofCANChannelstobeusedfortheapplication.</p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CAN_CFG_NUMBER_OF_CONTROLLERSvalidate()" style="width:30%" value="1" type="number" name="CAN_CFG_NUMBER_OF_CONTROLLERS"  id="CAN_CFG_NUMBER_OF_CONTROLLERS" min=0 max=255><Br>
+<script>
+    function CAN_CFG_NUMBER_OF_CONTROLLERSvalidate() {
+    var x = document.getElementById("CAN_CFG_NUMBER_OF_CONTROLLERS");
+    if( x.value <0  || x.value > 255)
+    { document.getElementById("CAN_CFG_NUMBER_OF_CONTROLLERS").style.background="red";
+    }
+    else{
+    document.getElementById("CAN_CFG_NUMBER_OF_CONTROLLERS").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CAN_WAKUP_ENABLE_ACC')" ><b>CAN_WAKUP_ENABLE</b></label><Br>
+      <div id="CAN_WAKUP_ENABLE_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey ">CanSleepWakeFeature</p>    </div>    </div>    </td>    <td>
+<select id="CAN_WAKUP_ENABLE" class="w3-select " name="CAN_WAKUP_ENABLE"  id="CAN_WAKUP_ENABLE"style="width:40%"><Br>
+<option value="TRUE">TRUE</option>
+<option value="FALSE">FALSE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CAN0_CONTROLLER_BASE_ADDRESS_ACC')" ><b>CAN0_CONTROLLER_BASE_ADDRESS</b></label><Br>
+      <div id="CAN0_CONTROLLER_BASE_ADDRESS_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey ">BaseaddressoftheCANx_CONTROLLER_BASE_ADDRESS</p>    </div>    </div>    </td>    <td>
+<select id="CAN0_CONTROLLER_BASE_ADDRESS" class="w3-select " name="CAN0_CONTROLLER_BASE_ADDRESS"  id="CAN0_CONTROLLER_BASE_ADDRESS"style="width:40%"><Br>
+<option value="0xFFFE5000uL">0xFFFE5000uL</option>
+<option value="0xFFFE5800uL">0xFFFE5800uL</option>
+<option value="0xFFFED800uL">0xFFFED800uL</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CAN0_PERIPHERAL_CLOCK_ACC')" ><b>CAN0_PERIPHERAL_CLOCK</b></label><Br>
+      <div id="CAN0_PERIPHERAL_CLOCK_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey ">ClocksuppliedforCANxModule.</p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CAN0_PERIPHERAL_CLOCKvalidate()" style="width:30%" value="3" type="number" name="CAN0_PERIPHERAL_CLOCK"  id="CAN0_PERIPHERAL_CLOCK" min=0 max=0xFFFFFFFF><Br>
+<script>
+    function CAN0_PERIPHERAL_CLOCKvalidate() {
+    var x = document.getElementById("CAN0_PERIPHERAL_CLOCK");
+    if( x.value <0  || x.value > 0xFFFFFFFF)
+    { document.getElementById("CAN0_PERIPHERAL_CLOCK").style.background="red";
+    }
+    else{
+    document.getElementById("CAN0_PERIPHERAL_CLOCK").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CAN0_BAUD_RATE_ACC')" ><b>CAN0_BAUD_RATE</b></label><Br>
+      <div id="CAN0_BAUD_RATE_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey ">BaudRateforCANxModule.</p>    </div>    </div>    </td>    <td>
+<select id="CAN0_BAUD_RATE" class="w3-select " name="CAN0_BAUD_RATE"  id="CAN0_BAUD_RATE"style="width:40%"><Br>
+<option value="125Kbps">125Kbps</option>
+<option value="250Kbps">250Kbps</option>
+<option value="500Kbps">500Kbps</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CAN0_TSEG1_ACC')" ><b>CAN0_TSEG1</b></label><Br>
+      <div id="CAN0_TSEG1_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey ">TSEG1usedforCANxModule.</p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CAN0_TSEG1validate()" style="width:30%" value="8" type="number" name="CAN0_TSEG1"  id="CAN0_TSEG1" min=0 max=20><Br>
+<script>
+    function CAN0_TSEG1validate() {
+    var x = document.getElementById("CAN0_TSEG1");
+    if( x.value <0  || x.value > 20)
+    { document.getElementById("CAN0_TSEG1").style.background="red";
+    }
+    else{
+    document.getElementById("CAN0_TSEG1").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CAN0_TSEG2_ACC')" ><b>CAN0_TSEG2</b></label><Br>
+      <div id="CAN0_TSEG2_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey ">TSEG2usedforCANxModule.</p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CAN0_TSEG2validate()" style="width:30%" value="2" type="number" name="CAN0_TSEG2"  id="CAN0_TSEG2" min=0 max=10><Br>
+<script>
+    function CAN0_TSEG2validate() {
+    var x = document.getElementById("CAN0_TSEG2");
+    if( x.value <0  || x.value > 10)
+    { document.getElementById("CAN0_TSEG2").style.background="red";
+    }
+    else{
+    document.getElementById("CAN0_TSEG2").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CAN0_SJW_ACC')" ><b>CAN0_SJW</b></label><Br>
+      <div id="CAN0_SJW_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey ">SJWforCANxModule.</p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CAN0_SJWvalidate()" style="width:30%" value="2" type="number" name="CAN0_SJW"  id="CAN0_SJW" min=0 max=10><Br>
+<script>
+    function CAN0_SJWvalidate() {
+    var x = document.getElementById("CAN0_SJW");
+    if( x.value <0  || x.value > 10)
+    { document.getElementById("CAN0_SJW").style.background="red";
+    }
+    else{
+    document.getElementById("CAN0_SJW").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CAN0_NSAMP_ACC')" ><b>CAN0_NSAMP</b></label><Br>
+      <div id="CAN0_NSAMP_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey ">NumberofSamplepointsselectedforCANxModule.</p>    </div>    </div>    </td>    <td>
+<select id="CAN0_NSAMP" class="w3-select " name="CAN0_NSAMP"  id="CAN0_NSAMP"style="width:40%"><Br>
+<option value="1">1</option>
+<option value="3">3</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CAN0_CFG_BUSOFF_INTERRUPT_ACC')" ><b>CAN0_CFG_BUSOFF_INTERRUPT</b></label><Br>
+      <div id="CAN0_CFG_BUSOFF_INTERRUPT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey ">InterruptConfiguration</p>    </div>    </div>    </td>    <td>
+<select id="CAN0_CFG_BUSOFF_INTERRUPT" class="w3-select " name="CAN0_CFG_BUSOFF_INTERRUPT"  id="CAN0_CFG_BUSOFF_INTERRUPT"style="width:40%"><Br>
+<option value="TRUE">TRUE</option>
+<option value="FALSE">FALSE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CAN0_CFG_RX_INTERRUPT_ACC')" ><b>CAN0_CFG_RX_INTERRUPT</b></label><Br>
+      <div id="CAN0_CFG_RX_INTERRUPT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey ">InterruptConfiguration</p>    </div>    </div>    </td>    <td>
+<select id="CAN0_CFG_RX_INTERRUPT" class="w3-select " name="CAN0_CFG_RX_INTERRUPT"  id="CAN0_CFG_RX_INTERRUPT"style="width:40%"><Br>
+<option value="TRUE">TRUE</option>
+<option value="FALSE">FALSE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CAN0_CFG_TX_INTERRUPT_ACC')" ><b>CAN0_CFG_TX_INTERRUPT</b></label><Br>
+      <div id="CAN0_CFG_TX_INTERRUPT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey ">InterruptConfiguration</p>    </div>    </div>    </td>    <td>
+<select id="CAN0_CFG_TX_INTERRUPT" class="w3-select " name="CAN0_CFG_TX_INTERRUPT"  id="CAN0_CFG_TX_INTERRUPT"style="width:40%"><Br>
+<option value="TRUE">TRUE</option>
+<option value="FALSE">FALSE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CAN0_CFG_WAKEUP_INTERRUPT_ACC')" ><b>CAN0_CFG_WAKEUP_INTERRUPT</b></label><Br>
+      <div id="CAN0_CFG_WAKEUP_INTERRUPT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey ">InterruptConfiguration</p>    </div>    </div>    </td>    <td>
+<select id="CAN0_CFG_WAKEUP_INTERRUPT" class="w3-select " name="CAN0_CFG_WAKEUP_INTERRUPT"  id="CAN0_CFG_WAKEUP_INTERRUPT"style="width:40%"><Br>
+<option value="TRUE">TRUE</option>
+<option value="FALSE">FALSE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CAN0_MIN_NUMBER_OF_BASIC_BUFFERS_TX_ACC')" ><b>CAN0_MIN_NUMBER_OF_BASIC_BUFFERS_TX</b></label><Br>
+      <div id="CAN0_MIN_NUMBER_OF_BASIC_BUFFERS_TX_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey ">MinimumNumbeofBasicbuffersallocatedfortx</p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CAN0_MIN_NUMBER_OF_BASIC_BUFFERS_TXvalidate()" style="width:30%" value="4" type="number" name="CAN0_MIN_NUMBER_OF_BASIC_BUFFERS_TX"  id="CAN0_MIN_NUMBER_OF_BASIC_BUFFERS_TX" min=0 max=255><Br>
+<script>
+    function CAN0_MIN_NUMBER_OF_BASIC_BUFFERS_TXvalidate() {
+    var x = document.getElementById("CAN0_MIN_NUMBER_OF_BASIC_BUFFERS_TX");
+    if( x.value <0  || x.value > 255)
+    { document.getElementById("CAN0_MIN_NUMBER_OF_BASIC_BUFFERS_TX").style.background="red";
+    }
+    else{
+    document.getElementById("CAN0_MIN_NUMBER_OF_BASIC_BUFFERS_TX").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CAN0_MIN_NUMBER_OF_BASIC_BUFFERS_RX_ACC')" ><b>CAN0_MIN_NUMBER_OF_BASIC_BUFFERS_RX</b></label><Br>
+      <div id="CAN0_MIN_NUMBER_OF_BASIC_BUFFERS_RX_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey ">MinimumNumberofBasicbuffersallocatedforrx</p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CAN0_MIN_NUMBER_OF_BASIC_BUFFERS_RXvalidate()" style="width:30%" value="4" type="number" name="CAN0_MIN_NUMBER_OF_BASIC_BUFFERS_RX"  id="CAN0_MIN_NUMBER_OF_BASIC_BUFFERS_RX" min=0 max=255><Br>
+<script>
+    function CAN0_MIN_NUMBER_OF_BASIC_BUFFERS_RXvalidate() {
+    var x = document.getElementById("CAN0_MIN_NUMBER_OF_BASIC_BUFFERS_RX");
+    if( x.value <0  || x.value > 255)
+    { document.getElementById("CAN0_MIN_NUMBER_OF_BASIC_BUFFERS_RX").style.background="red";
+    }
+    else{
+    document.getElementById("CAN0_MIN_NUMBER_OF_BASIC_BUFFERS_RX").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+ </table>
+    <br><input type="submit" value="Save and Back" id="form_submit">
+    </form>
+    </div> 
+    </div> 
+    </body>
+    </html>
+    

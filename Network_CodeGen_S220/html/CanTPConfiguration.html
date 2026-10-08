@@ -1,0 +1,309 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <title>TP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="data.json"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{'styl.css'|staticfile }}">
+    <script>
+    function accordionfn(id) {
+        var x = document.getElementById(id);
+        if (x.className.indexOf("w3-show") == -1) {
+            x.className += " w3-show";
+        } else { 
+            x.className = x.className.replace(" w3-show", "");
+        }
+    }</script>
+    </head>
+    <body onload="load()" class="w3-container w3-grey"><!--copy_start-->
+<div  class=" w3-dark-grey" style ="width:100%;height:100%;position:fixed">
+
+<div class="w3-sidenav w3-dark-grey" style ="width:15%;height:100%;float:left;overflow:auto">
+
+<div class="w3-card-4 w3-light-grey" style="width:100%;height:100%">
+    <header class="w3-container w3-light-green">
+        <h3>CAN Database </h3>
+    </header>
+    
+    <Br>
+            
+    <div class="w3-container ">
+        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_dbc0_msg" id="DRV" data-bind="true">+ TX/RX Message Configurations </a>
+    </div>
+  
+    <div class="w3-container ">
+        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_dbc0_sig" id="DRV" data-bind="true">+ TX/Rx signal Configurations </a>
+    </div>
+    <Br>
+   
+</div>
+
+</div>
+ 
+<div class=" w3-dark-grey w3-padding-medium" style ="width:85%;height:100%;float:right;overflow:auto">
+<form action="BackEnd.TP_SaveButton" id="form" data-bind="true">
+<table  class ="w3-table  w3-bordered  w3-border w3-hoverable">
+    <thead>
+    <tr>
+    <th> Configurable options </th>
+    <th>Channel 0</th>
+    </tr>
+    </thead><tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('VTP_NUM_CHANNEL_COUNT_ACC')" ><b>VTP_NUM_CHANNEL_COUNT</b></label><Br>
+      <div id="VTP_NUM_CHANNEL_COUNT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey ">MAIN</p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" VTP_NUM_CHANNEL_COUNTvalidate()" style="width:30%" value="1" type="number" name="VTP_NUM_CHANNEL_COUNT"  id="VTP_NUM_CHANNEL_COUNT" min=0 max=255><Br>
+<script>
+    function VTP_NUM_CHANNEL_COUNTvalidate() {
+    var x = document.getElementById("VTP_NUM_CHANNEL_COUNT");
+    if( x.value <0  || x.value > 255)
+    { document.getElementById("VTP_NUM_CHANNEL_COUNT").style.background="red";
+    }
+    else{
+    document.getElementById("VTP_NUM_CHANNEL_COUNT").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANTP_PERIODICITY_ACC')" ><b>CANTP_PERIODICITY</b></label><Br>
+      <div id="CANTP_PERIODICITY_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CANTP_PERIODICITYvalidate()" style="width:30%" value="1" type="number" name="CANTP_PERIODICITY"  id="CANTP_PERIODICITY" min=0 max=255><Br>
+<script>
+    function CANTP_PERIODICITYvalidate() {
+    var x = document.getElementById("CANTP_PERIODICITY");
+    if( x.value <0  || x.value > 255)
+    { document.getElementById("CANTP_PERIODICITY").style.background="red";
+    }
+    else{
+    document.getElementById("CANTP_PERIODICITY").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('VTP_FC_SUPPORT_ACC')" ><b>VTP_FC_SUPPORT</b></label><Br>
+      <div id="VTP_FC_SUPPORT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="VTP_FC_SUPPORT" class="w3-select " name="VTP_FC_SUPPORT"  id="VTP_FC_SUPPORT"style="width:40%"><Br>
+<option value="VTP_YES">VTP_YES</option>
+<option value="VTP_NO">VTP_NO</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('VTP_WAITFC_SUPPORT_ACC')" ><b>VTP_WAITFC_SUPPORT</b></label><Br>
+      <div id="VTP_WAITFC_SUPPORT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="VTP_WAITFC_SUPPORT" class="w3-select " name="VTP_WAITFC_SUPPORT"  id="VTP_WAITFC_SUPPORT"style="width:40%"><Br>
+<option value="VTP_YES">VTP_YES</option>
+<option value="VTP_NO">VTP_NO</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('VTP_TransmitCB_SUPPORT_ACC')" ><b>VTP_TransmitCB_SUPPORT</b></label><Br>
+      <div id="VTP_TransmitCB_SUPPORT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="VTP_TransmitCB_SUPPORT" class="w3-select " name="VTP_TransmitCB_SUPPORT"  id="VTP_TransmitCB_SUPPORT"style="width:40%"><Br>
+<option value="VTP_YES">VTP_YES</option>
+<option value="VTP_NO">VTP_NO</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('VTP_ReceiveCB_SUPPORT_ACC')" ><b>VTP_ReceiveCB_SUPPORT</b></label><Br>
+      <div id="VTP_ReceiveCB_SUPPORT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="VTP_ReceiveCB_SUPPORT" class="w3-select " name="VTP_ReceiveCB_SUPPORT"  id="VTP_ReceiveCB_SUPPORT"style="width:40%"><Br>
+<option value="VTP_YES">VTP_YES</option>
+<option value="VTP_NO">VTP_NO</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('VTP_ReceiveQueue_SUPPORT_ACC')" ><b>VTP_ReceiveQueue_SUPPORT</b></label><Br>
+      <div id="VTP_ReceiveQueue_SUPPORT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="VTP_ReceiveQueue_SUPPORT" class="w3-select " name="VTP_ReceiveQueue_SUPPORT"  id="VTP_ReceiveQueue_SUPPORT"style="width:40%"><Br>
+<option value="VTP_YES">VTP_YES</option>
+<option value="VTP_NO">VTP_NO</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('VTP_TransmitOnINT_SUPPORT_ACC')" ><b>VTP_TransmitOnINT_SUPPORT</b></label><Br>
+      <div id="VTP_TransmitOnINT_SUPPORT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="VTP_TransmitOnINT_SUPPORT" class="w3-select " name="VTP_TransmitOnINT_SUPPORT"  id="VTP_TransmitOnINT_SUPPORT"style="width:40%"><Br>
+<option value="VTP_YES">VTP_YES</option>
+<option value="VTP_NO">VTP_NO</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('VTP_TURING_SUPPORT_ACC')" ><b>VTP_TURING_SUPPORT</b></label><Br>
+      <div id="VTP_TURING_SUPPORT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="VTP_TURING_SUPPORT" class="w3-select " name="VTP_TURING_SUPPORT"  id="VTP_TURING_SUPPORT"style="width:40%"><Br>
+<option value="VTP_YES">VTP_YES</option>
+<option value="VTP_NO">VTP_NO</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('VTP_PADDING_SUPPORT_ACC')" ><b>VTP_PADDING_SUPPORT</b></label><Br>
+      <div id="VTP_PADDING_SUPPORT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="VTP_PADDING_SUPPORT" class="w3-select " name="VTP_PADDING_SUPPORT"  id="VTP_PADDING_SUPPORT"style="width:40%"><Br>
+<option value="VTP_YES">VTP_YES</option>
+<option value="VTP_NO">VTP_NO</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('VTP_PADDING_VALUE_ACC')" ><b>VTP_PADDING_VALUE</b></label><Br>
+      <div id="VTP_PADDING_VALUE_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input  type ="text" id="VTP_PADDING_VALUE" class="w3-input w3-border" value="0x00"name="VTP_PADDING_VALUE"  id="VTP_PADDING_VALUE"style="width:40%"><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('N_As_Tx_CONFIRMATION_TIMEOUT_ACC')" ><b>N_As_Tx_CONFIRMATION_TIMEOUT</b></label><Br>
+      <div id="N_As_Tx_CONFIRMATION_TIMEOUT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" N_As_Tx_CONFIRMATION_TIMEOUTvalidate()" style="width:30%" value="7" type="number" name="N_As_Tx_CONFIRMATION_TIMEOUT"  id="N_As_Tx_CONFIRMATION_TIMEOUT" min=0 max= 65535><Br>
+<script>
+    function N_As_Tx_CONFIRMATION_TIMEOUTvalidate() {
+    var x = document.getElementById("N_As_Tx_CONFIRMATION_TIMEOUT");
+    if( x.value <0  || x.value >  65535)
+    { document.getElementById("N_As_Tx_CONFIRMATION_TIMEOUT").style.background="red";
+    }
+    else{
+    document.getElementById("N_As_Tx_CONFIRMATION_TIMEOUT").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('N_Bs_FLOW_CONTROL_TIMEOUT_ACC')" ><b>N_Bs_FLOW_CONTROL_TIMEOUT</b></label><Br>
+      <div id="N_Bs_FLOW_CONTROL_TIMEOUT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" N_Bs_FLOW_CONTROL_TIMEOUTvalidate()" style="width:30%" value="1" type="number" name="N_Bs_FLOW_CONTROL_TIMEOUT"  id="N_Bs_FLOW_CONTROL_TIMEOUT" min=0 max= 65535><Br>
+<script>
+    function N_Bs_FLOW_CONTROL_TIMEOUTvalidate() {
+    var x = document.getElementById("N_Bs_FLOW_CONTROL_TIMEOUT");
+    if( x.value <0  || x.value >  65535)
+    { document.getElementById("N_Bs_FLOW_CONTROL_TIMEOUT").style.background="red";
+    }
+    else{
+    document.getElementById("N_Bs_FLOW_CONTROL_TIMEOUT").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('N_Cs_TX_CF_Timeout_ACC')" ><b>N_Cs_TX_CF_Timeout</b></label><Br>
+      <div id="N_Cs_TX_CF_Timeout_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" N_Cs_TX_CF_Timeoutvalidate()" style="width:30%" value="7" type="number" name="N_Cs_TX_CF_Timeout"  id="N_Cs_TX_CF_Timeout" min=0 max= 65535><Br>
+<script>
+    function N_Cs_TX_CF_Timeoutvalidate() {
+    var x = document.getElementById("N_Cs_TX_CF_Timeout");
+    if( x.value <0  || x.value >  65535)
+    { document.getElementById("N_Cs_TX_CF_Timeout").style.background="red";
+    }
+    else{
+    document.getElementById("N_Cs_TX_CF_Timeout").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('N_WFTmax_No_OF_WAIT_FRAMES_ACC')" ><b>N_WFTmax_No_OF_WAIT_FRAMES</b></label><Br>
+      <div id="N_WFTmax_No_OF_WAIT_FRAMES_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" N_WFTmax_No_OF_WAIT_FRAMESvalidate()" style="width:30%" value="0" type="number" name="N_WFTmax_No_OF_WAIT_FRAMES"  id="N_WFTmax_No_OF_WAIT_FRAMES" min=0 max= 65535><Br>
+<script>
+    function N_WFTmax_No_OF_WAIT_FRAMESvalidate() {
+    var x = document.getElementById("N_WFTmax_No_OF_WAIT_FRAMES");
+    if( x.value <0  || x.value >  65535)
+    { document.getElementById("N_WFTmax_No_OF_WAIT_FRAMES").style.background="red";
+    }
+    else{
+    document.getElementById("N_WFTmax_No_OF_WAIT_FRAMES").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('Stmin_ACC')" ><b>Stmin</b></label><Br>
+      <div id="Stmin_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" Stminvalidate()" style="width:30%" value="1" type="number" name="Stmin"  id="Stmin" min=0 max=65535><Br>
+<script>
+    function Stminvalidate() {
+    var x = document.getElementById("Stmin");
+    if( x.value <0  || x.value > 65535)
+    { document.getElementById("Stmin").style.background="red";
+    }
+    else{
+    document.getElementById("Stmin").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('Blocksize_ACC')" ><b>Blocksize</b></label><Br>
+      <div id="Blocksize_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" Blocksizevalidate()" style="width:30%" value="8" type="number" name="Blocksize"  id="Blocksize" min=0 max=255><Br>
+<script>
+    function Blocksizevalidate() {
+    var x = document.getElementById("Blocksize");
+    if( x.value <0  || x.value > 255)
+    { document.getElementById("Blocksize").style.background="red";
+    }
+    else{
+    document.getElementById("Blocksize").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('N_Cr_Rx_CF_Timeout_ACC')" ><b>N_Cr_Rx_CF_Timeout</b></label><Br>
+      <div id="N_Cr_Rx_CF_Timeout_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" N_Cr_Rx_CF_Timeoutvalidate()" style="width:30%" value="1" type="number" name="N_Cr_Rx_CF_Timeout"  id="N_Cr_Rx_CF_Timeout" min=0 max= 65535><Br>
+<script>
+    function N_Cr_Rx_CF_Timeoutvalidate() {
+    var x = document.getElementById("N_Cr_Rx_CF_Timeout");
+    if( x.value <0  || x.value >  65535)
+    { document.getElementById("N_Cr_Rx_CF_Timeout").style.background="red";
+    }
+    else{
+    document.getElementById("N_Cr_Rx_CF_Timeout").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+ </table>
+    <br><input type="submit" value="Save and Back" id="form_submit">
+    </form>
+    </div> 
+    </div> 
+    </body>
+    </html>
+    

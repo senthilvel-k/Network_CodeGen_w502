@@ -1,0 +1,1122 @@
+VERSION ""
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_: MPC GPS EPS EPB TPMS TCM_GW PAS PEPS ESP_ABS ESCL EMS_GW EBCM DSM AHL ACC SDM BCM ICM
+VAL_TABLE_ _0notfailed_1fail 1 "0x1: Fail" 0 "0x0: Not Failed" ;
+VAL_TABLE_ _0inactive_1active 1 "0x1: Active" 0 "0x0: Inactive" ;
+VAL_TABLE_ powerMode 0 "Off" 1 "ACC" 2 "IGN On" 3 "Crank" ;
+VAL_TABLE_ _0off_1on 1 "on" 0 "off" ;
+
+
+BO_ 3221225472 VECTOR__INDEPENDENT_SIG_MSG: 0 Vector__XXX
+ SG_ KEY_OUT_REMINDER : 0|1@0+ (1,0) [0|1] "" Vector__XXX
+ SG_ KEY_IN_REMENBER : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ Parking_Assistantce_Rear_Middle_ : 0|4@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ Reserved_for_furter_use : 0|2@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ Parking_Assistantce_Front_Middle : 0|4@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ EPB_SysWarnIndReq : 0|2@0+ (1,0) [0|3] "" Vector__XXX
+ SG_ EPB_SysStIndReq : 0|2@0+ (1,0) [0|3] "" Vector__XXX
+ SG_ EPB_SysDispMsgReq : 0|3@0+ (1,0) [0|5] "" Vector__XXX
+ SG_ EPB_SysAudWarnReq : 0|3@0+ (1,0) [0|2] "" Vector__XXX
+ SG_ EPB_StpOnBrkToRelParkBrkIndOn : 0|1@0+ (1,0) [0|1] "" Vector__XXX
+ SG_ EPB_MsgCounter : 0|4@0+ (1,0) [0|15] "" Vector__XXX
+ SG_ EPB_Checksum : 0|8@0+ (1,0) [0|255] "" Vector__XXX
+ SG_ DVD_TIMER_MODE : 0|1@0+ (1,0) [0|1] "" Vector__XXX
+ SG_ DVD_MINUTE : 0|8@0+ (1,0) [0|59] "" Vector__XXX
+ SG_ DVD_HOURS : 0|7@0+ (1,0) [0|23] "" Vector__XXX
+ SG_ DVD_AM_PM_MODE : 0|1@0+ (1,0) [0|1] "" Vector__XXX
+ SG_ POWER_MODE : 0|3@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ POWER_MODE_VALIDITY : 0|2@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ VEHICLE_SPEED_OF_SELF_LOCKING : 0|3@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ FOLLOW_ME_HOME_FUNCTION_SETTING : 0|3@0+ (1,0) [0|7] "" Vector__XXX
+ SG_ RR_Pressure : 0|8@0+ (1.373,0) [0|350] "kpa" Vector__XXX
+ SG_ RR_Pressure_warning : 0|3@0+ (1,0) [0|7] "" Vector__XXX
+ SG_ LR_Pressure : 0|8@0+ (1.373,0) [0|350] "kpa" Vector__XXX
+ SG_ RF_Pressure_warning : 0|3@0+ (1,0) [0|7] "" Vector__XXX
+ SG_ LR_Pressure_warning : 0|3@0+ (1,0) [0|7] "" Vector__XXX
+ SG_ Tire_Temperature : 0|8@0+ (1,-40) [-40|125] "℃" Vector__XXX
+ SG_ System_warning : 0|1@0+ (1,0) [0|1] "" Vector__XXX
+ SG_ LF_Pressure : 0|8@0+ (1.373,0) [0|350] "kpa" Vector__XXX
+ SG_ RF_Pressure : 0|8@0+ (1.373,0) [0|350] "kpa" Vector__XXX
+ SG_ LF_Pressure_warning : 0|3@0+ (1,0) [0|7] "" Vector__XXX
+ SG_ Signal_Status : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ tire_position : 0|3@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ Temperature_warning : 0|1@0+ (1,0) [0|1] "" Vector__XXX
+ SG_ Reserved : 0|4@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ AHL_FAULT_STATUS : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ CRANK_ERROR_TYPE : 0|8@0+ (1,0) [0|255] "" Vector__XXX
+ SG_ IMMO_SID : 0|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ CRANK_ERROR : 0|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ Memory_seat_failure : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ Memory_mirror_failure : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ POWER_MODE_VALIDITY_BCM : 0|2@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ FCI_DATA_VALID_TURBO : 0|2@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ KEY_OUT_REMENDER : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ KEY_IN_REMINDER : 0|1@0+ (1,0) [0|1] "" Vector__XXX
+ SG_ MIU_MSG_REQUEST_N16 : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ FCI_DATA_VALID_ACTUAL_GEAR : 0|2@0+ (1,0) [0|3] "" Vector__XXX
+ SG_ ACTUAL_GEAR : 0|8@0+ (1,0) [0|255] "" Vector__XXX
+ SG_ ENGINE_RUNNING : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ BRAKE_LIGHT : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ FCI_BRAKE_LIGHT : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ ACTUAL_GEARBOX : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ CRUISE_ACTIVE : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ HAND_BRAKE : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ BRAKE_LIGHT_LEFT_ACTIVE : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ BRAKE_AUXILIARY_LIGHT_STATUS : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ REQUEST_HAZARD_LIGHT_TELLTALE : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ BRAKE_LIGHT_RIGHT_ACTIVE : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ TRANSMISSION_SHIFT_PATTERN_STATU : 0|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ EBD_WARN_LAMP : 0|1@0+ (1,0) [0|1] "" Vector__XXX
+ SG_ ABS_WARN_LAMP : 0|1@0+ (1,0) [0|1] "" Vector__XXX
+ SG_ PASSENGER_AIRBAG_OFF : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ PAS_System_status : 0|2@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ SVA_system_status : 0|2@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ SVA_WARNING_status_RIGHT : 0|2@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ SVA_WARNING_status_LEFT : 0|2@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ SVA_System_Switch : 0|2@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ MIRROR_FADE_IN_OUT : 0|2@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ MEMORIZE_OUTSIDE_RIGHT_MIRROR_SE : 0|2@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ OUTSIDE_RIGHT_MIRROR_SEE_GROUND : 0|2@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ CHK_THEFT_ALARM : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ CHECK_BRAKE_AUXILIARY_LIGHT : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ CHECK_LICENCE_LIGHT : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ KEY_IN : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ TRANSMISSION_OIL_TEMPERATURE : 0|8@0+ (1,-40) [-40|215] "℃" Vector__XXX
+ SG_ REQ_MIL_ACTIVE : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ SECOND_ICM : 0|6@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ DAY_ICM : 0|5@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ YEAR_ICM : 0|5@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ WEEK_ICM : 0|3@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ TIME_MODE_ICM : 0|2@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ MONTH_ICM : 0|4@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ MINUTES_ICM : 0|6@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ HOUR_ICM : 0|5@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ DATA_VALID_TIME_ICM : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 818 MPC_REQUEST: 8 MPC
+ SG_ CHECKSUM_LKS : 63|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ ROLLING_COUNTER_LKS : 51|4@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ LKS_STATUS : 36|3@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ LKS_SENSITIVITY : 33|2@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ LKS_TORQUE_REQ : 31|11@0+ (0.02,-20.48) [-20.48|20.46] "nm" Vector__XXX
+ SG_ LKS_LANE_ASSIT_TYPE : 23|2@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ LKS_TAKE_OVER_REQ : 21|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ LKS_RIGHT_TRACKING_STATUS : 20|2@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ TSR_OPERATING_STATUS : 18|3@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ LKS_LEFT_TRACKING_STATUS : 15|2@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ TSR_SIGN_TYPE : 13|3@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ TSR_SPEED_LIMIT_UNIT : 10|2@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ TSR_SPEED_LIMIT : 7|5@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ HMA_STATUS : 2|3@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 831 ACC_GENERAL_STATUS: 8 Vector__XXX
+ SG_ CHECKSUM_ACC : 63|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ ALIVECOUNTER_ACC : 51|4@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ ACC_CONTROLLER_INITIALIZATION : 34|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ ACC_PCW_PREWARNING : 33|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ ACC_PCW_LATENT_WARNING : 32|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ ACC_MODE_ICM : 31|3@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ ACC_FAIL_INFO : 28|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ ACC_TAKE_OVER_REQ : 27|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ ACC_TEXT_INFO : 26|3@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ ACC_OBJ_DETECTED : 22|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ ACC_TAUGAP_SET : 21|3@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ ACC_DIS_TO_TAROBJECT : 18|3@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ ACC_VSPEED_SET_DISPLAY : 7|16@0+ (0.1,0) [0|0] "km/h" Vector__XXX
+
+BO_ 1776 ICM_ACC_Request: 8 Vector__XXX
+ SG_ CHECKSUM_ICM : 63|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ ALIVECOUNTER_ICM : 51|4@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ ICM_DISPLAY_UNIT_TYPE : 29|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ ICM_DISPLAY_FAIL : 28|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ ICM_QDASH_ACCFail_FEEDBACK : 27|2@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ ICM_VALID_DISPLAY_VEHICLE_SPEED : 25|2@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ ICM_VEHICLE_SPEED_DISPLAY : 15|16@0+ (1,0) [0|0] "km/h" Vector__XXX
+ SG_ ICM_LKS_LANE_AID_TYPE_REQ : 4|3@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ ICM_LKS_SENSITIVITY : 1|2@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1584 AHL_GENERAL_STATUS: 8 AHL
+ SG_ AHL_FAULT_STATUS : 7|1@0+ (1,0) [0|0] ""  ICM
+
+BO_ 1392 PEPS_GENERAL_STATUS: 8 PEPS
+ SG_ REMOTE_START_STATUS : 19|2@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ REMOTE_START_RESPONSE_PEPS : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 288 ESP_ENGINE_TORQUE_REQ: 8 ESP_ABS
+ SG_ ABS_OPERATING : 6|1@0+ (1,0) [0|0] ""  ICM
+
+BO_ 1777 ICM_GENERAL_STATUS_3: 8 ICM
+ SG_ AVERAGE_FUEL_CONSUM2 : 51|12@0+ (0.1,0) [0|0] "L/100km" Vector__XXX
+ SG_ REMAIN_MAINTAIN_MILEAGE : 35|16@0+ (1,10239) [0|20479] "km" Vector__XXX
+ SG_ ENDURANCE_MILEAGE : 31|12@0+ (1,0) [0|0] "km" Vector__XXX
+ SG_ AVERAGE_FUEL_CONSUM1 : 11|12@0+ (0.1,0) [0|0] "L/100km" Vector__XXX
+ SG_ INSTANT_FUEL_CONSUM : 7|12@0+ (0.1,0) [0|0] "L/100km" Vector__XXX
+
+BO_ 1297 HUM_TIME: 8 GPS
+ SG_ YEAR_HUM : 24|5@0+ (1,0) [0|0] ""  ICM
+ SG_ WEEK_HUM : 20|3@0+ (1,0) [0|0] ""  ICM
+ SG_ TIME_MODE_HUM : 1|2@0+ (1,0) [0|0] ""  ICM
+ SG_ SECOND_HUM : 7|6@0+ (1,0) [0|0] ""  ICM
+ SG_ MONTH_HUM : 28|4@0+ (1,0) [0|0] ""  ICM
+ SG_ MINUTES_HUM : 15|6@0+ (1,0) [0|0] ""  ICM
+ SG_ HOUR_HUM : 9|5@0+ (1,0) [0|0] ""  ICM
+ SG_ DAY_HUM : 17|5@0+ (1,0) [0|0] ""  ICM
+
+BO_ 802 EPS_STATUS: 8 EPS
+ SG_ STS_EPS_FAULT_STS : 7|4@0+ (1,0) [0|15] ""  ICM
+
+BO_ 793 ESP_INDIRECT_TPMS: 8 ESP_ABS
+ SG_ ITPMS_LF_PRESSURE_WARNING : 15|2@0+ (1,0) [0|3] ""  ICM
+ SG_ ITPMS_RF_PRESSURE_WARNING : 13|2@0+ (1,0) [0|3] ""  ICM
+ SG_ ITPMS_RR_PRESSURE_WARNING : 11|2@0+ (1,0) [0|3] ""  ICM
+ SG_ ITPMS_LR_PRESSURE_WARNING : 9|2@0+ (1,0) [0|3] ""  ICM
+ SG_ ITPMS_FAIL_STATUS : 7|1@0+ (1,0) [0|0] ""  ICM
+ SG_ ITPMS_WARNING_STATUS : 5|1@0+ (1,0) [0|0] ""  ICM
+ SG_ ITPMS_RESET_STATUS : 3|1@0+ (1,0) [0|0] ""  ICM
+
+BO_ 641 EMS_START_STOP: 8 EMS_GW
+ SG_ ISS_EMERGENCY_ST_REMINDER : 20|3@0+ (1,0) [0|0] ""  ICM
+ SG_ EMS_Manual_Start : 17|1@0+ (1,0) [0|0] ""  ICM
+ SG_ ENG_SS_STS : 15|4@0+ (1,0) [0|0] ""  ICM
+ SG_ ENG_SS_STS_VALID : 16|1@0+ (1,0) [0|0] ""  ICM
+ SG_ CHARGE_WARNING_TELLTALE : 7|1@0+ (1,0) [0|0] ""  ICM
+ SG_ SS_FAULT_LAMP : 5|1@0+ (1,0) [0|0] ""  ICM
+ SG_ SS_ENABLE_LAMP : 6|1@0+ (1,0) [0|0] ""  ICM
+
+BO_ 1569 ICM_GENERAL_STATUS_2: 8 ICM
+ SG_ OILPUMP_RESISTER_ICM : 19|12@0+ (0.1,0) [0|300] "Ohm" Vector__XXX
+ SG_ REMOTE_START_RESPONSE_ICM : 7|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ FAULT_BUZZING_IND_LAMP : 6|5@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ HAND_BRAKE_ICM : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ FUELTANK_REMAINING : 15|8@0+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 1376 PAS_GENERAL_STATUS: 8 PAS
+ SG_ NEAREST_REAR_PAS : 57|2@0+ (1,0) [0|0] ""  ICM
+ SG_ SVA_WARNING_STATUS_LEFT : 55|2@0+ (1,0) [0|0] ""  ICM
+ SG_ SVA_WARNING_STATUS_RIGHT : 53|2@0+ (1,0) [0|0] ""  ICM
+ SG_ SVA_SYS_STATUS : 3|2@0+ (1,0) [0|0] ""  ICM
+ SG_ PAS_SYS_STATUS : 1|2@0+ (1,0) [0|0] ""  ICM
+ SG_ PA_PAS_SW_STATUS : 59|2@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ Parking_Assistantce_Front_M_0000 : 63|4@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ Parking_Assistantce_Rear_Mi_0000 : 11|4@0+ (1,0) [0|0] ""  ICM
+ SG_ Parking_Assistantce_Rear_Mi_0001 : 51|4@0+ (1,0) [0|0] ""  ICM
+ SG_ Parking_Assistantce_Front_M_0001 : 31|4@0+ (1,0) [0|15] ""  ICM
+ SG_ The_REAR_minimum_PAS_distance : 39|8@0+ (1,0) [30|255] "cm"  ICM
+ SG_ Parking_Assistantce_Rear_Left_Re : 15|4@0+ (1,0) [0|0] ""  ICM
+ SG_ Parking_Assistantce_Rear_Right_R : 23|4@0+ (1,0) [0|0] ""  ICM
+ SG_ Parking_Assistantce_Front_Left_R : 19|4@0+ (1,0) [0|0] ""  ICM
+ SG_ Parking_Assistantce_Front_System : 5|2@0+ (1,0) [0|0] ""  ICM
+ SG_ Parking_Assistantce_Front_Right_ : 27|4@0+ (1,0) [0|0] ""  ICM
+ SG_ The_FRONT_minimum_PAS_distance : 47|8@0+ (1,0) [30|255] "cm"  ICM
+ SG_ Parking_Assistantce_Rear_System_ : 7|2@0+ (1,0) [0|0] ""  ICM
+
+BO_ 1060 ICM_NM_MESSAGE: 8 ICM
+ SG_ NM_DATA_FIELD_6_ICM : 63|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ NM_DATA_FIELD_5_ICM : 55|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ NM_DATA_FIELD_4_ICM : 47|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ NM_DATA_FIELD_3_ICM : 39|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ NM_DATA_FIELD_2_ICM : 31|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ MIU_NM_ALIVE : 8|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ MIU_NM_LIMPHOME : 10|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ MIU_NM_SLEEP_INDICATION : 12|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ MIU_NM_SLEEP_ACK : 13|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ NM_DATA_FIELD_1_ICM : 23|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ MIU_NM_DESTINATION_ADDRESS : 7|8@0+ (1,0) [0|255] "" Vector__XXX
+ SG_ MIU_NM_RING : 9|1@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 800 ICM_EVENT_COMMAND: 8 ICM
+ SG_ ITPMS_RESET_REQ : 7|1@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 992 TCU_GENERAL_STATUS: 8 TCM_GW
+ SG_ REQ_ECO2_TELLTALE : 27|1@0+ (1,0) [0|0] ""  ICM
+ SG_ TCU_SELECTED_GEAR : 23|8@0+ (1,0) [0|0] ""  ICM
+ SG_ CHECK_HIGH_OIL_TEMP : 39|1@0+ (1,0) [0|0] ""  ICM
+ SG_ GEAR_INDICATION : 55|8@0+ (1,0) [0|0] ""  ICM
+ SG_ VALID_SELECTED_GEAR : 3|2@0+ (1,0) [0|0] ""  ICM
+ SG_ REQUEST_SPORT_TELLTALE : 30|1@0+ (1,0) [0|0] ""  ICM
+ SG_ REQUEST_WINTER_TELLTALE : 29|1@0+ (1,0) [0|0] ""  ICM
+ SG_ REQUEST_CHECK_GEARBOX_TELLTALE : 31|1@0+ (1,0) [0|0] ""  ICM
+
+BO_ 792 ESPABS_GENERAL_STATUS: 8 ESP_ABS
+ SG_ REQUEST_EBD_TELLTALE : 22|1@0+ (1,0) [0|0] ""  ICM
+ SG_ REQUEST_TCS_ESP_ACTIVE_TELLTALE : 20|1@0+ (1,0) [0|0] ""  ICM
+ SG_ ODOMETER_ROLLING : 31|16@0+ (1,0) [0|0] "pulse"  ICM
+ SG_ REQUEST_ABS_TELLTALE : 23|1@0+ (1,0) [0|0] ""  ICM
+ SG_ REQUEST_TCS_ESP_OFF_TELLTALE : 21|1@0+ (1,0) [0|0] ""  ICM
+ SG_ REQUEST_TCS_ESP_FAILURE_TELLTALE : 14|1@0+ (1,0) [0|0] ""  ICM
+
+BO_ 848 SDM_GENERAL_STATUS: 8 SDM
+ SG_ SEATBELT_RR_ATT : 3|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ SEATBELT_RM_ATT : 4|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ SEATBELT_RL_ATT : 5|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ CHK_BELTS : 0|1@0+ (1,0) [0|0] ""  ICM
+ SG_ SEATBELT_DRIVER_ATTACHED : 7|1@0+ (1,0) [0|0] ""  ICM
+ SG_ AIRBAG_WARNING_LAMP : 10|2@0+ (1,0) [0|0] ""  ICM
+ SG_ SEATBELT_PASSENGER_ATTACHED : 6|1@0+ (1,0) [0|0] ""  ICM
+
+BO_ 1568 ICM_GENERAL_STATUS: 8 ICM
+ SG_ DISPLAYED_TOTAL_DISTANCE : 23|32@0+ (0.01,0) [0|2000000] "km" Vector__XXX
+ SG_ ODOMETER_RESET_COUNTER : 7|2@0+ (1,0) [0|3] "" Vector__XXX
+ SG_ ODOMETER_OFFSET_ICM : 63|8@0+ (1,0) [0|255] "km" Vector__XXX
+ SG_ DATA_VALID_ODO : 0|1@0+ (1,0) [0|1] "" Vector__XXX
+ SG_ BATTERY_VOLTAGE_LEVEL : 55|8@0+ (0.1,0) [0|25.4] "v" Vector__XXX
+ SG_ DATA_VALID_RHEOSTAT : 4|2@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ NIGHT_PANEL : 2|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ RHEOSTAT_LEVEL : 15|8@0+ (0.3921568627451,0) [0|100] "%" Vector__XXX
+ SG_ WASHER_FLUID_LEVEL_LOW : 5|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ AIRBAG_WARNINGLAMP_STATUS : 1|1@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 640 EMS_GENERAL_STATUS: 8 EMS_GW
+ SG_ CRUISE_ACTIVE : 22|1@0+ (1,0) [0|0] ""  ICM
+ SG_ GEAR_SWITCH_INDICATOR : 59|4@0+ (1,0) [0|0] ""  ICM
+ SG_ REQ_SHIFT_UP_TELLTALE : 38|1@0+ (1,0) [0|0] ""  ICM
+ SG_ REQ_SHIFT_DOWN_TELLTALE : 21|1@0+ (1,0) [0|1] ""  ICM
+ SG_ EMS_ACTUAL_GEAR : 15|8@0+ (1,0) [0|255] ""  ICM
+ SG_ VALID_ACTUAL_GEAR_EMS : 5|2@0+ (1,0) [0|3] ""  ICM
+ SG_ EMS_AUTHRESULT : 36|1@0+ (1,0) [0|1] ""  ICM
+ SG_ REQUEST_CHECK_ENGINE_TELLTALE : 39|1@0+ (1,0) [0|0] ""  ICM
+ SG_ REQUEST_CRUISE_TELLTALE : 37|1@0+ (1,0) [0|1] ""  ICM
+
+BO_ 1184 BCM_GENERAL_STATUS: 8 BCM
+ SG_ DRL_INDICATOR : 5|1@0+ (1,0) [0|0] ""  ICM
+ SG_ BRAKE_BULB_FAILURE_RIGHT : 36|1@0+ (1,0) [0|0] ""  ICM
+ SG_ REAR_LEFT_DOOR_OPEN : 27|1@0+ (1,0) [0|0] ""  ICM
+ SG_ TURN_BULB_FAILURE_RIGHT : 43|1@0+ (1,0) [0|0] ""  ICM
+ SG_ PARK_BULB_A_FAILURE : 39|1@0+ (1,0) [0|0] ""  ICM
+ SG_ TURN_BULB_FAILURE_LEFT : 44|1@0+ (1,0) [0|0] ""  ICM
+ SG_ POSITION_LIGHT_ON_WARNING : 50|1@0+ (1,0) [0|0] ""  ICM
+ SG_ LOW_BEAM_INDICATOR : 40|1@0+ (1,0) [0|0] ""  ICM
+ SG_ CHECK_DRL : 49|1@0+ (1,0) [0|0] ""  ICM
+ SG_ HOOD_LID_OPEN : 24|1@0+ (1,0) [0|0] ""  ICM
+ SG_ FRONT_FOG_LIGHT_TELLTALE : 19|1@0+ (1,0) [0|0] ""  ICM
+ SG_ REAR_FOG_LIGHT_TELLTALE : 20|1@0+ (1,0) [0|0] ""  ICM
+ SG_ REQ_LEFT_DI_TELLTALE : 22|1@0+ (1,0) [0|0] ""  ICM
+ SG_ HIGH_BEAM_INDICATOR : 41|1@0+ (1,0) [0|0] ""  ICM
+ SG_ ANTI_THELF_INDICATOR : 52|2@0+ (1,0) [0|0] ""  ICM
+ SG_ REQ_RIGHT_DI_TELLTALE : 21|1@0+ (1,0) [0|0] ""  ICM
+ SG_ REAR_RIGHT_DOOR_OPEN : 26|1@0+ (1,0) [0|0] ""  ICM
+ SG_ PARK_LIGHT_A_STATUS : 33|1@0+ (1,0) [0|0] ""  ICM
+ SG_ BRAKE_BULB_FAILURE_LEFT : 37|1@0+ (1,0) [0|0] ""  ICM
+ SG_ CHECK_REAR_FOG_LIGHT : 18|1@0+ (1,0) [0|0] ""  ICM
+ SG_ PARK_LIGHT_B_STATUS : 32|1@0+ (1,0) [0|0] ""  ICM
+ SG_ CHECK_FRONT_FOG_LIGHT : 17|1@0+ (1,0) [0|0] ""  ICM
+ SG_ TRUNK_LID_OPEN : 25|1@0+ (1,0) [0|0] ""  ICM
+ SG_ PARK_BULB_B_FAILURE : 38|1@0+ (1,0) [0|0] ""  ICM
+ SG_ PA_DOOR_OPEN : 28|1@0+ (1,0) [0|0] ""  ICM
+ SG_ DR_DOOR_OPEN : 29|1@0+ (1,0) [0|0] ""  ICM
+
+BO_ 1393 ESCL_GENERAL_STATUS: 8 ESCL
+ SG_ ESCL_LED_RED : 4|1@0+ (1,0) [0|0] ""  ICM
+ SG_ ESCL_LOCKED : 6|1@0+ (1,0) [0|0] ""  ICM
+ SG_ ESCL_TEXT_GARAGE : 1|1@0+ (1,0) [0|0] ""  ICM
+ SG_ ESCL_SERVICE_RELEVANT_FAILURE : 7|1@0+ (1,0) [0|0] ""  ICM
+ SG_ ESCL_TEXT_ROTATE_STEERING_WHEEL : 0|1@0+ (1,0) [0|0] ""  ICM
+ SG_ ESCL_UNLOCKED : 5|1@0+ (1,0) [0|0] ""  ICM
+ SG_ ESCL_TEXT_DEECT : 2|1@0+ (1,0) [0|0] ""  ICM
+ SG_ ESCL_LED_YELLOW : 3|1@0+ (1,0) [0|0] ""  ICM
+ SG_ ESCL_TEXT_STEERING_WHEELNOT_UNLO : 15|1@0+ (1,0) [0|0] ""  ICM
+
+BO_ 1472 ENGINE_TEMP_AND_BAROMETER: 8 EMS_GW
+ SG_ COOLANT_TEMPERATURE : 15|8@0+ (1,-40) [0|215] "℃"  ICM
+ SG_ VALID_COOLANT : 5|2@0+ (1,0) [0|3] ""  ICM
+
+BO_ 416 EMS_ENGINE_SPEED_AND_TORQUE: 8 EMS_GW
+ SG_ ACTUAL_ENGINE_SPEED_UNFILTERED : 15|16@0+ (1,0) [0|7000] "rpm"  ICM
+ SG_ VALID_ESPEED : 4|1@0+ (1,0) [0|0] ""  ICM
+
+BO_ 928 EMS_ENGINE_IDLE_AND_VSPEED: 8 EMS_GW
+ SG_ VEHICLE_SPEED : 31|16@0+ (0.1,0) [0|300] "km/h"  ICM
+ SG_ VALID_VEHICLE_SPEED : 3|2@0+ (1,0) [0|3] ""  ICM
+
+BO_ 880 ENGINE_FUEL_AND_TURBO: 8 EMS_GW
+ SG_ TURBO_PRESENTATION : 31|8@0+ (1,0) [0|0] "rel"  ICM
+ SG_ VALID_TURBO : 3|2@0+ (1,0) [0|0] ""  ICM
+ SG_ VALID_FUEL_INJ : 5|2@0+ (1,0) [0|3] ""  ICM
+ SG_ ENGINE_FUEAL_INJECTED : 15|16@0+ (0.001,0) [0|65.535] "ml"  ICM
+
+BO_ 1408 PEPS_GENERAL_STATUS_2: 8 PEPS
+ SG_ KEY_IN_REMINDER : 27|1@0+ (1,0) [0|0] ""  ICM
+ SG_ KEY_OUT_REMINDER : 26|1@0+ (1,0) [0|0] ""  ICM
+ SG_ MIU_MSG_REQ_N16 : 55|1@0+ (1,0) [0|0] ""  ICM
+ SG_ UID_LOW_BATT : 28|1@0+ (1,0) [0|1] "" Vector__XXX
+ SG_ MIU_MSG_REQUEST_N15 : 40|1@0+ (1,0) [0|0] ""  ICM
+ SG_ MIU_MSG_REQUEST_N14 : 41|1@0+ (1,0) [0|0] ""  ICM
+ SG_ MIU_MSG_REQUEST_N12 : 43|1@0+ (1,0) [0|0] ""  ICM
+ SG_ MIU_MSG_REQUEST_N7 : 32|1@0+ (1,0) [0|0] ""  ICM
+ SG_ MIU_MSG_REQUEST_N10 : 45|1@0+ (1,0) [0|0] ""  ICM
+ SG_ MIU_MSG_REQUEST_N13 : 42|1@0+ (1,0) [0|0] ""  ICM
+ SG_ MIU_MSG_REQUEST_N1 : 38|1@0+ (1,0) [0|0] ""  ICM
+ SG_ MIU_MSG_REQUEST_N9 : 46|1@0+ (1,0) [0|0] ""  ICM
+ SG_ MIU_MSG_REQUEST_N6 : 33|1@0+ (1,0) [0|0] ""  ICM
+ SG_ MIU_MSG_REQUEST_N11 : 44|1@0+ (1,0) [0|0] ""  ICM
+ SG_ MIU_MSG_REQUEST_N8 : 47|1@0+ (1,0) [0|0] ""  ICM
+ SG_ MIU_MSG_REQUEST_N0 : 39|1@0+ (1,0) [0|0] ""  ICM
+ SG_ MIU_MSG_REQUEST_N3 : 36|1@0+ (1,0) [0|0] ""  ICM
+ SG_ MIU_MSG_REQUEST_N5 : 34|1@0+ (1,0) [0|0] ""  ICM
+ SG_ MIU_MSG_REQUEST_N4 : 35|1@0+ (1,0) [0|0] ""  ICM
+ SG_ MIU_MSG_REQUEST_N2 : 37|1@0+ (1,0) [0|0] ""  ICM
+
+BO_ 1632 BCM_GENERAL_STATUS_2: 8 EBCM
+ SG_ POWER_MODE_VALID_BCM : 3|2@0+ (1,0) [0|0] ""  ICM
+ SG_ POWER_MODE_BCM : 1|2@0+ (1,0) [0|3] ""  ICM
+ SG_ KEY_IN_WARNING : 4|1@0+ (1,0) [0|0] ""  ICM
+ SG_ EB_ODO_VALID : 5|1@0+ (1,0) [0|0] ""  ICM
+ SG_ EB_ODO : 15|32@0+ (0.01,0) [0|2000000] "km"  ICM
+ SG_ ODOMETER_OFFSET_BCM : 47|8@0+ (1,0) [0|255] "km"  ICM
+ SG_ ODOMETER_RESET_COUNTER : 7|2@0+ (1,0) [0|3] ""  ICM
+
+BO_ 1328 AC_CONTROL: 8 ACC
+ SG_ VALID_OTEMP : 1|2@0+ (1,0) [0|3] ""  ICM
+ SG_ OUTSIDE_TEMP : 23|8@0+ (0.5,-40) [-40|70] "deg.C"  ICM
+
+
+
+CM_ BO_ 3221225472 "This is a message for not used signals, created by Vector CANdb++ DBC OLE DB Provider.";
+CM_ SG_ 3221225472 Parking_Assistantce_Rear_Middle_ "This signal's transmit type is on event
+";
+CM_ SG_ 3221225472 Reserved_for_furter_use "Reserved
+";
+CM_ SG_ 3221225472 Parking_Assistantce_Front_Middle "This signal's transmit type is on event
+";
+CM_ SG_ 3221225472 RR_Pressure "Right rear tire pressure";
+CM_ SG_ 3221225472 RR_Pressure_warning "RR tire pressure warning status";
+CM_ SG_ 3221225472 LR_Pressure "Left rear tire pressure";
+CM_ SG_ 3221225472 RF_Pressure_warning "RF tire pressure warning status";
+CM_ SG_ 3221225472 LR_Pressure_warning "LR tire pressure warning status";
+CM_ SG_ 3221225472 Tire_Temperature "Tire temperature";
+CM_ SG_ 3221225472 System_warning "system warning";
+CM_ SG_ 3221225472 LF_Pressure "Left front tire pressure";
+CM_ SG_ 3221225472 RF_Pressure "Right front tire pressure";
+CM_ SG_ 3221225472 LF_Pressure_warning "LF tire pressure warning status";
+CM_ SG_ 3221225472 Signal_Status "Indentify this frame information is newly get  or reserved last time.";
+CM_ SG_ 3221225472 tire_position "Tire position";
+CM_ SG_ 3221225472 Temperature_warning "temperature warning";
+CM_ SG_ 3221225472 Reserved "reserved";
+CM_ SG_ 3221225472 IMMO_SID "Define this message is for RAND NUMBER or CRANK ERROR
+";
+CM_ SG_ 3221225472 CRANK_ERROR "Crank Error Information
+This signal is used to disbale start realy when crank failed for PEPS
+";
+CM_ SG_ 3221225472 Memory_seat_failure "seat failure happens
+";
+CM_ SG_ 3221225472 Memory_mirror_failure "memory_mirror_failure
+";
+CM_ SG_ 3221225472 MIU_MSG_REQUEST_N16 "IPC display message request
+This is request signal for IPC display message
+";
+CM_ SG_ 3221225472 ENGINE_RUNNING "Indicates that the engine is running";
+CM_ SG_ 3221225472 BRAKE_LIGHT "indicates that Brake Lights is active";
+CM_ SG_ 3221225472 CRUISE_ACTIVE "Cruise control engaged";
+CM_ SG_ 3221225472 HAND_BRAKE "Hand brake switch";
+CM_ SG_ 3221225472 BRAKE_LIGHT_LEFT_ACTIVE "Tells if the brake light left is on. Brake switch.";
+CM_ SG_ 3221225472 BRAKE_AUXILIARY_LIGHT_STATUS "STATUS OF BRAKE AUXILIARY LIGHT ";
+CM_ SG_ 3221225472 REQUEST_HAZARD_LIGHT_TELLTALE "Hazard light indicator ";
+CM_ SG_ 3221225472 BRAKE_LIGHT_RIGHT_ACTIVE "Tells if the brake light right is on. Brakeswitch.";
+CM_ SG_ 3221225472 PASSENGER_AIRBAG_OFF "Request to MIU to light passenger airbag OFF lights, indicate  passenger seat not been occupied.
+The signal is reserved.";
+CM_ SG_ 3221225472 SVA_system_status "This signal's transmit type is on event
+";
+CM_ SG_ 3221225472 SVA_WARNING_status_RIGHT "This signal will be stimulated paralely with LED and could be used by IPC for necessary tone generation
+This signal's transmit type is on event.
+";
+CM_ SG_ 3221225472 SVA_WARNING_status_LEFT "This signal will be stimulated paralely with LED and could be used by IPC for necessary tone generation
+This signal's transmit type is on event
+";
+CM_ SG_ 3221225472 MIRROR_FADE_IN_OUT "Outside rear view mirror fade in/out control";
+CM_ SG_ 3221225472 MEMORIZE_OUTSIDE_RIGHT_MIRROR_SE "Memorize outside rear view mirror outside positon";
+CM_ SG_ 3221225472 OUTSIDE_RIGHT_MIRROR_SEE_GROUND "Enable outside rear view mirror see ground function";
+CM_ SG_ 3221225472 CHECK_BRAKE_AUXILIARY_LIGHT "Write info on display";
+CM_ SG_ 3221225472 CHECK_LICENCE_LIGHT "Write info on display
+
+The signal is reserved.";
+CM_ SG_ 3221225472 TRANSMISSION_OIL_TEMPERATURE "When the signal is invalid, the value 0xFF will be sent. ICM can be used to display the failure.
+";
+CM_ BO_ 1776 "Reserved for C53F";
+CM_ SG_ 1392 REMOTE_START_STATUS "reserved for remote start";
+CM_ SG_ 1392 REMOTE_START_RESPONSE_PEPS "reserved for remote start";
+CM_ SG_ 1777 AVERAGE_FUEL_CONSUM1 "如果仪表仅有一个平均油耗，那么使用AVERAGE_FUEL_CONSUM1";
+CM_ SG_ 641 ISS_EMERGENCY_ST_REMINDER "A150 EMS 
+This signal remind the driver via Instrument Cluster,
+ to switch the gear into Neutral position or fully press the clutch pedal. 
+Signal value description indicate the trigger source.";
+CM_ SG_ 641 EMS_Manual_Start "A150 EMS
+车辆不能自行启动需驾驶员拧钥匙启动提醒
+此信号为1的触发条件为，当怠速停机后，车辆不能自行启动需驾驶员拧钥匙启动时置1，希望仪表能进行“请手动启动车辆”类似的文字提示
+断码屏不提示。";
+CM_ SG_ 1376 The_REAR_minimum_PAS_distance "The mimimum distance measured between all rear sensors. Could be use for IPC Tone stimulation
+This signal's transmit type is on event";
+CM_ SG_ 1376 Parking_Assistantce_Rear_Left_Re "This signal's transmit type is on event
+";
+CM_ SG_ 1376 Parking_Assistantce_Rear_Right_R "This signal's transmit type is on event
+";
+CM_ SG_ 1376 Parking_Assistantce_Front_Left_R "This signal's transmit type is on event
+";
+CM_ SG_ 1376 Parking_Assistantce_Front_System "This signal's transmit type is on event
+";
+CM_ SG_ 1376 Parking_Assistantce_Front_Right_ "This signal's transmit type is on event
+";
+CM_ SG_ 1376 The_FRONT_minimum_PAS_distance "The mimimum distance measured between all front sensors. Could be used for IPC Tone stimulation
+This signal's transmit type is on event
+";
+CM_ SG_ 1376 Parking_Assistantce_Rear_System_ "This signal's transmit type is on event
+";
+CM_ SG_ 992 REQ_ECO2_TELLTALE "TCU requests MIL and EMS to store the powertrain freeze frame information.";
+CM_ SG_ 992 TCU_SELECTED_GEAR "Shift lever position";
+CM_ SG_ 992 CHECK_HIGH_OIL_TEMP "Information to be written on display";
+CM_ SG_ 992 GEAR_INDICATION "This signal means the target gear at manual mode.";
+CM_ SG_ 992 REQUEST_SPORT_TELLTALE "Sport lamp on dashboard";
+CM_ SG_ 992 REQUEST_WINTER_TELLTALE "Winter lamp on dashboard.
+The signal is reserved.";
+CM_ SG_ 992 REQUEST_CHECK_GEARBOX_TELLTALE "Check gearbox lamp on dashboard";
+CM_ SG_ 792 REQUEST_EBD_TELLTALE "Signal indicates to light up EBD lamp 
+";
+CM_ SG_ 792 REQUEST_TCS_ESP_ACTIVE_TELLTALE "Signal indicates to light up 'TCS active'lamp. Is used to indicate to the driver that the system is currently active.
+";
+CM_ SG_ 792 ODOMETER_ROLLING "Odometer rolling count 1 pulse/bit. The value shall be set to zero at every ignition off and if the counter reach max value it starts from zero again.
+";
+CM_ SG_ 792 REQUEST_ABS_TELLTALE "Signal indicates to light up ABS lamp on MIU
+";
+CM_ SG_ 792 REQUEST_TCS_ESP_OFF_TELLTALE "Signal indicates to light up 'TCS off' lamp
+";
+CM_ SG_ 792 REQUEST_TCS_ESP_FAILURE_TELLTALE "Signal indicates failure monitoring of ESP function
+";
+CM_ SG_ 848 SEATBELT_RR_ATT "Front Right seatbelt attached indication";
+CM_ SG_ 848 SEATBELT_RM_ATT "Front Right seatbelt attached indication";
+CM_ SG_ 848 SEATBELT_RL_ATT "Front Right seatbelt attached indication";
+CM_ SG_ 848 CHK_BELTS "Write info on display
+
+This signal is reserved.";
+CM_ SG_ 848 SEATBELT_DRIVER_ATTACHED "Front Left seatbelt attached";
+CM_ SG_ 848 AIRBAG_WARNING_LAMP "Set if there is an error in the airbag.";
+CM_ SG_ 848 SEATBELT_PASSENGER_ATTACHED "Front Right seatbelt attached indication";
+CM_ SG_ 1568 DISPLAYED_TOTAL_DISTANCE "Total distance";
+CM_ SG_ 1568 ODOMETER_RESET_COUNTER "Odometer reset counter";
+CM_ SG_ 1568 ODOMETER_OFFSET_ICM "Odometer offset";
+CM_ SG_ 1568 BATTERY_VOLTAGE_LEVEL "Battery voltage level";
+CM_ SG_ 1568 RHEOSTAT_LEVEL "Rheostat level";
+CM_ SG_ 1568 WASHER_FLUID_LEVEL_LOW "When the check control function Washer Fluid Level Low is active in MIU. ";
+CM_ SG_ 1568 AIRBAG_WARNINGLAMP_STATUS "status of airbag warning lamp";
+CM_ SG_ 640 REQUEST_CHECK_ENGINE_TELLTALE "Lights up the check engine lamp.";
+CM_ SG_ 640 REQUEST_CRUISE_TELLTALE "Lights up the cruise lamp.";
+CM_ SG_ 1184 BRAKE_BULB_FAILURE_RIGHT "Write info on display";
+CM_ SG_ 1184 REAR_LEFT_DOOR_OPEN "Status of the rear left door switch";
+CM_ SG_ 1184 TURN_BULB_FAILURE_RIGHT "Write information on display";
+CM_ SG_ 1184 PARK_BULB_A_FAILURE "Write info on display";
+CM_ SG_ 1184 TURN_BULB_FAILURE_LEFT "Write information on display";
+CM_ SG_ 1184 LOW_BEAM_INDICATOR "Low beam indicator ";
+CM_ SG_ 1184 HOOD_LID_OPEN "Status of hood switch";
+CM_ SG_ 1184 REQ_LEFT_DI_TELLTALE "Request left direction telltale, to MIU. Indicate the actual status of direction lights.";
+CM_ SG_ 1184 HIGH_BEAM_INDICATOR "High beam indicator ";
+CM_ SG_ 1184 REQ_RIGHT_DI_TELLTALE "Request right direction telltale, to MIU. Indicate the actual status of direction lights.";
+CM_ SG_ 1184 REAR_RIGHT_DOOR_OPEN "Status of the rear right door switch";
+CM_ SG_ 1184 PARK_LIGHT_A_STATUS "Status of front park light";
+CM_ SG_ 1184 BRAKE_BULB_FAILURE_LEFT "Write info on display";
+CM_ SG_ 1184 CHECK_REAR_FOG_LIGHT "Write information on display";
+CM_ SG_ 1184 PARK_LIGHT_B_STATUS "Status of rear park light";
+CM_ SG_ 1184 CHECK_FRONT_FOG_LIGHT "Write information on display
+The signal is reserved.";
+CM_ SG_ 1184 TRUNK_LID_OPEN "Status of trunk switch";
+CM_ SG_ 1184 PARK_BULB_B_FAILURE "Write info on display";
+CM_ SG_ 1184 PA_DOOR_OPEN "Status of the front right door switch";
+CM_ SG_ 1184 DR_DOOR_OPEN "Status of front left door switch";
+CM_ SG_ 1393 ESCL_LED_RED "The ESCL sets this signal when it has detected a defect failure.
+";
+CM_ SG_ 1393 ESCL_LOCKED "The ESCL sets this signal when it is locked.
+";
+CM_ SG_ 1393 ESCL_TEXT_GARAGE "The ESCL sets this signal when it has detected a failure which leads to a redundancy loss.
+";
+CM_ SG_ 1393 ESCL_SERVICE_RELEVANT_FAILURE "The ESCL sets this signal when a service relevant Failure is detected an stored to the failure memory.
+";
+CM_ SG_ 1393 ESCL_TEXT_ROTATE_STEERING_WHEEL "The ESCL sets this signal when it was unable to unlock the Steering wheel after the first 3 attempts.
+";
+CM_ SG_ 1393 ESCL_UNLOCKED "The ESCL sets this signal when it is unlocked.
+";
+CM_ SG_ 1393 ESCL_TEXT_DEECT "The ESCL sets this signal when it has detected a defect failure.
+";
+CM_ SG_ 1393 ESCL_LED_YELLOW "The ESCL sets this signal when it has detected a failure which leads to a redundancy loss.
+";
+CM_ SG_ 1393 ESCL_TEXT_STEERING_WHEELNOT_UNLO "The ESCL sets this signal when it was unable to unlock the Steering wheel.
+";
+CM_ SG_ 1472 COOLANT_TEMPERATURE "Engine coolant temperature";
+CM_ SG_ 1472 VALID_COOLANT "When the EMS have set a failure code on the signal, a calculated limphome value will be transmitted.";
+CM_ SG_ 416 ACTUAL_ENGINE_SPEED_UNFILTERED "Actual engine speed, updated every combustion. The engine speed is cleared 200 ms after the engine is stopped.
+";
+CM_ SG_ 416 VALID_ESPEED "Describes the condition of the 'Actual speed unfiltered'. As long as the engine can run the value will be OK.";
+CM_ SG_ 928 VEHICLE_SPEED "Vehicle speed calculated by EMS according to the message WHEEL SPEED from ESP.";
+CM_ SG_ 928 VALID_VEHICLE_SPEED "When the diagnostic have set the failure code on this signal the value will be 3.";
+CM_ SG_ 880 TURBO_PRESENTATION "reserved for A150TD
+Relative turbo pressure in % of max pressure in this engine. 
+0 - Lowest preasure below atmosphere
+105 - Atmosphere preasure
+193 - Normal maximum preasure
+255 - Highest position on instrument";
+CM_ SG_ 880 VALID_TURBO "reserved for A150TD";
+CM_ SG_ 880 ENGINE_FUEAL_INJECTED "Consumption in liter used from ignition on. If the consumption is more than 65,535 milli-litre will the value start from zero again.";
+CM_ SG_ 1408 MIU_MSG_REQUEST_N15 "IPC display message request
+This is request signal for IPC display message
+";
+CM_ SG_ 1408 MIU_MSG_REQUEST_N14 "IPC display message request
+This is request signal for IPC display message";
+CM_ SG_ 1408 MIU_MSG_REQUEST_N12 "IPC display message request
+This is request signal for IPC display message
+";
+CM_ SG_ 1408 MIU_MSG_REQUEST_N7 "IPC display message request
+This is request signal for IPC display message
+";
+CM_ SG_ 1408 MIU_MSG_REQUEST_N10 "IPC display message request
+This is request signal for IPC display message
+";
+CM_ SG_ 1408 MIU_MSG_REQUEST_N13 "IPC display message request
+This is request signal for IPC display message
+Power Mode From RES_RUN to Normal RUN(Engine_On)";
+CM_ SG_ 1408 MIU_MSG_REQUEST_N1 "IPC display message request
+This is request signal for IPC display message
+";
+CM_ SG_ 1408 MIU_MSG_REQUEST_N9 "IPC display message request
+This is request signal for IPC display message
+";
+CM_ SG_ 1408 MIU_MSG_REQUEST_N6 "IPC display message request
+This is request signal for IPC display message
+";
+CM_ SG_ 1408 MIU_MSG_REQUEST_N11 "IPC display message request
+This is request signal for IPC display message
+";
+CM_ SG_ 1408 MIU_MSG_REQUEST_N8 "IPC display message request
+This is request signal for IPC display message
+";
+CM_ SG_ 1408 MIU_MSG_REQUEST_N0 "IPC display message request
+This is request signal for IPC display message
+";
+CM_ SG_ 1408 MIU_MSG_REQUEST_N3 "IPC display message request
+This is request signal for IPC display message
+";
+CM_ SG_ 1408 MIU_MSG_REQUEST_N5 "IPC display message request
+This is request signal for IPC display message
+";
+CM_ SG_ 1408 MIU_MSG_REQUEST_N4 "IPC display message request
+This is request signal for IPC display message
+";
+CM_ SG_ 1408 MIU_MSG_REQUEST_N2 "IPC display message request
+This is request signal for IPC display message
+";
+CM_ SG_ 1632 EB_ODO "Total distance";
+CM_ SG_ 1632 ODOMETER_OFFSET_BCM "Odometer offset";
+CM_ SG_ 1632 ODOMETER_RESET_COUNTER "Odometer reset counter";
+BA_DEF_ SG_  "DescriptionJ" STRING ;
+BA_DEF_ SG_  "DescriptionE" STRING ;
+BA_DEF_ SG_  "CommentTxJ" STRING ;
+BA_DEF_ SG_  "CommentTxE" STRING ;
+BA_DEF_ SG_  "CommentRxJ" STRING ;
+BA_DEF_ SG_  "CommentRxE" STRING ;
+BA_DEF_ SG_  "ValueTableE" STRING ;
+BA_DEF_ BO_  "FrameType" INT 0 2;
+BA_DEF_ BO_  "PRI" INT 0 7;
+BA_DEF_ BO_  "PF" HEX 0 65535;
+BA_DEF_ BO_  "PS" ENUM  "+B","ACC","IG1","IG2","*","vector_leerstring";
+BA_DEF_ BO_  "TpMessage" ENUM  "No","Yes";
+BA_DEF_ BO_  "GenMsgIlSupport" ENUM  "No","Yes";
+BA_DEF_ BU_  "CANoeStartDelay" INT 0 0;
+BA_DEF_ BU_  "CANoeDrift" INT 0 0;
+BA_DEF_ BU_  "CANoeJitterMin" INT 0 0;
+BA_DEF_ BU_  "CANoeJitterMax" INT 0 0;
+BA_DEF_ BU_  "ECU" STRING ;
+BA_DEF_ BU_  "NodeLayerModules" STRING ;
+BA_DEF_ BO_  "GenMsgSendType" ENUM  "Cyclic","Event","NotUsed","Cycle and Event","NotUsed","Cycle if Active","NotUsed","IfActive","NoMsgSendType","NotUsed","vector_leerstring";
+BA_DEF_ BO_  "GenMsgNrOfRepetition" INT 0 999999;
+BA_DEF_ BO_  "GenMsgDelayTime" INT 0 1000;
+BA_DEF_ BO_  "GenMsgCycleTime" INT 0 50000;
+BA_DEF_ BO_  "GenMsgCycleTimeFast" INT 0 50000;
+BA_DEF_ BO_  "GenMsgStartDelayTime" INT 0 65535;
+BA_DEF_  "DBName" STRING ;
+BA_DEF_ SG_  "GenSigStartValue" INT 0 0;
+BA_DEF_ SG_  "GenSigInactiveValue" INT 0 0;
+BA_DEF_ SG_  "GenSigSendType" ENUM  "Cyclic","Event","OnWrite","OnWriteWithRepetition","OnChange","OnChangeWithRepetition","IfActive","IfActiveWithRepetition","NoSigSendType","NotUsed","NotUsed","NotUsed","NotUsed";
+BA_DEF_  "Baudrate" INT 0 1000000;
+BA_DEF_  "BusType" STRING ;
+BA_DEF_  "NmType" STRING ;
+BA_DEF_  "Manufacturer" STRING ;
+BA_DEF_ BU_  "NmStationAddress" INT 0 63;
+BA_DEF_ BU_  "NmNode" ENUM  "no","yes";
+BA_DEF_ BO_  "NmMessage" ENUM  "no","yes";
+BA_DEF_  "NmBaseAddress" HEX 1024 1087;
+BA_DEF_ SG_  "NWM-WakeupAllowed" ENUM  "No","Yes";
+BA_DEF_ BO_  "GenMsgILSupport" ENUM  "No","Yes";
+BA_DEF_ SG_  "SystemSignalLongSymbol" STRING ;
+BA_DEF_DEF_  "DescriptionJ" "";
+BA_DEF_DEF_  "DescriptionE" "";
+BA_DEF_DEF_  "CommentTxJ" "";
+BA_DEF_DEF_  "CommentTxE" "";
+BA_DEF_DEF_  "CommentRxJ" "";
+BA_DEF_DEF_  "CommentRxE" "";
+BA_DEF_DEF_  "ValueTableE" "";
+BA_DEF_DEF_  "FrameType" 2;
+BA_DEF_DEF_  "PRI" 0;
+BA_DEF_DEF_  "PF" 0;
+BA_DEF_DEF_  "PS" "";
+BA_DEF_DEF_  "TpMessage" "No";
+BA_DEF_DEF_  "GenMsgIlSupport" "Yes";
+BA_DEF_DEF_  "CANoeStartDelay" 0;
+BA_DEF_DEF_  "CANoeDrift" 0;
+BA_DEF_DEF_  "CANoeJitterMin" 0;
+BA_DEF_DEF_  "CANoeJitterMax" 0;
+BA_DEF_DEF_  "ECU" "";
+BA_DEF_DEF_  "NodeLayerModules" "";
+BA_DEF_DEF_  "GenMsgSendType" "NoMsgSendType";
+BA_DEF_DEF_  "GenMsgNrOfRepetition" 0;
+BA_DEF_DEF_  "GenMsgDelayTime" 0;
+BA_DEF_DEF_  "GenMsgCycleTime" 0;
+BA_DEF_DEF_  "GenMsgCycleTimeFast" 0;
+BA_DEF_DEF_  "GenMsgStartDelayTime" 0;
+BA_DEF_DEF_  "DBName" "";
+BA_DEF_DEF_  "GenSigStartValue" 0;
+BA_DEF_DEF_  "GenSigInactiveValue" 0;
+BA_DEF_DEF_  "GenSigSendType" "Cyclic";
+BA_DEF_DEF_  "Baudrate" 125000;
+BA_DEF_DEF_  "BusType" "";
+BA_DEF_DEF_  "NmType" "";
+BA_DEF_DEF_  "Manufacturer" "";
+BA_DEF_DEF_  "NmStationAddress" 0;
+BA_DEF_DEF_  "NmNode" "no";
+BA_DEF_DEF_  "NmMessage" "no";
+BA_DEF_DEF_  "NmBaseAddress" 1024;
+BA_DEF_DEF_  "NWM-WakeupAllowed" "";
+BA_DEF_DEF_  "GenMsgILSupport" "Yes";
+BA_DEF_DEF_  "SystemSignalLongSymbol" "";
+BA_ "Baudrate" 0;
+BA_ "BusType" "CAN";
+BA_ "NmType" "";
+BA_ "Manufacturer" "";
+BA_ "DBName" "BATC_MIU_CMXV2_9_130722";
+BA_ "GenMsgSendType" BO_ 831 0;
+BA_ "GenMsgCycleTime" BO_ 831 20;
+BA_ "GenMsgSendType" BO_ 1776 0;
+BA_ "GenMsgCycleTime" BO_ 1776 500;
+BA_ "GenMsgCycleTime" BO_ 1584 1000;
+BA_ "GenMsgSendType" BO_ 1584 0;
+BA_ "GenMsgSendType" BO_ 1392 3;
+BA_ "GenMsgCycleTime" BO_ 1392 50;
+BA_ "GenMsgSendType" BO_ 288 0;
+BA_ "GenMsgCycleTime" BO_ 288 20;
+BA_ "GenMsgSendType" BO_ 1777 0;
+BA_ "GenMsgCycleTime" BO_ 1777 1000;
+BA_ "GenMsgSendType" BO_ 1297 0;
+BA_ "GenMsgCycleTime" BO_ 1297 1000;
+BA_ "GenMsgCycleTime" BO_ 802 100;
+BA_ "GenMsgSendType" BO_ 802 0;
+BA_ "GenMsgSendType" BO_ 793 0;
+BA_ "GenMsgCycleTime" BO_ 793 500;
+BA_ "GenMsgCycleTime" BO_ 641 50;
+BA_ "GenMsgSendType" BO_ 641 0;
+BA_ "GenMsgSendType" BO_ 1569 0;
+BA_ "GenMsgCycleTime" BO_ 1569 500;
+BA_ "GenMsgSendType" BO_ 1376 0;
+BA_ "GenMsgCycleTime" BO_ 1376 200;
+BA_ "GenMsgIlSupport" BO_ 1060 0;
+BA_ "NmMessage" BO_ 1060 1;
+BA_ "GenMsgSendType" BO_ 1060 0;
+BA_ "GenMsgCycleTime" BO_ 1060 0;
+BA_ "GenMsgILSupport" BO_ 1060 0;
+BA_ "GenMsgSendType" BO_ 800 1;
+BA_ "GenMsgCycleTime" BO_ 992 50;
+BA_ "GenMsgSendType" BO_ 992 0;
+BA_ "GenMsgCycleTime" BO_ 792 50;
+BA_ "GenMsgSendType" BO_ 792 0;
+BA_ "GenMsgCycleTime" BO_ 848 100;
+BA_ "GenMsgSendType" BO_ 848 3;
+BA_ "GenMsgCycleTime" BO_ 1568 100;
+BA_ "GenMsgSendType" BO_ 1568 0;
+BA_ "GenMsgCycleTime" BO_ 640 50;
+BA_ "GenMsgSendType" BO_ 640 0;
+BA_ "GenMsgCycleTimeFast" BO_ 1184 40;
+BA_ "GenMsgNrOfRepetition" BO_ 1184 3;
+BA_ "GenMsgCycleTime" BO_ 1184 50;
+BA_ "GenMsgSendType" BO_ 1184 0;
+BA_ "GenMsgCycleTime" BO_ 1393 50;
+BA_ "GenMsgSendType" BO_ 1393 0;
+BA_ "GenMsgCycleTime" BO_ 1472 1000;
+BA_ "GenMsgSendType" BO_ 1472 0;
+BA_ "GenMsgSendType" BO_ 416 0;
+BA_ "GenMsgCycleTime" BO_ 416 50;
+BA_ "GenMsgCycleTime" BO_ 928 20;
+BA_ "GenMsgSendType" BO_ 928 0;
+BA_ "GenMsgCycleTime" BO_ 880 100;
+BA_ "GenMsgSendType" BO_ 880 0;
+BA_ "GenMsgCycleTime" BO_ 1408 100;
+BA_ "GenMsgSendType" BO_ 1408 3;
+BA_ "GenMsgCycleTime" BO_ 1632 100;
+BA_ "GenMsgSendType" BO_ 1632 3;
+BA_ "GenMsgCycleTime" BO_ 1328 100;
+BA_ "GenMsgSendType" BO_ 1328 0;
+BA_ "SystemSignalLongSymbol" SG_ 3221225472 Parking_Assistantce_Rear_Middle_ "Parking_Assistantce_Rear_Middle_Region_Object_Status";
+BA_ "SystemSignalLongSymbol" SG_ 3221225472 Parking_Assistantce_Front_Middle "Parking_Assistantce_Front_Middle_Region_Object_Status";
+BA_ "GenSigSendType" SG_ 3221225472 RR_Pressure 0;
+BA_ "GenSigSendType" SG_ 3221225472 RR_Pressure_warning 0;
+BA_ "GenSigSendType" SG_ 3221225472 LR_Pressure 0;
+BA_ "GenSigSendType" SG_ 3221225472 RF_Pressure_warning 0;
+BA_ "GenSigSendType" SG_ 3221225472 LR_Pressure_warning 0;
+BA_ "GenSigStartValue" SG_ 3221225472 Tire_Temperature 40;
+BA_ "GenSigSendType" SG_ 3221225472 Tire_Temperature 0;
+BA_ "GenSigSendType" SG_ 3221225472 System_warning 0;
+BA_ "GenSigSendType" SG_ 3221225472 LF_Pressure 0;
+BA_ "GenSigSendType" SG_ 3221225472 RF_Pressure 0;
+BA_ "GenSigSendType" SG_ 3221225472 LF_Pressure_warning 0;
+BA_ "GenSigSendType" SG_ 3221225472 Signal_Status 0;
+BA_ "GenSigSendType" SG_ 3221225472 tire_position 0;
+BA_ "GenSigSendType" SG_ 3221225472 Temperature_warning 0;
+BA_ "GenSigSendType" SG_ 3221225472 Reserved 0;
+BA_ "GenSigSendType" SG_ 3221225472 AHL_FAULT_STATUS 0;
+BA_ "GenSigSendType" SG_ 3221225472 Memory_seat_failure 0;
+BA_ "GenSigSendType" SG_ 3221225472 Memory_mirror_failure 0;
+BA_ "GenSigSendType" SG_ 3221225472 FCI_DATA_VALID_TURBO 0;
+BA_ "GenSigSendType" SG_ 3221225472 ENGINE_RUNNING 0;
+BA_ "GenSigSendType" SG_ 3221225472 BRAKE_LIGHT 0;
+BA_ "GenSigSendType" SG_ 3221225472 FCI_BRAKE_LIGHT 0;
+BA_ "GenSigSendType" SG_ 3221225472 ACTUAL_GEARBOX 0;
+BA_ "GenSigSendType" SG_ 3221225472 CRUISE_ACTIVE 0;
+BA_ "GenSigSendType" SG_ 3221225472 HAND_BRAKE 0;
+BA_ "GenSigSendType" SG_ 3221225472 TRANSMISSION_SHIFT_PATTERN_STATU 0;
+BA_ "SystemSignalLongSymbol" SG_ 3221225472 TRANSMISSION_SHIFT_PATTERN_STATU "TRANSMISSION_SHIFT_PATTERN_STATUS";
+BA_ "SystemSignalLongSymbol" SG_ 3221225472 MEMORIZE_OUTSIDE_RIGHT_MIRROR_SE "MEMORIZE_OUTSIDE_RIGHT_MIRROR_SEE_GROUND_POSITION";
+BA_ "GenSigStartValue" SG_ 3221225472 TRANSMISSION_OIL_TEMPERATURE 40;
+BA_ "GenSigSendType" SG_ 3221225472 TRANSMISSION_OIL_TEMPERATURE 0;
+BA_ "GenSigStartValue" SG_ 818 LKS_TORQUE_REQ 1024;
+BA_ "GenSigStartValue" SG_ 1777 REMAIN_MAINTAIN_MILEAGE -10239;
+BA_ "GenSigSendType" SG_ 1297 YEAR_HUM 5;
+BA_ "GenSigSendType" SG_ 1297 WEEK_HUM 5;
+BA_ "GenSigSendType" SG_ 1297 TIME_MODE_HUM 5;
+BA_ "GenSigSendType" SG_ 1297 SECOND_HUM 5;
+BA_ "GenSigSendType" SG_ 1297 MONTH_HUM 5;
+BA_ "GenSigSendType" SG_ 1297 MINUTES_HUM 5;
+BA_ "GenSigSendType" SG_ 1297 HOUR_HUM 5;
+BA_ "GenSigSendType" SG_ 1297 DAY_HUM 5;
+BA_ "GenSigSendType" SG_ 641 SS_FAULT_LAMP 0;
+BA_ "GenSigSendType" SG_ 641 SS_ENABLE_LAMP 0;
+BA_ "SystemSignalLongSymbol" SG_ 1376 Parking_Assistantce_Front_M_0000 "Parking_Assistantce_Front_Middle_Right_Region_Object_Status";
+BA_ "SystemSignalLongSymbol" SG_ 1376 Parking_Assistantce_Rear_Mi_0000 "Parking_Assistantce_Rear_Middle_Left_Region_Object_Status";
+BA_ "SystemSignalLongSymbol" SG_ 1376 Parking_Assistantce_Rear_Mi_0001 "Parking_Assistantce_Rear_Middle_Right_Region_Object_Status";
+BA_ "SystemSignalLongSymbol" SG_ 1376 Parking_Assistantce_Front_M_0001 "Parking_Assistantce_Front_Middle_Left_Region_Object_Status";
+BA_ "GenSigStartValue" SG_ 1376 The_REAR_minimum_PAS_distance 30;
+BA_ "SystemSignalLongSymbol" SG_ 1376 Parking_Assistantce_Rear_Left_Re "Parking_Assistantce_Rear_Left_Region_Object_Status";
+BA_ "SystemSignalLongSymbol" SG_ 1376 Parking_Assistantce_Rear_Right_R "Parking_Assistantce_Rear_Right_Region_Object_Status";
+BA_ "SystemSignalLongSymbol" SG_ 1376 Parking_Assistantce_Front_Left_R "Parking_Assistantce_Front_Left_Region_Object_Status";
+BA_ "SystemSignalLongSymbol" SG_ 1376 Parking_Assistantce_Front_System "Parking_Assistantce_Front_System_Status";
+BA_ "SystemSignalLongSymbol" SG_ 1376 Parking_Assistantce_Front_Right_ "Parking_Assistantce_Front_Right_Region_Object_Status";
+BA_ "GenSigStartValue" SG_ 1376 The_FRONT_minimum_PAS_distance 30;
+BA_ "SystemSignalLongSymbol" SG_ 1376 Parking_Assistantce_Rear_System_ "Parking_Assistantce_Rear_System_Status";
+BA_ "GenSigSendType" SG_ 1060 MIU_NM_ALIVE 0;
+BA_ "GenSigSendType" SG_ 800 ITPMS_RESET_REQ 3;
+BA_ "GenSigSendType" SG_ 992 REQ_ECO2_TELLTALE 0;
+BA_ "GenSigSendType" SG_ 992 TCU_SELECTED_GEAR 0;
+BA_ "GenSigSendType" SG_ 992 CHECK_HIGH_OIL_TEMP 0;
+BA_ "GenSigSendType" SG_ 992 GEAR_INDICATION 0;
+BA_ "GenSigSendType" SG_ 992 VALID_SELECTED_GEAR 0;
+BA_ "GenSigSendType" SG_ 992 REQUEST_SPORT_TELLTALE 0;
+BA_ "GenSigSendType" SG_ 992 REQUEST_WINTER_TELLTALE 0;
+BA_ "GenSigSendType" SG_ 992 REQUEST_CHECK_GEARBOX_TELLTALE 0;
+BA_ "GenSigSendType" SG_ 792 REQUEST_EBD_TELLTALE 0;
+BA_ "GenSigSendType" SG_ 792 ODOMETER_ROLLING 0;
+BA_ "GenSigSendType" SG_ 792 REQUEST_ABS_TELLTALE 0;
+BA_ "GenSigSendType" SG_ 792 REQUEST_TCS_ESP_OFF_TELLTALE 0;
+BA_ "GenSigSendType" SG_ 1568 DISPLAYED_TOTAL_DISTANCE 0;
+BA_ "GenSigSendType" SG_ 1568 ODOMETER_RESET_COUNTER 0;
+BA_ "GenSigSendType" SG_ 1568 ODOMETER_OFFSET_ICM 0;
+BA_ "GenSigSendType" SG_ 1568 DATA_VALID_ODO 0;
+BA_ "GenSigSendType" SG_ 1568 BATTERY_VOLTAGE_LEVEL 0;
+BA_ "GenSigSendType" SG_ 1568 DATA_VALID_RHEOSTAT 0;
+BA_ "GenSigSendType" SG_ 1568 NIGHT_PANEL 0;
+BA_ "GenSigSendType" SG_ 1568 RHEOSTAT_LEVEL 0;
+BA_ "GenSigSendType" SG_ 1568 WASHER_FLUID_LEVEL_LOW 0;
+BA_ "GenSigSendType" SG_ 1568 AIRBAG_WARNINGLAMP_STATUS 0;
+BA_ "GenSigSendType" SG_ 640 REQUEST_CHECK_ENGINE_TELLTALE 0;
+BA_ "GenSigSendType" SG_ 640 REQUEST_CRUISE_TELLTALE 0;
+BA_ "SystemSignalLongSymbol" SG_ 1393 ESCL_TEXT_STEERING_WHEELNOT_UNLO "ESCL_TEXT_STEERING_WHEELNOT_UNLOCKED";
+BA_ "GenSigStartValue" SG_ 1472 COOLANT_TEMPERATURE 40;
+BA_ "GenSigSendType" SG_ 1472 COOLANT_TEMPERATURE 0;
+BA_ "GenSigSendType" SG_ 1472 VALID_COOLANT 0;
+BA_ "GenSigSendType" SG_ 416 ACTUAL_ENGINE_SPEED_UNFILTERED 0;
+BA_ "GenSigSendType" SG_ 416 VALID_ESPEED 0;
+BA_ "GenSigSendType" SG_ 928 VEHICLE_SPEED 0;
+BA_ "GenSigSendType" SG_ 928 VALID_VEHICLE_SPEED 0;
+BA_ "GenSigSendType" SG_ 880 VALID_FUEL_INJ 0;
+BA_ "GenSigSendType" SG_ 880 ENGINE_FUEAL_INJECTED 0;
+BA_ "GenSigSendType" SG_ 1632 EB_ODO_VALID 0;
+BA_ "GenSigSendType" SG_ 1632 EB_ODO 0;
+BA_ "GenSigSendType" SG_ 1632 ODOMETER_OFFSET_BCM 0;
+BA_ "GenSigSendType" SG_ 1632 ODOMETER_RESET_COUNTER 0;
+BA_ "GenSigSendType" SG_ 1328 VALID_OTEMP 0;
+BA_ "GenSigStartValue" SG_ 1328 OUTSIDE_TEMP 80;
+BA_ "GenSigSendType" SG_ 1328 OUTSIDE_TEMP 0;
+VAL_ 3221225472 KEY_IN_REMENBER 1 "active" 0 "Inactive" ;
+VAL_ 3221225472 Parking_Assistantce_Rear_Middle_ 8 "Zone 8" 7 "Zone 7" 6 "Zone 6" 5 "Zone 5" 4 "Zone 4" 3 "Zone 3" 2 "Zone 2" 1 "Zone 1" 0 "No Object" ;
+VAL_ 3221225472 Parking_Assistantce_Front_Middle 8 "Zone 8" 7 "Zone 7" 6 "Zone 6" 5 "Zone 5" 4 "Zone 4" 3 "Zone 3" 2 "Zone 2" 1 "Zone 1" 0 "No Object" ;
+VAL_ 3221225472 EPB_SysWarnIndReq 3 "Flash Rate #2 Indication" 2 "Flash Rate #1 Indication" 1 "Continuous Indicaiton" 0 "No Indication" ;
+VAL_ 3221225472 EPB_SysStIndReq 3 "Flash Rate #2 Indication" 2 "Flash Rate #1 Indication" 1 "Continuous Indicaiton" 0 "No Indication" ;
+VAL_ 3221225472 EPB_SysDispMsgReq 5 "Description for the value '0x5'" 4 "Park Brake Set" 3 "Service ParkBrake" 2 "Release Park Brake Switch" 1 "Press Brake Pedal to Release" 0 "Off" ;
+VAL_ 3221225472 EPB_SysAudWarnReq 2 "Warning #2" 1 "Warning #1" 0 "Off" ;
+VAL_ 3221225472 EPB_StpOnBrkToRelParkBrkIndOn 1 "true" 0 "false" ;
+VAL_ 3221225472 EPB_MsgCounter 15 "Range Low" 0 "Range High" ;
+VAL_ 3221225472 DVD_TIMER_MODE 1 "24hours" 0 "12hours" ;
+VAL_ 3221225472 DVD_MINUTE 59 "Range High" 0 "Range Low" ;
+VAL_ 3221225472 DVD_HOURS 23 "Range High" 0 "Range Low" ;
+VAL_ 3221225472 DVD_AM_PM_MODE 1 "PM" 0 "AM" ;
+VAL_ 3221225472 POWER_MODE 5 "CRANK OFF(Reserved)" 4 "CRANK" 3 "CRANK PENDING(Reserved)" 2 "RUN" 1 "ACC" 0 "OFF" ;
+VAL_ 3221225472 POWER_MODE_VALIDITY 2 "Valid" 1 "Invalid" 0 "Not available" ;
+VAL_ 3221225472 VEHICLE_SPEED_OF_SELF_LOCKING 7 "reserve" 6 "reserve" 5 "20km/h" 4 "15km/h" 3 "10km/h" 2 "5km/h" 1 "off" 0 "Inactive" ;
+VAL_ 3221225472 FOLLOW_ME_HOME_FUNCTION_SETTING 7 "reserve" 6 "120s" 5 "60s" 4 "30s" 3 "20s" 2 "10s" 1 "off" 0 "Inactive" ;
+VAL_ 3221225472 RR_Pressure_warning 7 "Reserved" 6 "Sensor failure" 5 "Sensor battery low" 4 "Lost Sensor" 3 "Quik leakage" 2 "Low pressure warning" 1 "High pressure warning" 0 "No warning" ;
+VAL_ 3221225472 RF_Pressure_warning 7 "Reserved" 6 "Sensor failure" 5 "Sensor battery low" 4 "Lost Sensor" 3 "Quik leakage" 2 "Low pressure warning" 1 "High pressure warning" 0 "No warning" ;
+VAL_ 3221225472 LR_Pressure_warning 7 "Reserved" 6 "Sensor failure" 5 "Sensor battery low" 4 "Lost Sensor" 3 "Quik leakage" 2 "Low pressure warning" 1 "High pressure warning" 0 "No warning" ;
+VAL_ 3221225472 System_warning 1 "System error" 0 "No any error" ;
+VAL_ 3221225472 LF_Pressure_warning 7 "Reserved" 6 "Sensor failure" 5 "Sensor battery low" 4 "Lost Sensor" 3 "Quik leakage" 2 "Low pressure warning" 1 "High pressure warning" 0 "No warning" ;
+VAL_ 3221225472 Signal_Status 1 "Last Signal" 0 "Current Signal" ;
+VAL_ 3221225472 tire_position 7 "reseved" 6 "reseved" 5 "reseved" 4 "Left Rear tire" 3 "Right Rear tire" 2 "Right Front tire" 1 "Left Front tire" 0 "No any sensor" ;
+VAL_ 3221225472 Temperature_warning 1 "Temperature warning" 0 "No temperature warning" ;
+VAL_ 3221225472 AHL_FAULT_STATUS 1 "Fail" 0 "Not Failed" ;
+VAL_ 3221225472 CRANK_ERROR_TYPE 6 "SMRC overfeat" 5 "SMRC trasmission engaged" 4 "SMRC circuit fault" 3 "IMMO wrong secret Key" 2 "IMMO No response" 1 "ENS virgin" 0 "Normal" ;
+VAL_ 3221225472 IMMO_SID 1 "CRANK ERROR" 0 "RAND Number" ;
+VAL_ 3221225472 CRANK_ERROR 1 "AuthFailed" 0 "No Error" ;
+VAL_ 3221225472 Memory_seat_failure 1 "failure happened" 0 "failure not happened" ;
+VAL_ 3221225472 Memory_mirror_failure 1 "failure happened" 0 "failure not happened" ;
+VAL_ 3221225472 POWER_MODE_VALIDITY_BCM 2 "Valid" 1 "Invalid" 0 "Not available" ;
+VAL_ 3221225472 FCI_DATA_VALID_TURBO 3 "Not used" 2 "Not used" 1 "Not used" 0 "Value OK" ;
+VAL_ 3221225472 KEY_OUT_REMENDER 1 "active" 0 "Inactive" ;
+VAL_ 3221225472 MIU_MSG_REQUEST_N16 1 "INFORM_16_DRVIER_INFORMATION" 0 "No Information" ;
+VAL_ 3221225472 FCI_DATA_VALID_ACTUAL_GEAR 3 "Value unreliable" 2 "Value above upper limit
+" 1 "Value below lower limit
+" 0 "Value OK" ;
+VAL_ 3221225472 ACTUAL_GEAR 255 "Undefined" 10 "6" 9 "5" 8 "4" 7 "3" 6 "2" 5 "1" 3 "Neutral" 2 "R" ;
+VAL_ 3221225472 ENGINE_RUNNING 1 "Engine running" 0 "Engine NOT running, 200 ms after last revolution pulse" ;
+VAL_ 3221225472 BRAKE_LIGHT 1 "On" 0 "Off" ;
+VAL_ 3221225472 FCI_BRAKE_LIGHT 1 "Value unreliable" 0 "Value OK" ;
+VAL_ 3221225472 ACTUAL_GEARBOX 1 "Automatic" 0 "Manual" ;
+VAL_ 3221225472 CRUISE_ACTIVE 1 "Cruise active" 0 "Cruise not active" ;
+VAL_ 3221225472 HAND_BRAKE 1 "Hand brake switch on" 0 "Hand brake switch off" ;
+VAL_ 3221225472 BRAKE_LIGHT_LEFT_ACTIVE 1 "On" 0 "Off" ;
+VAL_ 3221225472 BRAKE_AUXILIARY_LIGHT_STATUS 1 "active" 0 "Inactive" ;
+VAL_ 3221225472 REQUEST_HAZARD_LIGHT_TELLTALE 1 "Active" 0 "Not active" ;
+VAL_ 3221225472 BRAKE_LIGHT_RIGHT_ACTIVE 1 "On" 0 "Off" ;
+VAL_ 3221225472 TRANSMISSION_SHIFT_PATTERN_STATU 11 "TAP U/D" 10 "DS(Not Used)" 9 "REP(Not Used)" 8 "JERK(Not Used)" 7 "HOT2(Not Used)" 6 "HOT1" 5 "US2" 4 "US1" 3 "WNT(Not Used)" 2 "WUSP" 0 "ECO" 1 "PWR" ;
+VAL_ 3221225472 EBD_WARN_LAMP 1 "active" 0 "no active" ;
+VAL_ 3221225472 ABS_WARN_LAMP 1 "active" 0 "no active" ;
+VAL_ 3221225472 PASSENGER_AIRBAG_OFF 1 "Active (Disable the Passenger airbag)" 0 "Not Active( Passenger airbag normal operate)" ;
+VAL_ 3221225472 PAS_System_status 3 "Failed" 2 "Inhibited" 1 "Active" 0 "Off" ;
+VAL_ 3221225472 SVA_system_status 3 "Failed" 2 "Inhibited" 1 "Active" 0 "Off" ;
+VAL_ 3221225472 SVA_WARNING_status_RIGHT 2 "SVA Warning Level 2" 1 "SVA Warning Level 1" 0 "No SVA Warning" ;
+VAL_ 3221225472 SVA_WARNING_status_LEFT 2 "SVA Warning Level 2" 1 "SVA Warning Level 1" 0 "No SVA Warning" ;
+VAL_ 3221225472 SVA_System_Switch 2 "OFF" 1 "ON" ;
+VAL_ 3221225472 MIRROR_FADE_IN_OUT 3 "Not used" 2 "Disable" 1 "Enable" 0 "Inactive" ;
+VAL_ 3221225472 MEMORIZE_OUTSIDE_RIGHT_MIRROR_SE 3 "Not used" 2 "Not used" 1 "Memorize" 0 "Inactive" ;
+VAL_ 3221225472 OUTSIDE_RIGHT_MIRROR_SEE_GROUND 3 "Not used" 2 "Disable" 1 "Enable" 0 "Inactive" ;
+VAL_ 3221225472 CHK_THEFT_ALARM 1 "Service theft alarm" 0 "No text on display" ;
+VAL_ 3221225472 CHECK_BRAKE_AUXILIARY_LIGHT 1 "Request to write ''BRAKE AUXILIARY LIGHT  failure''" 0 "No text on display" ;
+VAL_ 3221225472 CHECK_LICENCE_LIGHT 1 "Request to write ''Licence light failure'' on display" 0 "No text on display" ;
+VAL_ 3221225472 KEY_IN 1 "IN" 0 "not IN" ;
+VAL_ 3221225472 REQ_MIL_ACTIVE 1 "0x1: Lamp on" 0 "0x0: Lamp oFF" ;
+VAL_ 3221225472 TIME_MODE_ICM 3 "0x3: 24 hour" 2 "'0x2' PM" 1 "'0x1' AM" 0 "0x0: No display" ;
+VAL_ 3221225472 DATA_VALID_TIME_ICM 1 "0x1: Value unreliable" 0 "0x0: Value OK" ;
+VAL_ 818 LKS_STATUS 7 "reserved" 6 "reserved" 5 "reserved" 4 "Camera blocked" 3 "LKS failure" 2 "LKS active" 1 "LKS standby" 0 "LKS off" ;
+VAL_ 818 LKS_SENSITIVITY 3 "reserved" 2 "highSensitivity" 1 "normalSensitivity" 0 "lowSensitivity" ;
+VAL_ 818 LKS_LANE_ASSIT_TYPE 3 "LKS" 2 "RDP" 1 "LDW" 0 "not selected" ;
+VAL_ 818 LKS_TAKE_OVER_REQ 1 "active" 0 "inactive" ;
+VAL_ 818 LKS_RIGHT_TRACKING_STATUS 3 "warning" 2 "intervention" 1 "line tracking" 0 "no display" ;
+VAL_ 818 TSR_OPERATING_STATUS 7 "Reserved" 6 "Reserved" 5 "Reserved" 4 "TSR failure" 3 "Operating: Navigation only mode" 2 "Operating: Vision only mode" 1 "Operating: Fusion mode" 0 "Off" ;
+VAL_ 818 LKS_LEFT_TRACKING_STATUS 3 "warning.接近报警线时" 2 "intervention;系统将要干预" 1 "line tracking;在两车道线中间行驶" 0 "no display;" ;
+VAL_ 818 TSR_SIGN_TYPE 7 "Reserved." 6 "Reserved." 5 "Reserved." 4 "Reserved." 3 "Canada;" 2 "US" 1 "Viennal convention;" 0 "Unknown;" ;
+VAL_ 818 TSR_SPEED_LIMIT_UNIT 3 "Reserved." 2 "miles/h;" 1 "km/h;" 0 "-Unknown;" ;
+VAL_ 818 TSR_SPEED_LIMIT 31 "Reserved." 30 "Reserved." 29 "Reserved." 28 "Reserved." 27 "130" 26 "125" 25 "120" 24 "115" 23 "110" 22 "105" 21 "100" 20 "95" 19 "90" 18 "85" 17 "80" 16 "75" 15 "70" 14 "65" 13 "60" 12 "55" 11 "50" 10 "45" 9 "40" 8 "35" 7 "30" 6 "25" 5 "20" 4 "15" 3 "10" 2 "5" 1 "1-Cancelled:" 0 "0-No display;" ;
+VAL_ 818 HMA_STATUS 4 "not available, permanent failure" 3 "not avaialble, camera blocked;" 2 "not available, temporary failure" 1 "HMA active" 0 "HMA passive;" ;
+VAL_ 831 ACC_CONTROLLER_INITIALIZATION 1 "initialization" 0 "no initialization" ;
+VAL_ 831 ACC_PCW_PREWARNING 1 "warning." 0 "no warning." ;
+VAL_ 831 ACC_PCW_LATENT_WARNING 1 "warning." 0 "no warning." ;
+VAL_ 831 ACC_MODE_ICM 7 "Failure mode;" 6 "Standstill;" 5 "Override;" 4 "Brake-Only mode;绿色" 3 "Active-Control mode;绿色" 2 "Stand-By mode;灰色" 1 "Passive mode;灰色" 0 "OFF mode.指示灯关闭" ;
+VAL_ 831 ACC_FAIL_INFO 1 " error." 0 "no error." ;
+VAL_ 831 ACC_TAKE_OVER_REQ 1 "valid TakeOver request;" 0 "no TakeOver request;" ;
+VAL_ 831 ACC_TEXT_INFO 6 "ACC is switched off" 5 "ACC is switched on" 4 "ACC and PEBS is in error mode" 3 "Active" 2 "ACC is cancelled" 1 "unable to active ACC" 0 "No display" ;
+VAL_ 831 ACC_OBJ_DETECTED 1 "target object detected;" 0 "no object. " ;
+VAL_ 831 ACC_TAUGAP_SET 7 "tauGap_7;" 6 "tauGap_6" 5 "tauGap_5" 4 "tauGap_4" 3 "tauGap_3" 2 "tauGap_2" 1 "tauGap_1" 0 "tauGap_0" ;
+VAL_ 831 ACC_DIS_TO_TAROBJECT 7 "0x0:Distance_7" 6 "0x0:Distance_6." 5 "0x0:Distance_5." 4 "0x0:Distance_4." 3 "0x0:Distance_3" 2 "0x0:Distance_2" 1 "0x0:Distance_1" 0 "0x0:Distance_0." ;
+VAL_ 1776 ICM_DISPLAY_UNIT_TYPE 1 "MPH;" 0 "kmh" ;
+VAL_ 1776 ICM_DISPLAY_FAIL 1 "error;" 0 "no error;" ;
+VAL_ 1776 ICM_QDASH_ACCFail_FEEDBACK 3 "not defined" 2 "irreversible error" 1 "reversible error" 0 "no error" ;
+VAL_ 1776 ICM_VALID_DISPLAY_VEHICLE_SPEED 3 " Value unreliable" 2 " Not used" 1 " Not used" 0 " Value OK" ;
+VAL_ 1776 ICM_LKS_LANE_AID_TYPE_REQ 3 "LKS." 2 "RDP" 1 "LDW" 0 "no selection" ;
+VAL_ 1776 ICM_LKS_SENSITIVITY 3 "reserved." 2 "highSensitivity;" 1 "normalSensitivity;" 0 "lowSensitivity;" ;
+VAL_ 1584 AHL_FAULT_STATUS 1 "0x1: Fail" 0 "0x0: Not Failed" ;
+VAL_ 1392 REMOTE_START_STATUS 3 "0x3: reserved" 2 "0x2: RES Start" 1 "0x2: RES RUN" 0 "0x0: Invalid" ;
+VAL_ 1392 REMOTE_START_RESPONSE_PEPS 1 "0x1: Active" 0 "0x0: Inactive" ;
+VAL_ 288 ABS_OPERATING 1 "0x1: ABS actually operating" 0 "0x0: ABS Standby" ;
+VAL_ 1297 WEEK_HUM 7 "0x7: Sunday" 6 "0x6: Saturday" 5 "0x5: Friday" 4 "0x4: Thursday" 3 "0x3: Wednesday" 2 "0x2: Tuesday" 1 "0x1: Monday" 0 "0x0: Invalid" ;
+VAL_ 1297 TIME_MODE_HUM 3 "0x3: 24 hour" 2 "PM" 1 "AM" 0 "0x0: No display" ;
+VAL_ 1297 MONTH_HUM 12 "0xC: December" 11 "0xB: November" 10 "0xA: October" 9 "0x9: September" 8 "0x8: August" 7 "0x7: July" 6 "0x6: June" 5 "0x5: May" 4 "0x4: April" 3 "0x3: March" 2 "0x2: February" 1 "0x1: January" 0 "0x0: Invalid" ;
+VAL_ 802 STS_EPS_FAULT_STS 3 "fault value" 2 "WL on" 1 "WL flash" 0 "WL off" ;
+VAL_ 793 ITPMS_LF_PRESSURE_WARNING 3 "inactive" 2 "alarm" 1 "warning" 0 "normal" ;
+VAL_ 793 ITPMS_RF_PRESSURE_WARNING 3 "inactive" 2 "alarm" 1 "warning" 0 "normal" ;
+VAL_ 793 ITPMS_RR_PRESSURE_WARNING 3 "inactive" 2 "alarm" 1 "warning" 0 "normal" ;
+VAL_ 793 ITPMS_LR_PRESSURE_WARNING 3 "inactive" 2 "alarm" 1 "warning" 0 "normal" ;
+VAL_ 793 ITPMS_FAIL_STATUS 1 "telltale requested" 0 "No telltale requested" ;
+VAL_ 793 ITPMS_WARNING_STATUS 1 "telltale requested" 0 "No telltale requested" ;
+VAL_ 793 ITPMS_RESET_STATUS 1 "active" 0 "Inactive" ;
+VAL_ 641 ISS_EMERGENCY_ST_REMINDER 7 "not used" 6 "not used" 5 "Engine coolant temperature low" 4 "Sliding vehicle" 3 "AC reqeust" 2 "Brake system low vacuum" 1 "Battery low SOC" 0 "no request" ;
+VAL_ 641 EMS_Manual_Start 1 "1：reminder" 0 "0：No reminder" ;
+VAL_ 641 ENG_SS_STS 6 "Engine auto-stopping" 5 "Engine Operation" 4 "Engine restart" 3 "Starter restart" 2 "Engine Stopped" 1 "Engine standby" 0 "non-start/stop mode" ;
+VAL_ 641 ENG_SS_STS_VALID 1 "Value unreliable" 0 "Value OK" ;
+VAL_ 641 CHARGE_WARNING_TELLTALE 1 "On" 0 "Off" ;
+VAL_ 641 SS_FAULT_LAMP 1 "Lamp On" 0 "Lamp Off" ;
+VAL_ 641 SS_ENABLE_LAMP 1 "Lamp On" 0 "Lamp Off" ;
+VAL_ 1569 REMOTE_START_RESPONSE_ICM 1 "active" 0 "inactive" ;
+VAL_ 1569 FAULT_BUZZING_IND_LAMP 10 "Continuous , 'park beep'" 9 "Continuous, 'pling..." 8 "120 seconds , 'pling..." 7 " One time, 'dong'" 6 "Five times 'dong..." 5 "60 seconds, 'dong..." 4 "Continuous , 'dong..." 3 "Sound-tic&tac," 2 "Continuous 'pling-plong-..." 1 "Three times,'pling-plong-pling'" 0 "No fault" ;
+VAL_ 1569 HAND_BRAKE_ICM 1 "Active" 0 "inActive" ;
+VAL_ 1376 NEAREST_REAR_PAS 3 "0x3: Right" 2 "0x2: Middle" 1 "0x1: Left" 0 "0x0: Default" ;
+VAL_ 1376 SVA_WARNING_STATUS_LEFT 2 "0x2: SVA Warning Level 1" 1 "0x1: SVA Warning Level 1" 0 "0x0: No SVA Warning" ;
+VAL_ 1376 SVA_WARNING_STATUS_RIGHT 2 "0x2: SVA Warning Level 1" 1 "0x1: SVA Warning Level 1" 0 "0x0: No SVA Warning" ;
+VAL_ 1376 SVA_SYS_STATUS 3 "0x3: Failed" 2 "0x2: Inhibited" 1 "0x1: Active" 0 "0x0: Off" ;
+VAL_ 1376 PAS_SYS_STATUS 3 "0x3: Failed" 2 "0x2: Inhibited" 1 "0x1: Active" 0 "0x0: Off" ;
+VAL_ 1376 PA_PAS_SW_STATUS 3 "0x3: Reserved" 0 "0x0: Invalid" 2 "OFF" 1 "ON" ;
+VAL_ 1376 Parking_Assistantce_Front_M_0000 8 "Zone 8" 7 "Zone 7" 6 "Zone 6" 5 "Zone 5" 4 "Zone 4" 3 "Zone 3" 2 "Zone 2" 1 "Zone 1" 0 "No Object" ;
+VAL_ 1376 Parking_Assistantce_Rear_Mi_0000 8 "Zone 8" 7 "Zone 7" 6 "Zone 6" 5 "Zone 5" 4 "Zone 4" 3 "Zone 3" 2 "Zone 2" 1 "Zone 1" 0 "No Object" ;
+VAL_ 1376 Parking_Assistantce_Rear_Mi_0001 8 "Zone 8" 7 "Zone 7" 6 "Zone 6" 5 "Zone 5" 4 "Zone 4" 3 "Zone 3" 2 "Zone 2" 1 "Zone 1" 0 "No Object" ;
+VAL_ 1376 Parking_Assistantce_Front_M_0001 8 "Zone 8" 7 "Zone 7" 6 "Zone 6" 5 "Zone 5" 4 "Zone 4" 3 "Zone 3" 2 "Zone 2" 1 "Zone 1" 0 "No Object" ;
+VAL_ 1376 Parking_Assistantce_Rear_Left_Re 8 "Zone 8" 7 "Zone 7" 6 "Zone 6" 5 "Zone 5" 4 "Zone 4" 3 "Zone 3" 2 "Zone 2" 1 "Zone 1" 0 "No Object" ;
+VAL_ 1376 Parking_Assistantce_Rear_Right_R 8 "Zone 8" 7 "Zone 7" 6 "Zone 6" 5 "Zone 5" 4 "Zone 4" 3 "Zone 3" 2 "Zone 2" 1 "Zone 1" 0 "No Object" ;
+VAL_ 1376 Parking_Assistantce_Front_Left_R 8 "Zone 8" 7 "Zone 7" 6 "Zone 6" 5 "Zone 5" 4 "Zone 4" 3 "Zone 3" 2 "Zone 2" 1 "Zone 1" 0 "No Object" ;
+VAL_ 1376 Parking_Assistantce_Front_System 3 "Failed" 2 "Inhibited" 1 "Active" 0 "Off" ;
+VAL_ 1376 Parking_Assistantce_Front_Right_ 8 "Zone 8" 7 "Zone 7" 6 "Zone 6" 5 "Zone 5" 4 "Zone 4" 3 "Zone 3" 2 "Zone 2" 1 "Zone 1" 0 "No Object" ;
+VAL_ 1376 Parking_Assistantce_Rear_System_ 3 "Failed" 2 "Inhibited" 1 "Active" 0 "Off" ;
+VAL_ 1060 MIU_NM_ALIVE 1 "Active" 0 "Not active" ;
+VAL_ 1060 MIU_NM_LIMPHOME 1 "Active" 0 "Not active" ;
+VAL_ 1060 MIU_NM_SLEEP_INDICATION 1 "Active" 0 "Not active" ;
+VAL_ 1060 MIU_NM_SLEEP_ACK 1 "Active" 0 "Not active" ;
+VAL_ 1060 MIU_NM_RING 1 "Active" 0 "Not active" ;
+VAL_ 800 ITPMS_RESET_REQ 1 "0x1: Request reset" 0 "0x0: no Request " ;
+VAL_ 992 REQ_ECO2_TELLTALE 0 "Lamp off" 1 "Lamp on" ;
+VAL_ 992 TCU_SELECTED_GEAR 12 "L (Low)" 11 "M (Manual)" 4 "D (Drive)" 3 "N (Neutral)" 2 "R (reverse)" 1 "P (Park)" ;
+VAL_ 992 CHECK_HIGH_OIL_TEMP 0 "No text on display" 1 "Request to write ''Transmission overheating'' on display" ;
+VAL_ 992 GEAR_INDICATION 255 "Undefined (In P, R, N, D, Lrange)" 6 "6:th Gear (for future use)" 5 "5:th Gear" 4 "4:th Gear" 3 "3:rd Gear" 2 "2:nd Gear" 0 "Not active, look at ''actual gear'' (Not Used)" 1 "1:st Gear" ;
+VAL_ 992 VALID_SELECTED_GEAR 3 "Value unreliable" 2 "Value above upper limit(Not used)" 1 "Value below lower limit(Not used)" 0 "Value OK" ;
+VAL_ 992 REQUEST_SPORT_TELLTALE 0 "Lamp off" 1 "Lamp on" ;
+VAL_ 992 REQUEST_WINTER_TELLTALE 0 "Lamp off" 1 "Lamp on" ;
+VAL_ 992 REQUEST_CHECK_GEARBOX_TELLTALE 0 "Lamp off" 1 "Lamp on" ;
+VAL_ 792 REQUEST_EBD_TELLTALE 1 "Telltale requested" 0 "No telltale requested" ;
+VAL_ 792 REQUEST_TCS_ESP_ACTIVE_TELLTALE 1 "Telltale requested" 0 "No telltale requested" ;
+VAL_ 792 REQUEST_ABS_TELLTALE 1 "Telltale requested" 0 "No telltale requested" ;
+VAL_ 792 REQUEST_TCS_ESP_OFF_TELLTALE 1 "Telltale requested" 0 "No telltale requested" ;
+VAL_ 792 REQUEST_TCS_ESP_FAILURE_TELLTALE 1 "Telltale requested" 0 "No telltale requested" ;
+VAL_ 848 SEATBELT_RR_ATT 1 "Attached" 0 "Not attached" ;
+VAL_ 848 SEATBELT_RM_ATT 1 "Attached" 0 "Not attached" ;
+VAL_ 848 SEATBELT_RL_ATT 1 "Attached" 0 "Not attached" ;
+VAL_ 848 CHK_BELTS 1 "Request to write ''Use your seat belts'' on display" 0 "No text on display" ;
+VAL_ 848 SEATBELT_DRIVER_ATTACHED 1 "Attached" 0 "Not attached" ;
+VAL_ 848 AIRBAG_WARNING_LAMP 3 "reserved" 2 "production mode, blinking" 1 "fault, lamp on" 0 "no fault, lamp off" ;
+VAL_ 848 SEATBELT_PASSENGER_ATTACHED 1 "Attached" 0 "Not attached" ;
+VAL_ 1568 DATA_VALID_ODO 1 "Value unreliable" 0 "Value OK" ;
+VAL_ 1568 DATA_VALID_RHEOSTAT 3 "Value unreliable" 2 "Value above upper limit" 1 "Value below lower limit" 0 "Value OK" ;
+VAL_ 1568 NIGHT_PANEL 1 "On" 0 "Off" ;
+VAL_ 1568 RHEOSTAT_LEVEL 255 "LEVEL10" 229 "LEVEL9" 204 "LEVEL8" 178 "LEVEL7" 153 "LEVEL6'" 127 "LEVEL5'" 102 "LEVEL4" 76 "LEVEL3" 51 "LEVEL2" 25 "LEVEL1" 0 "DARK" ;
+VAL_ 1568 WASHER_FLUID_LEVEL_LOW 1 "Low level" 0 "Normal" ;
+VAL_ 1568 AIRBAG_WARNINGLAMP_STATUS 1 "Fault" 0 "No Fault" ;
+VAL_ 640 CRUISE_ACTIVE 1 "Cruise active" 0 "Cruise not active" ;
+VAL_ 640 GEAR_SWITCH_INDICATOR 6 "6" 5 "5" 4 "4" 3 "3" 2 "2" 1 "1" 0 "No gear switch indication" ;
+VAL_ 640 REQ_SHIFT_UP_TELLTALE 1 "'shift up' lamp" 0 "normal" ;
+VAL_ 640 REQ_SHIFT_DOWN_TELLTALE 1 "'shift down' lamp" 0 "normal" ;
+VAL_ 640 EMS_ACTUAL_GEAR 255 "undefined" 11 "notused until 0xF" 10 "6" 9 "5" 8 "4" 7 "3" 6 "2" 5 "1" 4 "undefined" 3 "Neutral" 2 "R" 1 "not used" 0 "not used" ;
+VAL_ 640 VALID_ACTUAL_GEAR_EMS 3 "Value unreliable" 2 "Value below upper limit" 1 "Value below lower limit" 0 "Value ok" ;
+VAL_ 640 EMS_AUTHRESULT 1 "anthentication success" 0 "anthentication failure" ;
+VAL_ 640 REQUEST_CHECK_ENGINE_TELLTALE 1 "''check engine''lamp ON" 0 "Normal" ;
+VAL_ 640 REQUEST_CRUISE_TELLTALE 1 "''cruise'' lamp ON" 0 "Normal" ;
+VAL_ 1184 DRL_INDICATOR 1 "on" 0 "off" ;
+VAL_ 1184 BRAKE_BULB_FAILURE_RIGHT 1 "Request to write ''Brake light failure'' on display" 0 "No text on display" ;
+VAL_ 1184 REAR_LEFT_DOOR_OPEN 1 "Door open" 0 "Door closed" ;
+VAL_ 1184 TURN_BULB_FAILURE_RIGHT 1 "Request to write ''turn light
+right failure'' on display" 0 "No text on display" ;
+VAL_ 1184 TURN_BULB_FAILURE_LEFT 1 "Request to write ''Turn light left failure'' on display" 0 "No text on display" ;
+VAL_ 1184 POSITION_LIGHT_ON_WARNING 1 "active" 0 "Inactive" ;
+VAL_ 1184 LOW_BEAM_INDICATOR 1 "On" 0 "Off" ;
+VAL_ 1184 CHECK_DRL 1 "Request to write 'DRL failure'" 0 "No text on display" ;
+VAL_ 1184 HOOD_LID_OPEN 1 "Open" 0 "Closed" ;
+VAL_ 1184 FRONT_FOG_LIGHT_TELLTALE 1 "Active" 0 "Not active" ;
+VAL_ 1184 REAR_FOG_LIGHT_TELLTALE 1 "Active" 0 "Not active" ;
+VAL_ 1184 REQ_LEFT_DI_TELLTALE 1 "Lit" 0 "Not lit" ;
+VAL_ 1184 HIGH_BEAM_INDICATOR 1 "On" 0 "Off" ;
+VAL_ 1184 ANTI_THELF_INDICATOR 3 "Not used" 2 "alarm" 1 "active" 0 "Inactive" ;
+VAL_ 1184 REQ_RIGHT_DI_TELLTALE 1 "Lit" 0 "Not lit" ;
+VAL_ 1184 REAR_RIGHT_DOOR_OPEN 1 "Door open" 0 "Door closed" ;
+VAL_ 1184 PARK_LIGHT_A_STATUS 1 "on" 0 "off" ;
+VAL_ 1184 BRAKE_BULB_FAILURE_LEFT 1 "Request to write ''Brake light failure'' on display" 0 "No text on display" ;
+VAL_ 1184 CHECK_REAR_FOG_LIGHT 1 "Request to write ''Fog light failure''on display" 0 "No text on display" ;
+VAL_ 1184 PARK_LIGHT_B_STATUS 1 "on" 0 "off" ;
+VAL_ 1184 CHECK_FRONT_FOG_LIGHT 1 "Request to write ''Fog light failure''on display" 0 "No text on display" ;
+VAL_ 1184 TRUNK_LID_OPEN 1 "Open" 0 "Closed" ;
+VAL_ 1184 PA_DOOR_OPEN 1 "Door open" 0 "Door closed" ;
+VAL_ 1184 DR_DOOR_OPEN 1 "Door open" 0 "Door closed" ;
+VAL_ 1393 ESCL_LED_RED 1 "Defect failure detected" 0 "No defect failure detected" ;
+VAL_ 1393 ESCL_LOCKED 1 "ESCL is locked" 0 "ESCL is not locked" ;
+VAL_ 1393 ESCL_TEXT_GARAGE 1 "Service relevant failure detected" 0 "No servie relevant failure detected" ;
+VAL_ 1393 ESCL_SERVICE_RELEVANT_FAILURE 1 "Service relevant failure detected" 0 "No servie relevant failure detected" ;
+VAL_ 1393 ESCL_TEXT_ROTATE_STEERING_WHEEL 1 "Steering wheel is blocked" 0 "Steering wheel is not blocked" ;
+VAL_ 1393 ESCL_UNLOCKED 1 "ESCL is unlocked" 0 "ESCL is not unlocked" ;
+VAL_ 1393 ESCL_TEXT_DEECT 1 "Defect failure detected" 0 "No defect failure detected" ;
+VAL_ 1393 ESCL_LED_YELLOW 1 "Service relevant failure detected" 0 "No servie relevant failure detected" ;
+VAL_ 1393 ESCL_TEXT_STEERING_WHEELNOT_UNLO 1 "ESCL couldn't unlock" 0 "ESCL was able to unlock" ;
+VAL_ 1472 VALID_COOLANT 3 "Value unreliable" 2 "Value above upper limit" 1 "Value below lower limit" 0 "Value OK" ;
+VAL_ 416 VALID_ESPEED 1 "Value unreliable" 0 "Value OK" ;
+VAL_ 928 VALID_VEHICLE_SPEED 3 "Value unreliable" 2 "Not used" 1 "Not used" 0 "Value OK" ;
+VAL_ 880 VALID_TURBO 3 "Not used" 2 "Not used" 1 "Not used" 0 "0x0: Value OK" ;
+VAL_ 880 VALID_FUEL_INJ 3 "Not used" 2 "Not used" 1 "Not used" 0 "Value OK" ;
+VAL_ 1408 KEY_IN_REMINDER 1 "0x1: Active" 0 "0x0: Inactive" ;
+VAL_ 1408 MIU_MSG_REQ_N16 1 "INFORM_16_DRVIER_INFORMATION" 0 "0x0: No Information" ;
+VAL_ 1408 UID_LOW_BATT 1 "Low Battery" 0 "Normal" ;
+VAL_ 1408 MIU_MSG_REQUEST_N15 1 "INFORM_15_DRVIER_INFORMATION" 0 "No Information" ;
+VAL_ 1408 MIU_MSG_REQUEST_N14 1 "INFORM_14_DRVIER_INFORMATION" 0 "No Information" ;
+VAL_ 1408 MIU_MSG_REQUEST_N12 1 "Please keep UID close to SSB" 0 "No Information" ;
+VAL_ 1408 MIU_MSG_REQUEST_N7 1 "key in reminder" 0 "No Information" ;
+VAL_ 1408 MIU_MSG_REQUEST_N10 1 "EMS authentication failure" 0 "No Information" ;
+VAL_ 1408 MIU_MSG_REQUEST_N13 1 "INFORM_13_DRVIER_INFORMATION" 0 "No Information" ;
+VAL_ 1408 MIU_MSG_REQUEST_N1 1 "system red warning" 0 "No Information" ;
+VAL_ 1408 MIU_MSG_REQUEST_N9 1 "UID low battery" 0 "No Information" ;
+VAL_ 1408 MIU_MSG_REQUEST_N6 1 "INFORM_6_DRVIER_INFORMATION" 0 "No Information" ;
+VAL_ 1408 MIU_MSG_REQUEST_N11 1 "ESCL is not unlocked" 0 "No Information" ;
+VAL_ 1408 MIU_MSG_REQUEST_N8 1 "key out reminder" 0 "No Information" ;
+VAL_ 1408 MIU_MSG_REQUEST_N0 1 "system yellow warning" 0 "No Information" ;
+VAL_ 1408 MIU_MSG_REQUEST_N3 1 "press bake to start" 0 "No Information" ;
+VAL_ 1408 MIU_MSG_REQUEST_N5 1 "Press clutch to start" 0 "No Information" ;
+VAL_ 1408 MIU_MSG_REQUEST_N4 1 "shift to P/N to start" 0 "No Information" ;
+VAL_ 1408 MIU_MSG_REQUEST_N2 1 "no UID found" 0 "No Information" ;
+VAL_ 1632 POWER_MODE_VALID_BCM 3 "0x3: reserved" 2 "0x2: Vaild" 1 "0x1: Invaild" 0 "0x0: reserved" ;
+VAL_ 1632 POWER_MODE_BCM 3 "Crank" 2 "IGN ON" 1 "ACC" 0 "OFF" ;
+VAL_ 1632 KEY_IN_WARNING 1 "active" 0 "Inactive" ;
+VAL_ 1632 EB_ODO_VALID 1 "Value unreliable" 0 "Value OK" ;
+VAL_ 1328 VALID_OTEMP 3 "Value unreliable" 2 "Value above upper limit" 1 "Value below lower limit" 0 "Value OK" ;
+

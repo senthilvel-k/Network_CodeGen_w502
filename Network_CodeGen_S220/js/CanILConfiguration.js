@@ -1,0 +1,15 @@
+document.getElementById("IL_TASK_PERIOD_MS").value = data[0].IL_TASK_PERIOD_MS;
+IL_TASK_PERIOD_MSvalidate();
+document.getElementById("CAN_IL_NUM_OF_CHANNELS").value = data[0].CAN_IL_NUM_OF_CHANNELS;
+CAN_IL_NUM_OF_CHANNELSvalidate();
+document.getElementById("CAN_IL_DYNAMIC_LEN_SUPPORT").value = data[0].CAN_IL_DYNAMIC_LEN_SUPPORT;
+document.getElementById("CANIL_TX_TIMEOUT_SUPPORT").value = data[0].CANIL_TX_TIMEOUT_SUPPORT;
+document.getElementById("CAN_IL_TX_BURST_MODE").value = data[0].CAN_IL_TX_BURST_MODE;
+document.getElementById("CAN_IL_TX_WITH_DLC0_SUPPORT").value = data[0].CAN_IL_TX_WITH_DLC0_SUPPORT;
+document.getElementById("CAN_IL_REQ_FRAME_SUPPORT").value = data[0].CAN_IL_REQ_FRAME_SUPPORT;
+document.getElementById("CAN_IL_PERIODIC_RESTART_AFTER_EVENT").value = data[0].CAN_IL_PERIODIC_RESTART_AFTER_EVENT;
+document.getElementById("CAN_IL_MESSAGE_VALIDATION_SUPPORT").value = data[0].CAN_IL_MESSAGE_VALIDATION_SUPPORT;
+document.getElementById("CANIL_IFSUPPORT").value = data[0].CANIL_IFSUPPORT;
+document.getElementById("CANIL_BYTEENDIANNESS").value = data[0].CANIL_BYTEENDIANNESS;
+document.getElementById("CANIL_RXINDICATION_API").value = data[0].CANIL_RXINDICATION_API;
+document.getElementById("CANIL_TXCONFIRMATION_API").value = data[0].CANIL_TXCONFIRMATION_API;

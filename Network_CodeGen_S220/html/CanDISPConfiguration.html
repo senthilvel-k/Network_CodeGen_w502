@@ -1,0 +1,378 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <title>DISP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="data.json"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{'styl.css'|staticfile }}">
+    <script>
+    function accordionfn(id) {
+        var x = document.getElementById(id);
+        if (x.className.indexOf("w3-show") == -1) {
+            x.className += " w3-show";
+        } else { 
+            x.className = x.className.replace(" w3-show", "");
+        }
+    }</script>
+    </head>
+    <body onload="load()" class="w3-container w3-grey"><!--copy_start-->
+<div  class=" w3-dark-grey" style ="width:100%;height:100%;position:fixed">
+
+<div class="w3-sidenav w3-dark-grey" style ="width:15%;height:100%;float:left;overflow:auto">
+
+<div class="w3-card-4 w3-light-grey" style="width:100%;height:100%">
+    <header class="w3-container w3-light-green">
+        <h3>CAN Database </h3>
+    </header>
+    
+    <Br>
+            
+    <div class="w3-container ">
+        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_dbc0_msg" id="DRV" data-bind="true">+ TX/RX Message Configurations </a>
+    </div>
+  
+    <div class="w3-container ">
+        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_dbc0_sig" id="DRV" data-bind="true">+ TX/Rx signal Configurations </a>
+    </div>
+    <Br>
+   
+</div>
+
+</div>
+ 
+<div class=" w3-dark-grey w3-padding-medium" style ="width:85%;height:100%;float:right;overflow:auto">
+<form action="BackEnd.DISP_SaveButton" id="form" data-bind="true">
+<table  class ="w3-table  w3-bordered  w3-border w3-hoverable">
+    <thead>
+    <tr>
+    <th> Configurable options </th>
+    <th>Channel 0</th>
+    </tr>
+    </thead><tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDISP_EXTENDEDID_SUPPORT_ACC')" ><b>CANDISP_EXTENDEDID_SUPPORT</b></label><Br>
+      <div id="CANDISP_EXTENDEDID_SUPPORT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey ">MAIN</p>    </div>    </div>    </td>    <td>
+<select id="CANDISP_EXTENDEDID_SUPPORT" class="w3-select " name="CANDISP_EXTENDEDID_SUPPORT"  id="CANDISP_EXTENDEDID_SUPPORT"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDISP_SETDYNAMICTXID_API_ACC')" ><b>CANDISP_SETDYNAMICTXID_API</b></label><Br>
+      <div id="CANDISP_SETDYNAMICTXID_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDISP_SETDYNAMICTXID_API" class="w3-select " name="CANDISP_SETDYNAMICTXID_API"  id="CANDISP_SETDYNAMICTXID_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDISP_TRIGGER_TRANSMIT_API_ACC')" ><b>CANDISP_TRIGGER_TRANSMIT_API</b></label><Br>
+      <div id="CANDISP_TRIGGER_TRANSMIT_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDISP_TRIGGER_TRANSMIT_API" class="w3-select " name="CANDISP_TRIGGER_TRANSMIT_API"  id="CANDISP_TRIGGER_TRANSMIT_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDISP_SET_BAUDRATE_API_ACC')" ><b>CANDISP_SET_BAUDRATE_API</b></label><Br>
+      <div id="CANDISP_SET_BAUDRATE_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDISP_SET_BAUDRATE_API" class="w3-select " name="CANDISP_SET_BAUDRATE_API"  id="CANDISP_SET_BAUDRATE_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDISP_XCP_SUPPORT_API_ACC')" ><b>CANDISP_XCP_SUPPORT_API</b></label><Br>
+      <div id="CANDISP_XCP_SUPPORT_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDISP_XCP_SUPPORT_API" class="w3-select " name="CANDISP_XCP_SUPPORT_API"  id="CANDISP_XCP_SUPPORT_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDISP_TP_SUPPORT_API_ACC')" ><b>CANDISP_TP_SUPPORT_API</b></label><Br>
+      <div id="CANDISP_TP_SUPPORT_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDISP_TP_SUPPORT_API" class="w3-select " name="CANDISP_TP_SUPPORT_API"  id="CANDISP_TP_SUPPORT_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CAN_TXQ_SIZE_ACC')" ><b>CAN_TXQ_SIZE</b></label><Br>
+      <div id="CAN_TXQ_SIZE_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CAN_TXQ_SIZEvalidate()" style="width:30%" value="5" type="number" name="CAN_TXQ_SIZE"  id="CAN_TXQ_SIZE" min=0 max=255><Br>
+<script>
+    function CAN_TXQ_SIZEvalidate() {
+    var x = document.getElementById("CAN_TXQ_SIZE");
+    if( x.value <0  || x.value > 255)
+    { document.getElementById("CAN_TXQ_SIZE").style.background="red";
+    }
+    else{
+    document.getElementById("CAN_TXQ_SIZE").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CAN_RXQ_SIZE_ACC')" ><b>CAN_RXQ_SIZE</b></label><Br>
+      <div id="CAN_RXQ_SIZE_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CAN_RXQ_SIZEvalidate()" style="width:30%" value="0" type="number" name="CAN_RXQ_SIZE"  id="CAN_RXQ_SIZE" min=0 max=255><Br>
+<script>
+    function CAN_RXQ_SIZEvalidate() {
+    var x = document.getElementById("CAN_RXQ_SIZE");
+    if( x.value <0  || x.value > 255)
+    { document.getElementById("CAN_RXQ_SIZE").style.background="red";
+    }
+    else{
+    document.getElementById("CAN_RXQ_SIZE").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDISP_TRANSMIT_RECEIVE_QUEUE_SUPPORT_ACC')" ><b>CANDISP_TRANSMIT_RECEIVE_QUEUE_SUPPORT</b></label><Br>
+      <div id="CANDISP_TRANSMIT_RECEIVE_QUEUE_SUPPORT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDISP_TRANSMIT_RECEIVE_QUEUE_SUPPORT" class="w3-select " name="CANDISP_TRANSMIT_RECEIVE_QUEUE_SUPPORT"  id="CANDISP_TRANSMIT_RECEIVE_QUEUE_SUPPORT"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDISP_RECEIVE_INDICATION_API_ACC')" ><b>CANDISP_RECEIVE_INDICATION_API</b></label><Br>
+      <div id="CANDISP_RECEIVE_INDICATION_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDISP_RECEIVE_INDICATION_API" class="w3-select " name="CANDISP_RECEIVE_INDICATION_API"  id="CANDISP_RECEIVE_INDICATION_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDISP_TRANSMIT_CONFIRMATION_API_ACC')" ><b>CANDISP_TRANSMIT_CONFIRMATION_API</b></label><Br>
+      <div id="CANDISP_TRANSMIT_CONFIRMATION_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDISP_TRANSMIT_CONFIRMATION_API" class="w3-select " name="CANDISP_TRANSMIT_CONFIRMATION_API"  id="CANDISP_TRANSMIT_CONFIRMATION_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDISP_POLLED_RECEIVE_DISPATCH_ACC')" ><b>CANDISP_POLLED_RECEIVE_DISPATCH</b></label><Br>
+      <div id="CANDISP_POLLED_RECEIVE_DISPATCH_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDISP_POLLED_RECEIVE_DISPATCH" class="w3-select " name="CANDISP_POLLED_RECEIVE_DISPATCH"  id="CANDISP_POLLED_RECEIVE_DISPATCH"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDISP_POLLED_CONFIRMATION_DISPATCH_ACC')" ><b>CANDISP_POLLED_CONFIRMATION_DISPATCH</b></label><Br>
+      <div id="CANDISP_POLLED_CONFIRMATION_DISPATCH_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDISP_POLLED_CONFIRMATION_DISPATCH" class="w3-select " name="CANDISP_POLLED_CONFIRMATION_DISPATCH"  id="CANDISP_POLLED_CONFIRMATION_DISPATCH"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDISP_TRANSMIT_BUFFER_ACC')" ><b>CANDISP_TRANSMIT_BUFFER</b></label><Br>
+      <div id="CANDISP_TRANSMIT_BUFFER_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDISP_TRANSMIT_BUFFER" class="w3-select " name="CANDISP_TRANSMIT_BUFFER"  id="CANDISP_TRANSMIT_BUFFER"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDISP_BITQUEUE_ACC')" ><b>CANDISP_BITQUEUE</b></label><Br>
+      <div id="CANDISP_BITQUEUE_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDISP_BITQUEUE" class="w3-select " name="CANDISP_BITQUEUE"  id="CANDISP_BITQUEUE"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDISP_WAKEUP_SUPPORT_ACC')" ><b>CANDISP_WAKEUP_SUPPORT</b></label><Br>
+      <div id="CANDISP_WAKEUP_SUPPORT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDISP_WAKEUP_SUPPORT" class="w3-select " name="CANDISP_WAKEUP_SUPPORT"  id="CANDISP_WAKEUP_SUPPORT"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDISP_WAKEUP_VALIDATION_ACC')" ><b>CANDISP_WAKEUP_VALIDATION</b></label><Br>
+      <div id="CANDISP_WAKEUP_VALIDATION_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDISP_WAKEUP_VALIDATION" class="w3-select " name="CANDISP_WAKEUP_VALIDATION"  id="CANDISP_WAKEUP_VALIDATION"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDISP_WAKEUP_VALID_ALL_RX_MSGS_ACC')" ><b>CANDISP_WAKEUP_VALID_ALL_RX_MSGS</b></label><Br>
+      <div id="CANDISP_WAKEUP_VALID_ALL_RX_MSGS_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDISP_WAKEUP_VALID_ALL_RX_MSGS" class="w3-select " name="CANDISP_WAKEUP_VALID_ALL_RX_MSGS"  id="CANDISP_WAKEUP_VALID_ALL_RX_MSGS"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDISP_WAKEUP_VALID_ONLY_NM_RX_MSGS_ACC')" ><b>CANDISP_WAKEUP_VALID_ONLY_NM_RX_MSGS</b></label><Br>
+      <div id="CANDISP_WAKEUP_VALID_ONLY_NM_RX_MSGS_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDISP_WAKEUP_VALID_ONLY_NM_RX_MSGS" class="w3-select " name="CANDISP_WAKEUP_VALID_ONLY_NM_RX_MSGS"  id="CANDISP_WAKEUP_VALID_ONLY_NM_RX_MSGS"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDISP_TRANSMIT_CANCELLATION_ACC')" ><b>CANDISP_TRANSMIT_CANCELLATION</b></label><Br>
+      <div id="CANDISP_TRANSMIT_CANCELLATION_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDISP_TRANSMIT_CANCELLATION" class="w3-select " name="CANDISP_TRANSMIT_CANCELLATION"  id="CANDISP_TRANSMIT_CANCELLATION"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDISP_CANCEL_SUPPORT_API_ACC')" ><b>CANDISP_CANCEL_SUPPORT_API</b></label><Br>
+      <div id="CANDISP_CANCEL_SUPPORT_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDISP_CANCEL_SUPPORT_API" class="w3-select " name="CANDISP_CANCEL_SUPPORT_API"  id="CANDISP_CANCEL_SUPPORT_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDISP_DLC_CHECK_ACC')" ><b>CANDISP_DLC_CHECK</b></label><Br>
+      <div id="CANDISP_DLC_CHECK_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDISP_DLC_CHECK" class="w3-select " name="CANDISP_DLC_CHECK"  id="CANDISP_DLC_CHECK"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDISP_XCVR_HANDLING_ACC')" ><b>CANDISP_XCVR_HANDLING</b></label><Br>
+      <div id="CANDISP_XCVR_HANDLING_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDISP_XCVR_HANDLING" class="w3-select " name="CANDISP_XCVR_HANDLING"  id="CANDISP_XCVR_HANDLING"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDISP_PUBLIC_TX_CONFIRM_POLLING_SUPPORT_ACC')" ><b>CANDISP_PUBLIC_TX_CONFIRM_POLLING_SUPPORT</b></label><Br>
+      <div id="CANDISP_PUBLIC_TX_CONFIRM_POLLING_SUPPORT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDISP_PUBLIC_TX_CONFIRM_POLLING_SUPPORT" class="w3-select " name="CANDISP_PUBLIC_TX_CONFIRM_POLLING_SUPPORT"  id="CANDISP_PUBLIC_TX_CONFIRM_POLLING_SUPPORT"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDISP_PN_XCVR_HANDLING_ACC')" ><b>CANDISP_PN_XCVR_HANDLING</b></label><Br>
+      <div id="CANDISP_PN_XCVR_HANDLING_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDISP_PN_XCVR_HANDLING" class="w3-select " name="CANDISP_PN_XCVR_HANDLING"  id="CANDISP_PN_XCVR_HANDLING"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDISP_PN_WU_TX_PDU_FILTER_ACC')" ><b>CANDISP_PN_WU_TX_PDU_FILTER</b></label><Br>
+      <div id="CANDISP_PN_WU_TX_PDU_FILTER_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDISP_PN_WU_TX_PDU_FILTER" class="w3-select " name="CANDISP_PN_WU_TX_PDU_FILTER"  id="CANDISP_PN_WU_TX_PDU_FILTER"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDISP_SEARCH_ALGORITHM_ACC')" ><b>CANDISP_SEARCH_ALGORITHM</b></label><Br>
+      <div id="CANDISP_SEARCH_ALGORITHM_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDISP_SEARCH_ALGORITHM" class="w3-select " name="CANDISP_SEARCH_ALGORITHM"  id="CANDISP_SEARCH_ALGORITHM"style="width:40%"><Br>
+<option value="CANDISP_LINEAR">CANDISP_LINEAR</option>
+<option value="CANDISP_BINARY">CANDISP_BINARY</option>
+<option value="CANDISP_HASH">CANDISP_HASH</option>
+<option value="CANDISP_DOUBLEHASH">CANDISP_DOUBLEHASH</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDISP_STATIC_FD_TXQUEUE_ACC')" ><b>CANDISP_STATIC_FD_TXQUEUE</b></label><Br>
+      <div id="CANDISP_STATIC_FD_TXQUEUE_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDISP_STATIC_FD_TXQUEUE" class="w3-select " name="CANDISP_STATIC_FD_TXQUEUE"  id="CANDISP_STATIC_FD_TXQUEUE"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDISP_DEV_ERROR_DETECT_ACC')" ><b>CANDISP_DEV_ERROR_DETECT</b></label><Br>
+      <div id="CANDISP_DEV_ERROR_DETECT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDISP_DEV_ERROR_DETECT" class="w3-select " name="CANDISP_DEV_ERROR_DETECT"  id="CANDISP_DEV_ERROR_DETECT"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDISP_BUSOFF_INDICATION_API_ACC')" ><b>CANDISP_BUSOFF_INDICATION_API</b></label><Br>
+      <div id="CANDISP_BUSOFF_INDICATION_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDISP_BUSOFF_INDICATION_API" class="w3-select " name="CANDISP_BUSOFF_INDICATION_API"  id="CANDISP_BUSOFF_INDICATION_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+ </table>
+    <br><input type="submit" value="Save and Back" id="form_submit">
+    </form>
+    </div> 
+    </div> 
+    </body>
+    </html>
+    

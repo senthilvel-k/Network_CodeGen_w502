@@ -1,0 +1,650 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <title>VNIM</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="data.json"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{'styl.css'|staticfile }}">
+    <script>
+    function accordionfn(id) {
+        var x = document.getElementById(id);
+        if (x.className.indexOf("w3-show") == -1) {
+            x.className += " w3-show";
+        } else { 
+            x.className = x.className.replace(" w3-show", "");
+        }
+    }</script>
+    </head>
+    <body onload="load()" class="w3-container w3-grey"><!--copy_start-->
+<div  class=" w3-dark-grey" style ="width:100%;height:100%;position:fixed">
+
+<div class="w3-sidenav w3-dark-grey" style ="width:15%;height:100%;float:left;overflow:auto">
+
+<div class="w3-card-4 w3-light-grey" style="width:100%;height:100%">
+    <header class="w3-container w3-light-green">
+        <h3>CAN Database </h3>
+    </header>
+    
+    <Br>
+            
+    <div class="w3-container ">
+        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_dbc0_msg" id="DRV" data-bind="true">+ TX/RX Message Configurations </a>
+    </div>
+  
+    <div class="w3-container ">
+        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_dbc0_sig" id="DRV" data-bind="true">+ TX/Rx signal Configurations </a>
+    </div>
+    <Br>
+   
+</div>
+
+</div>
+ 
+<div class=" w3-dark-grey w3-padding-medium" style ="width:85%;height:100%;float:right;overflow:auto">
+<form action="BackEnd.VNIM_SaveButton" id="form" data-bind="true">
+<table  class ="w3-table  w3-bordered  w3-border w3-hoverable">
+    <thead>
+    <tr>
+    <th> Configurable options </th>
+    <th>Channel 0</th>
+    </tr>
+    </thead><tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_DEV_ERROR_DETECT_ACC')" ><b>CANVNIM_DEV_ERROR_DETECT</b></label><Br>
+      <div id="CANVNIM_DEV_ERROR_DETECT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_DEV_ERROR_DETECT" class="w3-select " name="CANVNIM_DEV_ERROR_DETECT"  id="CANVNIM_DEV_ERROR_DETECT"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_INIT_DATA_ACC')" ><b>CANVNIM_INIT_DATA</b></label><Br>
+      <div id="CANVNIM_INIT_DATA_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_INIT_DATA" class="w3-select " name="CANVNIM_INIT_DATA"  id="CANVNIM_INIT_DATA"style="width:40%"><Br>
+<option value="CCL_CONST">CCL_CONST</option>
+<option value="NULL">NULL</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_USE_INIT_POINTER_ACC')" ><b>CANVNIM_USE_INIT_POINTER</b></label><Br>
+      <div id="CANVNIM_USE_INIT_POINTER_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_USE_INIT_POINTER" class="w3-select " name="CANVNIM_USE_INIT_POINTER"  id="CANVNIM_USE_INIT_POINTER"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_SEPARATE_INIT_CONDITIONS_ACC')" ><b>CANVNIM_SEPARATE_INIT_CONDITIONS</b></label><Br>
+      <div id="CANVNIM_SEPARATE_INIT_CONDITIONS_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_SEPARATE_INIT_CONDITIONS" class="w3-select " name="CANVNIM_SEPARATE_INIT_CONDITIONS"  id="CANVNIM_SEPARATE_INIT_CONDITIONS"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_INIT_MEMORY_API_ACC')" ><b>CANVNIM_INIT_MEMORY_API</b></label><Br>
+      <div id="CANVNIM_INIT_MEMORY_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_INIT_MEMORY_API" class="w3-select " name="CANVNIM_INIT_MEMORY_API"  id="CANVNIM_INIT_MEMORY_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_DE_INIT_API_ACC')" ><b>CANVNIM_DE_INIT_API</b></label><Br>
+      <div id="CANVNIM_DE_INIT_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_DE_INIT_API" class="w3-select " name="CANVNIM_DE_INIT_API"  id="CANVNIM_DE_INIT_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_GET_STATUS_API_ACC')" ><b>CANVNIM_GET_STATUS_API</b></label><Br>
+      <div id="CANVNIM_GET_STATUS_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_GET_STATUS_API" class="w3-select " name="CANVNIM_GET_STATUS_API"  id="CANVNIM_GET_STATUS_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_IPDU_GROUP_CONTROL_API_ACC')" ><b>CANVNIM_IPDU_GROUP_CONTROL_API</b></label><Br>
+      <div id="CANVNIM_IPDU_GROUP_CONTROL_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_IPDU_GROUP_CONTROL_API" class="w3-select " name="CANVNIM_IPDU_GROUP_CONTROL_API"  id="CANVNIM_IPDU_GROUP_CONTROL_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_RECEPTION_DM_CONTROL_API_ACC')" ><b>CANVNIM_RECEPTION_DM_CONTROL_API</b></label><Br>
+      <div id="CANVNIM_RECEPTION_DM_CONTROL_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_RECEPTION_DM_CONTROL_API" class="w3-select " name="CANVNIM_RECEPTION_DM_CONTROL_API"  id="CANVNIM_RECEPTION_DM_CONTROL_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_IPDU_GROUP_START_API_ACC')" ><b>CANVNIM_IPDU_GROUP_START_API</b></label><Br>
+      <div id="CANVNIM_IPDU_GROUP_START_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_IPDU_GROUP_START_API" class="w3-select " name="CANVNIM_IPDU_GROUP_START_API"  id="CANVNIM_IPDU_GROUP_START_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_IPDU_GROUP_STOP_API_ACC')" ><b>CANVNIM_IPDU_GROUP_STOP_API</b></label><Br>
+      <div id="CANVNIM_IPDU_GROUP_STOP_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_IPDU_GROUP_STOP_API" class="w3-select " name="CANVNIM_IPDU_GROUP_STOP_API"  id="CANVNIM_IPDU_GROUP_STOP_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_ENABLE_RECEPTION_DM_API_ACC')" ><b>CANVNIM_ENABLE_RECEPTION_DM_API</b></label><Br>
+      <div id="CANVNIM_ENABLE_RECEPTION_DM_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_ENABLE_RECEPTION_DM_API" class="w3-select " name="CANVNIM_ENABLE_RECEPTION_DM_API"  id="CANVNIM_ENABLE_RECEPTION_DM_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_DISABLE_RECEPTION_DM_API_ACC')" ><b>CANVNIM_DISABLE_RECEPTION_DM_API</b></label><Br>
+      <div id="CANVNIM_DISABLE_RECEPTION_DM_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_DISABLE_RECEPTION_DM_API" class="w3-select " name="CANVNIM_DISABLE_RECEPTION_DM_API"  id="CANVNIM_DISABLE_RECEPTION_DM_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_BYTEENDIANNESS_ACC')" ><b>CANVNIM_BYTEENDIANNESS</b></label><Br>
+      <div id="CANVNIM_BYTEENDIANNESS_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_BYTEENDIANNESS" class="w3-select " name="CANVNIM_BYTEENDIANNESS"  id="CANVNIM_BYTEENDIANNESS"style="width:40%"><Br>
+<option value="BIG">BIG</option>
+<option value="LITTLE">LITTLE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_MAIN_FUNCTION_TX_API_ACC')" ><b>CANVNIM_MAIN_FUNCTION_TX_API</b></label><Br>
+      <div id="CANVNIM_MAIN_FUNCTION_TX_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_MAIN_FUNCTION_TX_API" class="w3-select " name="CANVNIM_MAIN_FUNCTION_TX_API"  id="CANVNIM_MAIN_FUNCTION_TX_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_TX_CONFIRMATION_API_ACC')" ><b>CANVNIM_TX_CONFIRMATION_API</b></label><Br>
+      <div id="CANVNIM_TX_CONFIRMATION_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_TX_CONFIRMATION_API" class="w3-select " name="CANVNIM_TX_CONFIRMATION_API"  id="CANVNIM_TX_CONFIRMATION_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_TX_TP_CONFIRMATION_API_ACC')" ><b>CANVNIM_TX_TP_CONFIRMATION_API</b></label><Br>
+      <div id="CANVNIM_TX_TP_CONFIRMATION_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_TX_TP_CONFIRMATION_API" class="w3-select " name="CANVNIM_TX_TP_CONFIRMATION_API"  id="CANVNIM_TX_TP_CONFIRMATION_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_TRIGGER_TRANSMIT_API_ACC')" ><b>CANVNIM_TRIGGER_TRANSMIT_API</b></label><Br>
+      <div id="CANVNIM_TRIGGER_TRANSMIT_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_TRIGGER_TRANSMIT_API" class="w3-select " name="CANVNIM_TRIGGER_TRANSMIT_API"  id="CANVNIM_TRIGGER_TRANSMIT_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_TRIGGER_IPDU_SEND_API_ACC')" ><b>CANVNIM_TRIGGER_IPDU_SEND_API</b></label><Br>
+      <div id="CANVNIM_TRIGGER_IPDU_SEND_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_TRIGGER_IPDU_SEND_API" class="w3-select " name="CANVNIM_TRIGGER_IPDU_SEND_API"  id="CANVNIM_TRIGGER_IPDU_SEND_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_TRIGGER_IPDU_SEND_WITH_META_DATA_API_ACC')" ><b>CANVNIM_TRIGGER_IPDU_SEND_WITH_META_DATA_API</b></label><Br>
+      <div id="CANVNIM_TRIGGER_IPDU_SEND_WITH_META_DATA_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_TRIGGER_IPDU_SEND_WITH_META_DATA_API" class="w3-select " name="CANVNIM_TRIGGER_IPDU_SEND_WITH_META_DATA_API"  id="CANVNIM_TRIGGER_IPDU_SEND_WITH_META_DATA_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_SWITCH_IPDU_TX_MODE_API_ACC')" ><b>CANVNIM_SWITCH_IPDU_TX_MODE_API</b></label><Br>
+      <div id="CANVNIM_SWITCH_IPDU_TX_MODE_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_SWITCH_IPDU_TX_MODE_API" class="w3-select " name="CANVNIM_SWITCH_IPDU_TX_MODE_API"  id="CANVNIM_SWITCH_IPDU_TX_MODE_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_SEND_SIGNAL_API_ACC')" ><b>CANVNIM_SEND_SIGNAL_API</b></label><Br>
+      <div id="CANVNIM_SEND_SIGNAL_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_SEND_SIGNAL_API" class="w3-select " name="CANVNIM_SEND_SIGNAL_API"  id="CANVNIM_SEND_SIGNAL_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_SEND_DYN_SIGNAL_API_ACC')" ><b>CANVNIM_SEND_DYN_SIGNAL_API</b></label><Br>
+      <div id="CANVNIM_SEND_DYN_SIGNAL_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_SEND_DYN_SIGNAL_API" class="w3-select " name="CANVNIM_SEND_DYN_SIGNAL_API"  id="CANVNIM_SEND_DYN_SIGNAL_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_UPDATE_SHADOW_SIGNAL_API_ACC')" ><b>CANVNIM_UPDATE_SHADOW_SIGNAL_API</b></label><Br>
+      <div id="CANVNIM_UPDATE_SHADOW_SIGNAL_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_UPDATE_SHADOW_SIGNAL_API" class="w3-select " name="CANVNIM_UPDATE_SHADOW_SIGNAL_API"  id="CANVNIM_UPDATE_SHADOW_SIGNAL_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_SEND_SIGNAL_GROUP_API_ACC')" ><b>CANVNIM_SEND_SIGNAL_GROUP_API</b></label><Br>
+      <div id="CANVNIM_SEND_SIGNAL_GROUP_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey ">   </p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_SEND_SIGNAL_GROUP_API" class="w3-select " name="CANVNIM_SEND_SIGNAL_GROUP_API"  id="CANVNIM_SEND_SIGNAL_GROUP_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_SEND_SIGNAL_GROUP_ARRAY_API_ACC')" ><b>CANVNIM_SEND_SIGNAL_GROUP_ARRAY_API</b></label><Br>
+      <div id="CANVNIM_SEND_SIGNAL_GROUP_ARRAY_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_SEND_SIGNAL_GROUP_ARRAY_API" class="w3-select " name="CANVNIM_SEND_SIGNAL_GROUP_ARRAY_API"  id="CANVNIM_SEND_SIGNAL_GROUP_ARRAY_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_COPY_TX_DATA_API_ACC')" ><b>CANVNIM_COPY_TX_DATA_API</b></label><Br>
+      <div id="CANVNIM_COPY_TX_DATA_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_COPY_TX_DATA_API" class="w3-select " name="CANVNIM_COPY_TX_DATA_API"  id="CANVNIM_COPY_TX_DATA_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_MAIN_FUNCTION_RX_API_ACC')" ><b>CANVNIM_MAIN_FUNCTION_RX_API</b></label><Br>
+      <div id="CANVNIM_MAIN_FUNCTION_RX_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_MAIN_FUNCTION_RX_API" class="w3-select " name="CANVNIM_MAIN_FUNCTION_RX_API"  id="CANVNIM_MAIN_FUNCTION_RX_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_RX_INDICATION_API_ACC')" ><b>CANVNIM_RX_INDICATION_API</b></label><Br>
+      <div id="CANVNIM_RX_INDICATION_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_RX_INDICATION_API" class="w3-select " name="CANVNIM_RX_INDICATION_API"  id="CANVNIM_RX_INDICATION_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_TX_ACKINDICATION_API_ACC')" ><b>CANVNIM_TX_ACKINDICATION_API</b></label><Br>
+      <div id="CANVNIM_TX_ACKINDICATION_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_TX_ACKINDICATION_API" class="w3-select " name="CANVNIM_TX_ACKINDICATION_API"  id="CANVNIM_TX_ACKINDICATION_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_TX_TOUTINDICATION_API_ACC')" ><b>CANVNIM_TX_TOUTINDICATION_API</b></label><Br>
+      <div id="CANVNIM_TX_TOUTINDICATION_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_TX_TOUTINDICATION_API" class="w3-select " name="CANVNIM_TX_TOUTINDICATION_API"  id="CANVNIM_TX_TOUTINDICATION_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_RECEIVE_SIGNAL_API_ACC')" ><b>CANVNIM_RECEIVE_SIGNAL_API</b></label><Br>
+      <div id="CANVNIM_RECEIVE_SIGNAL_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_RECEIVE_SIGNAL_API" class="w3-select " name="CANVNIM_RECEIVE_SIGNAL_API"  id="CANVNIM_RECEIVE_SIGNAL_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_RECEIVE_SHADOW_SIGNAL_API_ACC')" ><b>CANVNIM_RECEIVE_SHADOW_SIGNAL_API</b></label><Br>
+      <div id="CANVNIM_RECEIVE_SHADOW_SIGNAL_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_RECEIVE_SHADOW_SIGNAL_API" class="w3-select " name="CANVNIM_RECEIVE_SHADOW_SIGNAL_API"  id="CANVNIM_RECEIVE_SHADOW_SIGNAL_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_RECEIVE_SIGNAL_GROUP_API_ACC')" ><b>CANVNIM_RECEIVE_SIGNAL_GROUP_API</b></label><Br>
+      <div id="CANVNIM_RECEIVE_SIGNAL_GROUP_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_RECEIVE_SIGNAL_GROUP_API" class="w3-select " name="CANVNIM_RECEIVE_SIGNAL_GROUP_API"  id="CANVNIM_RECEIVE_SIGNAL_GROUP_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_RECEIVE_DYN_SIGNAL_API_ACC')" ><b>CANVNIM_RECEIVE_DYN_SIGNAL_API</b></label><Br>
+      <div id="CANVNIM_RECEIVE_DYN_SIGNAL_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_RECEIVE_DYN_SIGNAL_API" class="w3-select " name="CANVNIM_RECEIVE_DYN_SIGNAL_API"  id="CANVNIM_RECEIVE_DYN_SIGNAL_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_START_OF_RECEPTION_API_ACC')" ><b>CANVNIM_START_OF_RECEPTION_API</b></label><Br>
+      <div id="CANVNIM_START_OF_RECEPTION_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_START_OF_RECEPTION_API" class="w3-select " name="CANVNIM_START_OF_RECEPTION_API"  id="CANVNIM_START_OF_RECEPTION_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_TP_RXINDICATION_API_ACC')" ><b>CANVNIM_TP_RXINDICATION_API</b></label><Br>
+      <div id="CANVNIM_TP_RXINDICATION_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_TP_RXINDICATION_API" class="w3-select " name="CANVNIM_TP_RXINDICATION_API"  id="CANVNIM_TP_RXINDICATION_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_COPY_RX_DATA_API_ACC')" ><b>CANVNIM_COPY_RX_DATA_API</b></label><Br>
+      <div id="CANVNIM_COPY_RX_DATA_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_COPY_RX_DATA_API" class="w3-select " name="CANVNIM_COPY_RX_DATA_API"  id="CANVNIM_COPY_RX_DATA_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_INVALIDATE_SIGNAL_API_ACC')" ><b>CANVNIM_INVALIDATE_SIGNAL_API</b></label><Br>
+      <div id="CANVNIM_INVALIDATE_SIGNAL_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_INVALIDATE_SIGNAL_API" class="w3-select " name="CANVNIM_INVALIDATE_SIGNAL_API"  id="CANVNIM_INVALIDATE_SIGNAL_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_INVALIDATE_SIGNAL_GROUP_API_ACC')" ><b>CANVNIM_INVALIDATE_SIGNAL_GROUP_API</b></label><Br>
+      <div id="CANVNIM_INVALIDATE_SIGNAL_GROUP_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_INVALIDATE_SIGNAL_GROUP_API" class="w3-select " name="CANVNIM_INVALIDATE_SIGNAL_GROUP_API"  id="CANVNIM_INVALIDATE_SIGNAL_GROUP_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_INVALIDATE_SHADOW_SIGNAL_API_ACC')" ><b>CANVNIM_INVALIDATE_SHADOW_SIGNAL_API</b></label><Br>
+      <div id="CANVNIM_INVALIDATE_SHADOW_SIGNAL_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_INVALIDATE_SHADOW_SIGNAL_API" class="w3-select " name="CANVNIM_INVALIDATE_SHADOW_SIGNAL_API"  id="CANVNIM_INVALIDATE_SHADOW_SIGNAL_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_EVENT_INACTIVE_SUPPORT_ACC')" ><b>CANVNIM_EVENT_INACTIVE_SUPPORT</b></label><Br>
+      <div id="CANVNIM_EVENT_INACTIVE_SUPPORT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_EVENT_INACTIVE_SUPPORT" class="w3-select " name="CANVNIM_EVENT_INACTIVE_SUPPORT"  id="CANVNIM_EVENT_INACTIVE_SUPPORT"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_MAIN_FUNCTION_ROUTE_SIGNALS_API_ACC')" ><b>CANVNIM_MAIN_FUNCTION_ROUTE_SIGNALS_API</b></label><Br>
+      <div id="CANVNIM_MAIN_FUNCTION_ROUTE_SIGNALS_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_MAIN_FUNCTION_ROUTE_SIGNALS_API" class="w3-select " name="CANVNIM_MAIN_FUNCTION_ROUTE_SIGNALS_API"  id="CANVNIM_MAIN_FUNCTION_ROUTE_SIGNALS_API"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_IMM_RESTART_AFTER_BUSOFF_ACC')" ><b>CANVNIM_IMM_RESTART_AFTER_BUSOFF</b></label><Br>
+      <div id="CANVNIM_IMM_RESTART_AFTER_BUSOFF_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_IMM_RESTART_AFTER_BUSOFF" class="w3-select " name="CANVNIM_IMM_RESTART_AFTER_BUSOFF"  id="CANVNIM_IMM_RESTART_AFTER_BUSOFF"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_DATACHANGED_SUPPORT_ACC')" ><b>CANVNIM_DATACHANGED_SUPPORT</b></label><Br>
+      <div id="CANVNIM_DATACHANGED_SUPPORT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_DATACHANGED_SUPPORT" class="w3-select " name="CANVNIM_DATACHANGED_SUPPORT"  id="CANVNIM_DATACHANGED_SUPPORT"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_POLLED_DISPATCH_IN_DISPATCHER_ACC')" ><b>CANVNIM_POLLED_DISPATCH_IN_DISPATCHER</b></label><Br>
+      <div id="CANVNIM_POLLED_DISPATCH_IN_DISPATCHER_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_POLLED_DISPATCH_IN_DISPATCHER" class="w3-select " name="CANVNIM_POLLED_DISPATCH_IN_DISPATCHER"  id="CANVNIM_POLLED_DISPATCH_IN_DISPATCHER"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_EVENT_QUEUE_SUPPORT_ACC')" ><b>CANVNIM_EVENT_QUEUE_SUPPORT</b></label><Br>
+      <div id="CANVNIM_EVENT_QUEUE_SUPPORT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_EVENT_QUEUE_SUPPORT" class="w3-select " name="CANVNIM_EVENT_QUEUE_SUPPORT"  id="CANVNIM_EVENT_QUEUE_SUPPORT"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_EVENT_DATA_SUPPORT_ACC')" ><b>CANVNIM_EVENT_DATA_SUPPORT</b></label><Br>
+      <div id="CANVNIM_EVENT_DATA_SUPPORT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_EVENT_DATA_SUPPORT" class="w3-select " name="CANVNIM_EVENT_DATA_SUPPORT"  id="CANVNIM_EVENT_DATA_SUPPORT"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CanVnim_AliveCounter_InvalidValue_ACC')" ><b>CanVnim_AliveCounter_InvalidValue</b></label><Br>
+      <div id="CanVnim_AliveCounter_InvalidValue_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CanVnim_AliveCounter_InvalidValuevalidate()" style="width:30%" value="0" type="number" name="CanVnim_AliveCounter_InvalidValue"  id="CanVnim_AliveCounter_InvalidValue" min=0 max=255><Br>
+<script>
+    function CanVnim_AliveCounter_InvalidValuevalidate() {
+    var x = document.getElementById("CanVnim_AliveCounter_InvalidValue");
+    if( x.value <0  || x.value > 255)
+    { document.getElementById("CanVnim_AliveCounter_InvalidValue").style.background="red";
+    }
+    else{
+    document.getElementById("CanVnim_AliveCounter_InvalidValue").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CanVnim_AliveCounter_MinValue_ACC')" ><b>CanVnim_AliveCounter_MinValue</b></label><Br>
+      <div id="CanVnim_AliveCounter_MinValue_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CanVnim_AliveCounter_MinValuevalidate()" style="width:30%" value="1" type="number" name="CanVnim_AliveCounter_MinValue"  id="CanVnim_AliveCounter_MinValue" min=0 max=255><Br>
+<script>
+    function CanVnim_AliveCounter_MinValuevalidate() {
+    var x = document.getElementById("CanVnim_AliveCounter_MinValue");
+    if( x.value <0  || x.value > 255)
+    { document.getElementById("CanVnim_AliveCounter_MinValue").style.background="red";
+    }
+    else{
+    document.getElementById("CanVnim_AliveCounter_MinValue").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CanVnim_AliveCounter_MaxValue_ACC')" ><b>CanVnim_AliveCounter_MaxValue</b></label><Br>
+      <div id="CanVnim_AliveCounter_MaxValue_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CanVnim_AliveCounter_MaxValuevalidate()" style="width:30%" value="1" type="number" name="CanVnim_AliveCounter_MaxValue"  id="CanVnim_AliveCounter_MaxValue" min=0 max=255><Br>
+<script>
+    function CanVnim_AliveCounter_MaxValuevalidate() {
+    var x = document.getElementById("CanVnim_AliveCounter_MaxValue");
+    if( x.value <0  || x.value > 255)
+    { document.getElementById("CanVnim_AliveCounter_MaxValue").style.background="red";
+    }
+    else{
+    document.getElementById("CanVnim_AliveCounter_MaxValue").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_SM_EVENT_QUEUE_SIZE_ACC')" ><b>CANVNIM_SM_EVENT_QUEUE_SIZE</b></label><Br>
+      <div id="CANVNIM_SM_EVENT_QUEUE_SIZE_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CANVNIM_SM_EVENT_QUEUE_SIZEvalidate()" style="width:30%" value="5" type="number" name="CANVNIM_SM_EVENT_QUEUE_SIZE"  id="CANVNIM_SM_EVENT_QUEUE_SIZE" min=0 max=255><Br>
+<script>
+    function CANVNIM_SM_EVENT_QUEUE_SIZEvalidate() {
+    var x = document.getElementById("CANVNIM_SM_EVENT_QUEUE_SIZE");
+    if( x.value <0  || x.value > 255)
+    { document.getElementById("CANVNIM_SM_EVENT_QUEUE_SIZE").style.background="red";
+    }
+    else{
+    document.getElementById("CANVNIM_SM_EVENT_QUEUE_SIZE").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_SM_MAXEVENT_DATA_SIZE_ACC')" ><b>CANVNIM_SM_MAXEVENT_DATA_SIZE</b></label><Br>
+      <div id="CANVNIM_SM_MAXEVENT_DATA_SIZE_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CANVNIM_SM_MAXEVENT_DATA_SIZEvalidate()" style="width:30%" value="6" type="number" name="CANVNIM_SM_MAXEVENT_DATA_SIZE"  id="CANVNIM_SM_MAXEVENT_DATA_SIZE" min=0 max=255><Br>
+<script>
+    function CANVNIM_SM_MAXEVENT_DATA_SIZEvalidate() {
+    var x = document.getElementById("CANVNIM_SM_MAXEVENT_DATA_SIZE");
+    if( x.value <0  || x.value > 255)
+    { document.getElementById("CANVNIM_SM_MAXEVENT_DATA_SIZE").style.background="red";
+    }
+    else{
+    document.getElementById("CANVNIM_SM_MAXEVENT_DATA_SIZE").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_VALIDATION_CONDITION_CHECK_ACC')" ><b>CANVNIM_VALIDATION_CONDITION_CHECK</b></label><Br>
+      <div id="CANVNIM_VALIDATION_CONDITION_CHECK_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_VALIDATION_CONDITION_CHECK" class="w3-select " name="CANVNIM_VALIDATION_CONDITION_CHECK"  id="CANVNIM_VALIDATION_CONDITION_CHECK"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANVNIM_ALIVECNTR_INVALID_ONCONDITION_ACC')" ><b>CANVNIM_ALIVECNTR_INVALID_ONCONDITION</b></label><Br>
+      <div id="CANVNIM_ALIVECNTR_INVALID_ONCONDITION_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANVNIM_ALIVECNTR_INVALID_ONCONDITION" class="w3-select " name="CANVNIM_ALIVECNTR_INVALID_ONCONDITION"  id="CANVNIM_ALIVECNTR_INVALID_ONCONDITION"style="width:40%"><Br>
+<option value="STD_ON">STD_ON</option>
+<option value="STD_OFF">STD_OFF</option>
+</select><Br><Br>
+</td>
+</tr>
+ </table>
+    <br><input type="submit" value="Save and Back" id="form_submit">
+    </form>
+    </div> 
+    </div> 
+    </body>
+    </html>
+    

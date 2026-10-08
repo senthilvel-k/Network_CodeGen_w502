@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<title>W3.CSS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="{{'styl.css'|staticfile }}">
+<!--link rel="stylesheet" href="styl.css"-->
+<script>
+function myFunction() {
+    var x = document.getElementById("demo");
+    if (x.className.indexOf("w3-show") == -1) {
+        x.className += " w3-show";
+    } else { 
+        x.className = x.className.replace(" w3-show", "");
+    }
+}
+</script>
+
+
+<body  onload="load()" class="w3-container w3-grey" >
+
+ <!-- <div class="w3-accordion w3-grey "style="width:30%" >
+  <button onclick="myFunction('Demo1')" class="w3-btn-block w3-left-align w3-round-large w3-xlarge w3-justify">&#9776; Menu </button>
+  <div id="Demo1" class="w3-accordion-content w3-animate-left "style="width:100%">
+  <BR>
+    -->
+<!--copy_start-->
+<div  class=" w3-black" style ="width:100%;height:100%;overflow:auto">
+
+<div class="w3-sidenav w3-black" style ="width:20%;height:100%;float:left">
+    
+<div class="w3-card-4 w3-light-grey" style="width:100%;overflow:auto">
+    <header class="w3-container w3-light-green">
+        <h3>CAN MCAL Layer </h3>
+    </header>
+
+    <div class="w3-container ">
+        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_Filter" id="DRV" data-bind="true">+ CAN Filter Configurations </a>
+    </div>
+    <Br>
+   
+</div>
+
+<div class="w3-card-4 w3-light-grey" style="width:100%">
+    <header class="w3-container w3-light-green">
+        <h3>CAN Database </h3>
+    </header>
+    <Br>
+    <div class="w3-container ">
+        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_dbc0_msg" id="DRV" data-bind="true">+ TX/RX Message Configurations </a>
+    </div>
+  
+    <div class="w3-container ">
+        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_dbc0_sig" id="DRV" data-bind="true">+ TX/Rx signal Configurations </a>
+    </div>
+    <Br>
+   
+   
+</div>
+
+</div>
+ 
+<div class=" w3-grey w3-padding-medium" style ="width:80%;float:right;overflow:auto"">
+<!--copy_end-->
+
+
+<form action="BackEnd.upload_dbc" id="form" data-bind="true">
+<br>
+<br>
+<br>
+<br>
+
+<table class ="w3-table  w3-bordered  w3-border  w3-hoverable w3-hoverable">
+<tr style="width:100%"> 
+<td style="width:20%">DBC File</td>
+<td style="width:80%">
+<input class="w3-input w3-border" id= "file_path" name="ch0_node_name" type="textbox">
+<input type="file" name="ch0_file" id="ch0_dbc_file"  style="width:100%">
+</td>
+</tr>
+<br>
+<tr style="width:100%">
+<td style="width:20%">
+<label>Node Name</label>
+</td>
+<td style="width:80%" >
+<input class="w3-input w3-border" id= "ch0_node_name"name="ch0_node_name" type="textbox"></p>
+</td>
+</tr>
+</table>
+<br>
+<br>
+<input type="submit" value="  Load DBC  " style="width:15%" id="form_submit" />
+<br>
+<br>
+</form>
+<input type="button" value ="  code gen "  style="width:15%" name="code_generate" onclick="BackEnd.code_gen()"/>
+</div>
+
+
+
+</div>
+</body>
+</html>
+<script>
+function load() {
+data=[];document.getElementById("ch0_node_name").value = data[0].ch0_node_name;
+document.getElementById("file_path").value = data[0].ch0_file;}
+</script>

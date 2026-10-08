@@ -1,0 +1,579 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <title>NM</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="data.json"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{'styl.css'|staticfile }}">
+    <script>
+    function accordionfn(id) {
+        var x = document.getElementById(id);
+        if (x.className.indexOf("w3-show") == -1) {
+            x.className += " w3-show";
+        } else { 
+            x.className = x.className.replace(" w3-show", "");
+        }
+    }</script>
+    </head>
+    <body onload="load()" class="w3-container w3-grey"><!--copy_start-->
+<div  class=" w3-dark-grey" style ="width:100%;height:100%;position:fixed">
+
+<div class="w3-sidenav w3-dark-grey" style ="width:15%;height:100%;float:left;overflow:auto">
+
+<div class="w3-card-4 w3-light-grey" style="width:100%;height:100%">
+    <header class="w3-container w3-light-green">
+        <h3>CAN Database </h3>
+    </header>
+    
+    <Br>
+            
+    <div class="w3-container ">
+        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_dbc0_msg" id="DRV" data-bind="true">+ TX/RX Message Configurations </a>
+    </div>
+  
+    <div class="w3-container ">
+        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_dbc0_sig" id="DRV" data-bind="true">+ TX/Rx signal Configurations </a>
+    </div>
+    <Br>
+   
+</div>
+
+</div>
+ 
+<div class=" w3-dark-grey w3-padding-medium" style ="width:85%;height:100%;float:right;overflow:auto">
+<form action="BackEnd.NM_SaveButton" id="form" data-bind="true">
+<table  class ="w3-table  w3-bordered  w3-border w3-hoverable">
+    <thead>
+    <tr>
+    <th> Configurable options </th>
+    <th>Channel 0</th>
+    </tr>
+    </thead><tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('NM_CHANNELS_ACC')" ><b>NM_CHANNELS</b></label><Br>
+      <div id="NM_CHANNELS_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" NM_CHANNELSvalidate()" style="width:30%" value="1" type="number" name="NM_CHANNELS"  id="NM_CHANNELS" min=0 max=255><Br>
+<script>
+    function NM_CHANNELSvalidate() {
+    var x = document.getElementById("NM_CHANNELS");
+    if( x.value <0  || x.value > 255)
+    { document.getElementById("NM_CHANNELS").style.background="red";
+    }
+    else{
+    document.getElementById("NM_CHANNELS").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANNM_PASSIVE_MODE_ENABLED_ACC')" ><b>CANNM_PASSIVE_MODE_ENABLED</b></label><Br>
+      <div id="CANNM_PASSIVE_MODE_ENABLED_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANNM_PASSIVE_MODE_ENABLED" class="w3-select " name="CANNM_PASSIVE_MODE_ENABLED"  id="CANNM_PASSIVE_MODE_ENABLED"style="width:40%"><Br>
+<option value="NM_DISABLE">NM_DISABLE</option>
+<option value="NM_ENABLE">NM_ENABLE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANNM_IMMEDIATE_TXCONF_ENABLED_ACC')" ><b>CANNM_IMMEDIATE_TXCONF_ENABLED</b></label><Br>
+      <div id="CANNM_IMMEDIATE_TXCONF_ENABLED_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANNM_IMMEDIATE_TXCONF_ENABLED" class="w3-select " name="CANNM_IMMEDIATE_TXCONF_ENABLED"  id="CANNM_IMMEDIATE_TXCONF_ENABLED"style="width:40%"><Br>
+<option value="NM_DISABLE">NM_DISABLE</option>
+<option value="NM_ENABLE">NM_ENABLE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANNM_IMMEDIATE_RESTART_ENABLED_ACC')" ><b>CANNM_IMMEDIATE_RESTART_ENABLED</b></label><Br>
+      <div id="CANNM_IMMEDIATE_RESTART_ENABLED_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANNM_IMMEDIATE_RESTART_ENABLED" class="w3-select " name="CANNM_IMMEDIATE_RESTART_ENABLED"  id="CANNM_IMMEDIATE_RESTART_ENABLED"style="width:40%"><Br>
+<option value="NM_DISABLE">NM_DISABLE</option>
+<option value="NM_ENABLE">NM_ENABLE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANNM_BUS_LOAD_REDUCTION_ENABLED_ACC')" ><b>CANNM_BUS_LOAD_REDUCTION_ENABLED</b></label><Br>
+      <div id="CANNM_BUS_LOAD_REDUCTION_ENABLED_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANNM_BUS_LOAD_REDUCTION_ENABLED" class="w3-select " name="CANNM_BUS_LOAD_REDUCTION_ENABLED"  id="CANNM_BUS_LOAD_REDUCTION_ENABLED"style="width:40%"><Br>
+<option value="NM_DISABLE">NM_DISABLE</option>
+<option value="NM_ENABLE">NM_ENABLE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANNM_NODE_DETECTION_ENABLED_ACC')" ><b>CANNM_NODE_DETECTION_ENABLED</b></label><Br>
+      <div id="CANNM_NODE_DETECTION_ENABLED_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANNM_NODE_DETECTION_ENABLED" class="w3-select " name="CANNM_NODE_DETECTION_ENABLED"  id="CANNM_NODE_DETECTION_ENABLED"style="width:40%"><Br>
+<option value="NM_DISABLE">NM_DISABLE</option>
+<option value="NM_ENABLE">NM_ENABLE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANNM_REMOTE_SLEEP_IND_ENABLED_ACC')" ><b>CANNM_REMOTE_SLEEP_IND_ENABLED</b></label><Br>
+      <div id="CANNM_REMOTE_SLEEP_IND_ENABLED_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANNM_REMOTE_SLEEP_IND_ENABLED" class="w3-select " name="CANNM_REMOTE_SLEEP_IND_ENABLED"  id="CANNM_REMOTE_SLEEP_IND_ENABLED"style="width:40%"><Br>
+<option value="NM_DISABLE">NM_DISABLE</option>
+<option value="NM_ENABLE">NM_ENABLE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANNM_REPEAT_MSG_IND_ENABLED_ACC')" ><b>CANNM_REPEAT_MSG_IND_ENABLED</b></label><Br>
+      <div id="CANNM_REPEAT_MSG_IND_ENABLED_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANNM_REPEAT_MSG_IND_ENABLED" class="w3-select " name="CANNM_REPEAT_MSG_IND_ENABLED"  id="CANNM_REPEAT_MSG_IND_ENABLED"style="width:40%"><Br>
+<option value="NM_DISABLE">NM_DISABLE</option>
+<option value="NM_ENABLE">NM_ENABLE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANNM_USER_DATA_ENABLED_ACC')" ><b>CANNM_USER_DATA_ENABLED</b></label><Br>
+      <div id="CANNM_USER_DATA_ENABLED_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANNM_USER_DATA_ENABLED" class="w3-select " name="CANNM_USER_DATA_ENABLED"  id="CANNM_USER_DATA_ENABLED"style="width:40%"><Br>
+<option value="NM_DISABLE">NM_DISABLE</option>
+<option value="NM_ENABLE">NM_ENABLE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CanNmComUserDataSupport_ACC')" ><b>CanNmComUserDataSupport</b></label><Br>
+      <div id="CanNmComUserDataSupport_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CanNmComUserDataSupport" class="w3-select " name="CanNmComUserDataSupport"  id="CanNmComUserDataSupport"style="width:40%"><Br>
+<option value="NM_DISABLE">NM_DISABLE</option>
+<option value="NM_ENABLE">NM_ENABLE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANNM_BUS_SYNCHRONIZATION_ENABLED_ACC')" ><b>CANNM_BUS_SYNCHRONIZATION_ENABLED</b></label><Br>
+      <div id="CANNM_BUS_SYNCHRONIZATION_ENABLED_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANNM_BUS_SYNCHRONIZATION_ENABLED" class="w3-select " name="CANNM_BUS_SYNCHRONIZATION_ENABLED"  id="CANNM_BUS_SYNCHRONIZATION_ENABLED"style="width:40%"><Br>
+<option value="NM_DISABLE">NM_DISABLE</option>
+<option value="NM_ENABLE">NM_ENABLE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CanNmActiveWakeupBitEnabled_ACC')" ><b>CanNmActiveWakeupBitEnabled</b></label><Br>
+      <div id="CanNmActiveWakeupBitEnabled_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CanNmActiveWakeupBitEnabled" class="w3-select " name="CanNmActiveWakeupBitEnabled"  id="CanNmActiveWakeupBitEnabled"style="width:40%"><Br>
+<option value="NM_DISABLE">NM_DISABLE</option>
+<option value="NM_ENABLE">NM_ENABLE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CanNmRetryFirstMessageRequest_ACC')" ><b>CanNmRetryFirstMessageRequest</b></label><Br>
+      <div id="CanNmRetryFirstMessageRequest_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CanNmRetryFirstMessageRequest" class="w3-select " name="CanNmRetryFirstMessageRequest"  id="CanNmRetryFirstMessageRequest"style="width:40%"><Br>
+<option value="NM_DISABLE">NM_DISABLE</option>
+<option value="NM_ENABLE">NM_ENABLE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('NM_DIAG_COMMCTRL_SUPPORT_ACC')" ><b>NM_DIAG_COMMCTRL_SUPPORT</b></label><Br>
+      <div id="NM_DIAG_COMMCTRL_SUPPORT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="NM_DIAG_COMMCTRL_SUPPORT" class="w3-select " name="NM_DIAG_COMMCTRL_SUPPORT"  id="NM_DIAG_COMMCTRL_SUPPORT"style="width:40%"><Br>
+<option value="NM_DISABLE">NM_DISABLE</option>
+<option value="NM_ENABLE">NM_ENABLE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANNM_COORDINATOR_SYNC_SUPPORT_ACC')" ><b>CANNM_COORDINATOR_SYNC_SUPPORT</b></label><Br>
+      <div id="CANNM_COORDINATOR_SYNC_SUPPORT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANNM_COORDINATOR_SYNC_SUPPORT" class="w3-select " name="CANNM_COORDINATOR_SYNC_SUPPORT"  id="CANNM_COORDINATOR_SYNC_SUPPORT"style="width:40%"><Br>
+<option value="NM_DISABLE">NM_DISABLE</option>
+<option value="NM_ENABLE">NM_ENABLE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CanNmCarWakeUpRxEnabled_ACC')" ><b>CanNmCarWakeUpRxEnabled</b></label><Br>
+      <div id="CanNmCarWakeUpRxEnabled_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CanNmCarWakeUpRxEnabled" class="w3-select " name="CanNmCarWakeUpRxEnabled"  id="CanNmCarWakeUpRxEnabled"style="width:40%"><Br>
+<option value="NM_DISABLE">NM_DISABLE</option>
+<option value="NM_ENABLE">NM_ENABLE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CanNmCarWakeUpFilterEnabled_ACC')" ><b>CanNmCarWakeUpFilterEnabled</b></label><Br>
+      <div id="CanNmCarWakeUpFilterEnabled_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CanNmCarWakeUpFilterEnabled" class="w3-select " name="CanNmCarWakeUpFilterEnabled"  id="CanNmCarWakeUpFilterEnabled"style="width:40%"><Br>
+<option value="NM_DISABLE">NM_DISABLE</option>
+<option value="NM_ENABLE">NM_ENABLE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CanNmPnEnabled_ACC')" ><b>CanNmPnEnabled</b></label><Br>
+      <div id="CanNmPnEnabled_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CanNmPnEnabled" class="w3-select " name="CanNmPnEnabled"  id="CanNmPnEnabled"style="width:40%"><Br>
+<option value="NM_DISABLE">NM_DISABLE</option>
+<option value="NM_ENABLE">NM_ENABLE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CanNmPnHandleMultipleNetworkRequests_ACC')" ><b>CanNmPnHandleMultipleNetworkRequests</b></label><Br>
+      <div id="CanNmPnHandleMultipleNetworkRequests_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CanNmPnHandleMultipleNetworkRequests" class="w3-select " name="CanNmPnHandleMultipleNetworkRequests"  id="CanNmPnHandleMultipleNetworkRequests"style="width:40%"><Br>
+<option value="NM_DISABLE">NM_DISABLE</option>
+<option value="NM_ENABLE">NM_ENABLE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CanNmAllNmMessagesKeepAwake_ACC')" ><b>CanNmAllNmMessagesKeepAwake</b></label><Br>
+      <div id="CanNmAllNmMessagesKeepAwake_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CanNmAllNmMessagesKeepAwake" class="w3-select " name="CanNmAllNmMessagesKeepAwake"  id="CanNmAllNmMessagesKeepAwake"style="width:40%"><Br>
+<option value="NM_DISABLE">NM_DISABLE</option>
+<option value="NM_ENABLE">NM_ENABLE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CanNmPnEiraCalcEnabled_ACC')" ><b>CanNmPnEiraCalcEnabled</b></label><Br>
+      <div id="CanNmPnEiraCalcEnabled_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CanNmPnEiraCalcEnabled" class="w3-select " name="CanNmPnEiraCalcEnabled"  id="CanNmPnEiraCalcEnabled"style="width:40%"><Br>
+<option value="NM_DISABLE">NM_DISABLE</option>
+<option value="NM_ENABLE">NM_ENABLE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CanNmPnEraCalcEnabled_ACC')" ><b>CanNmPnEraCalcEnabled</b></label><Br>
+      <div id="CanNmPnEraCalcEnabled_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CanNmPnEraCalcEnabled" class="w3-select " name="CanNmPnEraCalcEnabled"  id="CanNmPnEraCalcEnabled"style="width:40%"><Br>
+<option value="NM_DISABLE">NM_DISABLE</option>
+<option value="NM_ENABLE">NM_ENABLE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('NM_TYPE_ACC')" ><b>NM_TYPE</b></label><Br>
+      <div id="NM_TYPE_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="NM_TYPE" class="w3-select " name="NM_TYPE"  id="NM_TYPE"style="width:40%"><Br>
+<option value="NM_NOT_INITIALIZED">NM_NOT_INITIALIZED</option>
+<option value="NM_NOT_USED">NM_NOT_USED</option>
+<option value="NM_ACTIVE">NM_ACTIVE</option>
+<option value="NM_PASSIVE">NM_PASSIVE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANNM_MAX_DATA_LENGTH_ACC')" ><b>CANNM_MAX_DATA_LENGTH</b></label><Br>
+      <div id="CANNM_MAX_DATA_LENGTH_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CANNM_MAX_DATA_LENGTHvalidate()" style="width:30%" value="4" type="number" name="CANNM_MAX_DATA_LENGTH"  id="CANNM_MAX_DATA_LENGTH" min=1 max=8><Br>
+<script>
+    function CANNM_MAX_DATA_LENGTHvalidate() {
+    var x = document.getElementById("CANNM_MAX_DATA_LENGTH");
+    if( x.value <1  || x.value > 8)
+    { document.getElementById("CANNM_MAX_DATA_LENGTH").style.background="red";
+    }
+    else{
+    document.getElementById("CANNM_MAX_DATA_LENGTH").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANNM_NODEID_ACC')" ><b>CANNM_NODEID</b></label><Br>
+      <div id="CANNM_NODEID_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input  type ="text" id="CANNM_NODEID" class="w3-input w3-border" value="0x0F"name="CANNM_NODEID"  id="CANNM_NODEID"style="width:40%"><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANNM_CH0_WAKE_MASK_ACC')" ><b>CANNM_CH0_WAKE_MASK</b></label><Br>
+      <div id="CANNM_CH0_WAKE_MASK_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANNM_CH0_WAKE_MASK" class="w3-select " name="CANNM_CH0_WAKE_MASK"  id="CANNM_CH0_WAKE_MASK"style="width:40%"><Br>
+<option value="NM_COM_BODY">NM_COM_BODY</option>
+<option value="NM_COM_POWERTRAIN">NM_COM_POWERTRAIN</option>
+<option value="NM_COM_CHASSIS">NM_COM_CHASSIS</option>
+<option value="NM_COM_INFOTAINMENT">NM_COM_INFOTAINMENT</option>
+<option value="NM_COM_ADAS">NM_COM_ADAS</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('NM_CBV_PARTIAL_NETWORK_INFORMATION_BIT_ACC')" ><b>NM_CBV_PARTIAL_NETWORK_INFORMATION_BIT</b></label><Br>
+      <div id="NM_CBV_PARTIAL_NETWORK_INFORMATION_BIT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input  type ="text" id="NM_CBV_PARTIAL_NETWORK_INFORMATION_BIT" class="w3-input w3-border" value="0x40"name="NM_CBV_PARTIAL_NETWORK_INFORMATION_BIT"  id="NM_CBV_PARTIAL_NETWORK_INFORMATION_BIT"style="width:40%"><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('NM_20MS_OF_100HZ_ACC')" ><b>NM_20MS_OF_100HZ</b></label><Br>
+      <div id="NM_20MS_OF_100HZ_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" NM_20MS_OF_100HZvalidate()" style="width:30%" value="2" type="number" name="NM_20MS_OF_100HZ"  id="NM_20MS_OF_100HZ" min=0 max=255><Br>
+<script>
+    function NM_20MS_OF_100HZvalidate() {
+    var x = document.getElementById("NM_20MS_OF_100HZ");
+    if( x.value <0  || x.value > 255)
+    { document.getElementById("NM_20MS_OF_100HZ").style.background="red";
+    }
+    else{
+    document.getElementById("NM_20MS_OF_100HZ").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('NM_NUMBER_OF_IMMIDIATE_MESSAGES_ACC')" ><b>NM_NUMBER_OF_IMMIDIATE_MESSAGES</b></label><Br>
+      <div id="NM_NUMBER_OF_IMMIDIATE_MESSAGES_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" NM_NUMBER_OF_IMMIDIATE_MESSAGESvalidate()" style="width:30%" value="4" type="number" name="NM_NUMBER_OF_IMMIDIATE_MESSAGES"  id="NM_NUMBER_OF_IMMIDIATE_MESSAGES" min=0 max=255><Br>
+<script>
+    function NM_NUMBER_OF_IMMIDIATE_MESSAGESvalidate() {
+    var x = document.getElementById("NM_NUMBER_OF_IMMIDIATE_MESSAGES");
+    if( x.value <0  || x.value > 255)
+    { document.getElementById("NM_NUMBER_OF_IMMIDIATE_MESSAGES").style.background="red";
+    }
+    else{
+    document.getElementById("NM_NUMBER_OF_IMMIDIATE_MESSAGES").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('NM_MSG_CYCLE_OFFSET_ACC')" ><b>NM_MSG_CYCLE_OFFSET</b></label><Br>
+      <div id="NM_MSG_CYCLE_OFFSET_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" NM_MSG_CYCLE_OFFSETvalidate()" style="width:30%" value="4" type="number" name="NM_MSG_CYCLE_OFFSET"  id="NM_MSG_CYCLE_OFFSET" min=0 max=65535><Br>
+<script>
+    function NM_MSG_CYCLE_OFFSETvalidate() {
+    var x = document.getElementById("NM_MSG_CYCLE_OFFSET");
+    if( x.value <0  || x.value > 65535)
+    { document.getElementById("NM_MSG_CYCLE_OFFSET").style.background="red";
+    }
+    else{
+    document.getElementById("NM_MSG_CYCLE_OFFSET").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('NM_IMM_CYCLE_TIME_ACC')" ><b>NM_IMM_CYCLE_TIME</b></label><Br>
+      <div id="NM_IMM_CYCLE_TIME_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" NM_IMM_CYCLE_TIMEvalidate()" style="width:30%" value="4" type="number" name="NM_IMM_CYCLE_TIME"  id="NM_IMM_CYCLE_TIME" min=0 max=65535><Br>
+<script>
+    function NM_IMM_CYCLE_TIMEvalidate() {
+    var x = document.getElementById("NM_IMM_CYCLE_TIME");
+    if( x.value <0  || x.value > 65535)
+    { document.getElementById("NM_IMM_CYCLE_TIME").style.background="red";
+    }
+    else{
+    document.getElementById("NM_IMM_CYCLE_TIME").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('NmImmTransmissions_ACC')" ><b>NmImmTransmissions</b></label><Br>
+      <div id="NmImmTransmissions_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" NmImmTransmissionsvalidate()" style="width:30%" value="0" type="number" name="NmImmTransmissions"  id="NmImmTransmissions" min=0 max=255><Br>
+<script>
+    function NmImmTransmissionsvalidate() {
+    var x = document.getElementById("NmImmTransmissions");
+    if( x.value <0  || x.value > 255)
+    { document.getElementById("NmImmTransmissions").style.background="red";
+    }
+    else{
+    document.getElementById("NmImmTransmissions").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('NmReducedTime_ACC')" ><b>NmReducedTime</b></label><Br>
+      <div id="NmReducedTime_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" NmReducedTimevalidate()" style="width:30%" value="0" type="number" name="NmReducedTime"  id="NmReducedTime" min=0 max=65535><Br>
+<script>
+    function NmReducedTimevalidate() {
+    var x = document.getElementById("NmReducedTime");
+    if( x.value <0  || x.value > 65535)
+    { document.getElementById("NmReducedTime").style.background="red";
+    }
+    else{
+    document.getElementById("NmReducedTime").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('RemoteSleepIndTime_ACC')" ><b>RemoteSleepIndTime</b></label><Br>
+      <div id="RemoteSleepIndTime_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" RemoteSleepIndTimevalidate()" style="width:30%" value="0" type="number" name="RemoteSleepIndTime"  id="RemoteSleepIndTime" min=0 max=65535><Br>
+<script>
+    function RemoteSleepIndTimevalidate() {
+    var x = document.getElementById("RemoteSleepIndTime");
+    if( x.value <0  || x.value > 65535)
+    { document.getElementById("RemoteSleepIndTime").style.background="red";
+    }
+    else{
+    document.getElementById("RemoteSleepIndTime").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CarWakeBytePos_ACC')" ><b>CarWakeBytePos</b></label><Br>
+      <div id="CarWakeBytePos_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CarWakeBytePosvalidate()" style="width:30%" value="0" type="number" name="CarWakeBytePos"  id="CarWakeBytePos" min=0 max=255><Br>
+<script>
+    function CarWakeBytePosvalidate() {
+    var x = document.getElementById("CarWakeBytePos");
+    if( x.value <0  || x.value > 255)
+    { document.getElementById("CarWakeBytePos").style.background="red";
+    }
+    else{
+    document.getElementById("CarWakeBytePos").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CarWakeBitPos_ACC')" ><b>CarWakeBitPos</b></label><Br>
+      <div id="CarWakeBitPos_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CarWakeBitPosvalidate()" style="width:30%" value="0" type="number" name="CarWakeBitPos"  id="CarWakeBitPos" min=0 max=255><Br>
+<script>
+    function CarWakeBitPosvalidate() {
+    var x = document.getElementById("CarWakeBitPos");
+    if( x.value <0  || x.value > 255)
+    { document.getElementById("CarWakeBitPos").style.background="red";
+    }
+    else{
+    document.getElementById("CarWakeBitPos").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CarWakeFltrNodeId_ACC')" ><b>CarWakeFltrNodeId</b></label><Br>
+      <div id="CarWakeFltrNodeId_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CarWakeFltrNodeIdvalidate()" style="width:30%" value="0" type="number" name="CarWakeFltrNodeId"  id="CarWakeFltrNodeId" min=0 max=255><Br>
+<script>
+    function CarWakeFltrNodeIdvalidate() {
+    var x = document.getElementById("CarWakeFltrNodeId");
+    if( x.value <0  || x.value > 255)
+    { document.getElementById("CarWakeFltrNodeId").style.background="red";
+    }
+    else{
+    document.getElementById("CarWakeFltrNodeId").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('NmPnInfoLength_ACC')" ><b>NmPnInfoLength</b></label><Br>
+      <div id="NmPnInfoLength_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" NmPnInfoLengthvalidate()" style="width:30%" value="2" type="number" name="NmPnInfoLength"  id="NmPnInfoLength" min=0 max=255><Br>
+<script>
+    function NmPnInfoLengthvalidate() {
+    var x = document.getElementById("NmPnInfoLength");
+    if( x.value <0  || x.value > 255)
+    { document.getElementById("NmPnInfoLength").style.background="red";
+    }
+    else{
+    document.getElementById("NmPnInfoLength").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('NmPnInfoOffset_ACC')" ><b>NmPnInfoOffset</b></label><Br>
+      <div id="NmPnInfoOffset_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" NmPnInfoOffsetvalidate()" style="width:30%" value="2" type="number" name="NmPnInfoOffset"  id="NmPnInfoOffset" min=0 max=255><Br>
+<script>
+    function NmPnInfoOffsetvalidate() {
+    var x = document.getElementById("NmPnInfoOffset");
+    if( x.value <0  || x.value > 255)
+    { document.getElementById("NmPnInfoOffset").style.background="red";
+    }
+    else{
+    document.getElementById("NmPnInfoOffset").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('NmPnResetTime_ACC')" ><b>NmPnResetTime</b></label><Br>
+      <div id="NmPnResetTime_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" NmPnResetTimevalidate()" style="width:30%" value="0" type="number" name="NmPnResetTime"  id="NmPnResetTime" min=0 max=65535><Br>
+<script>
+    function NmPnResetTimevalidate() {
+    var x = document.getElementById("NmPnResetTime");
+    if( x.value <0  || x.value > 65535)
+    { document.getElementById("NmPnResetTime").style.background="red";
+    }
+    else{
+    document.getElementById("NmPnResetTime").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+ </table>
+    <br><input type="submit" value="Save and Back" id="form_submit">
+    </form>
+    </div> 
+    </div> 
+    </body>
+    </html>
+    

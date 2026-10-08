@@ -1,0 +1,20 @@
+<td><select id="AVERAGE_FUEL_CONSUM2_tx_conf_no_of_events" disabled ="true" class="AVERAGE_FUEL_CONSUM2_tx_conf_no_of_events "  name="AVERAGE_FUEL_CONSUM2_tx_conf_no_of_events"   onchange="check_changed_tx_conf(this)" min ="1" max="2" style="width:100%"><option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+</select>
+</td>
+<td><br>
+<input class ="ID" id="AVERAGE_FUEL_CONSUM2_tx_conf_ID_1"  name="AVERAGE_FUEL_CONSUM2_tx_conf_ID_1"  value=" VNIM_ICM_GENERAL_STATUS_1_tx_conf_ID" type="textbox"  onblur="MakeWidth(this)" >
+<br>
+<input class ="ID" id="AVERAGE_FUEL_CONSUM2_tx_conf_ID_2"  name="AVERAGE_FUEL_CONSUM2_tx_conf_ID_2"  value=" VNIM_ICM_GENERAL_STATUS_2_tx_conf_ID" type="textbox"  onblur="MakeWidth(this)" >
+<br>
+<input class ="ID" id="AVERAGE_FUEL_CONSUM2_tx_conf_ID_3"  name="AVERAGE_FUEL_CONSUM2_tx_conf_ID_3"  value=" VNIM_ICM_GENERAL_STATUS_3_tx_conf_ID" type="textbox"  onblur="MakeWidth(this)" >
+<br>
+<input class ="ID" id="AVERAGE_FUEL_CONSUM2_tx_conf_ID_4"  name="AVERAGE_FUEL_CONSUM2_tx_conf_ID_4"  value=" VNIM_ICM_GENERAL_STATUS_4_tx_conf_ID" type="textbox"  onblur="MakeWidth(this)" >
+</td><td><br>
+<input class="BIT_MASK" id="AVERAGE_FUEL_CONSUM2_tx_conf_MASK_1" name="AVERAGE_FUEL_CONSUM2_tx_conf_MASK_1"  onblur=" bit_validate()" style="width:100%" value="1" type="number"    min=0 max=31><Br>
+<input class="BIT_MASK" id="AVERAGE_FUEL_CONSUM2_tx_conf_MASK_2" name="AVERAGE_FUEL_CONSUM2_tx_conf_MASK_2"  onblur=" bit_validate()" style="width:100%" value="1" type="number"    min=0 max=31><Br>
+<input class="BIT_MASK" id="AVERAGE_FUEL_CONSUM2_tx_conf_MASK_3" name="AVERAGE_FUEL_CONSUM2_tx_conf_MASK_3"  onblur=" bit_validate()" style="width:100%" value="1" type="number"    min=0 max=31><Br>
+
+<input class="BIT_MASK" id="AVERAGE_FUEL_CONSUM2_tx_conf_MASK_4" name="AVERAGE_FUEL_CONSUM2_tx_conf_MASK_4"  onblur=" bit_validate()" style="width:100%" value="1" type="number"    min=0 max=31><Br></td></tr>

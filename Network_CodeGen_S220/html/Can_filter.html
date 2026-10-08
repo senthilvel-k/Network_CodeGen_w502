@@ -1,0 +1,412 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <title>Filter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="data.json"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{'styl.css'|staticfile }}">
+    
+    <script>
+    function accordionfn(id) {
+        var x = document.getElementById(id);
+        if (x.className.indexOf("w3-show") == -1) {
+            x.className += " w3-show";
+        } else { 
+            x.className = x.className.replace(" w3-show", "");
+        }
+    }</script>
+    <script>
+    function enable_clicked(elem){
+        
+        var sig = elem.id;
+        sig=sig.split('_enable')[0];
+        if (elem.checked)
+        {
+            document.getElementById(sig+'_msg_type_no_of_events').disabled = false;            
+        }
+        else{   
+            document.getElementById(sig+'_msg_type_no_of_events').disabled = true;         
+        }
+        
+    };
+    </script>
+    
+    </head>
+    <body onload="load()" class="w3-container w3-grey"><!--copy_start-->
+<div  class=" w3-dark-grey" style ="width:100%;height:100%;position:fixed">
+
+<div class="w3-sidenav w3-dark-grey" style ="width:20%;height:100%;float:left;overflow:auto">
+
+<div class="w3-card-4 w3-light-grey" style="width:100%;height:100%">
+    <header class="w3-container w3-light-green">
+        <h3>CAN Database </h3>
+    </header>
+    
+    <Br>
+    <div class="w3-container ">
+        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_Filter" id="DRV" data-bind="true">+ CAN Filter Configurations </a>
+    </div>
+        
+    <div class="w3-container ">
+        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_dbc0_msg" id="DRV" data-bind="true">+ TX/RX Message Configurations </a>
+    </div>
+  
+    <div class="w3-container ">
+        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_dbc0_sig" id="DRV" data-bind="true">+ TX/Rx signal Configurations </a>
+    </div>
+    <Br>
+   
+</div>
+
+</div>
+ 
+<div class=" w3-dark-grey w3-padding-medium" style ="width:80%;height:100%;float:right;overflow:auto">
+<form action="BackEnd.Filter_SaveButton" id="form" data-bind="true">
+<label class="w3-label w3-text-light-grey">    <h1>Tx Messages</h1></label><table  class ="w3-table  w3-bordered  w3-border w3-hoverable">
+    <thead>
+    <tr>
+    <th> Configurable options </th>
+    <th colspan="2" text-align="center">Channel 0</th>
+    </tr>
+    </thead>
+    <tr><th>Message Name</th>
+    <th>Enable/Disable Msg</th>
+    <th>Messsage Type</th>
+    </tr>
+    <tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                IS1_100</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="IS1_100_enable"   name="IS1_100_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="IS1_100_msg_type_no_of_events" style="width:100"  class="IS1_100_msg_type_no_of_events "  name="IS1_100_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                IS3_500</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="IS3_500_enable"   name="IS3_500_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="IS3_500_msg_type_no_of_events" style="width:100"  class="IS3_500_msg_type_no_of_events "  name="IS3_500_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                IS_SP</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="IS_SP_enable"   name="IS_SP_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="IS_SP_msg_type_no_of_events" style="width:100"  class="IS_SP_msg_type_no_of_events "  name="IS_SP_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                IS_TEST</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="IS_TEST_enable"   name="IS_TEST_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="IS_TEST_msg_type_no_of_events" style="width:100"  class="IS_TEST_msg_type_no_of_events "  name="IS_TEST_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                IS_ACTIVE</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="IS_ACTIVE_enable"   name="IS_ACTIVE_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="IS_ACTIVE_msg_type_no_of_events" style="width:100"  class="IS_ACTIVE_msg_type_no_of_events "  name="IS_ACTIVE_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                IS_DIAG_RES</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="IS_DIAG_RES_enable"   name="IS_DIAG_RES_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="IS_DIAG_RES_msg_type_no_of_events" style="width:100"  class="IS_DIAG_RES_msg_type_no_of_events "  name="IS_DIAG_RES_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr></table><br><label class="w3-label w3-text-light-grey">    <h1>Rx Messages</h1></label><table  class ="w3-table  w3-bordered  w3-border w3-hoverable">
+    <thead>
+    <tr>
+    <th> Configurable options </th>
+    <th colspan="2" text-align="center">Channel 0</th>
+    </tr>
+    </thead>
+    <tr><th>Message Name</th>
+    <th>Enable/Disable Msg</th>
+    <th>Messsage Type</th>
+    </tr>
+    <tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                EMS1_10</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="EMS1_10_enable"   name="EMS1_10_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="EMS1_10_msg_type_no_of_events" style="width:100"  class="EMS1_10_msg_type_no_of_events "  name="EMS1_10_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                EMS2_10</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="EMS2_10_enable"   name="EMS2_10_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="EMS2_10_msg_type_no_of_events" style="width:100"  class="EMS2_10_msg_type_no_of_events "  name="EMS2_10_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                EMS3_10</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="EMS3_10_enable"   name="EMS3_10_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="EMS3_10_msg_type_no_of_events" style="width:100"  class="EMS3_10_msg_type_no_of_events "  name="EMS3_10_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                EMS4_20</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="EMS4_20_enable"   name="EMS4_20_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="EMS4_20_msg_type_no_of_events" style="width:100"  class="EMS4_20_msg_type_no_of_events "  name="EMS4_20_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                EMS5_500</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="EMS5_500_enable"   name="EMS5_500_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="EMS5_500_msg_type_no_of_events" style="width:100"  class="EMS5_500_msg_type_no_of_events "  name="EMS5_500_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                EMS6_500</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="EMS6_500_enable"   name="EMS6_500_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="EMS6_500_msg_type_no_of_events" style="width:100"  class="EMS6_500_msg_type_no_of_events "  name="EMS6_500_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                EMS8_10</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="EMS8_10_enable"   name="EMS8_10_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="EMS8_10_msg_type_no_of_events" style="width:100"  class="EMS8_10_msg_type_no_of_events "  name="EMS8_10_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                ESC1_10</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="ESC1_10_enable"   name="ESC1_10_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="ESC1_10_msg_type_no_of_events" style="width:100"  class="ESC1_10_msg_type_no_of_events "  name="ESC1_10_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                ESC2_10</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="ESC2_10_enable"   name="ESC2_10_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="ESC2_10_msg_type_no_of_events" style="width:100"  class="ESC2_10_msg_type_no_of_events "  name="ESC2_10_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                ESC3_20</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="ESC3_20_enable"   name="ESC3_20_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="ESC3_20_msg_type_no_of_events" style="width:100"  class="ESC3_20_msg_type_no_of_events "  name="ESC3_20_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                FATC1_200</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="FATC1_200_enable"   name="FATC1_200_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="FATC1_200_msg_type_no_of_events" style="width:100"  class="FATC1_200_msg_type_no_of_events "  name="FATC1_200_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                IC1_100</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="IC1_100_enable"   name="IC1_100_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="IC1_100_msg_type_no_of_events" style="width:100"  class="IC1_100_msg_type_no_of_events "  name="IC1_100_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                IC2_100</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="IC2_100_enable"   name="IC2_100_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="IC2_100_msg_type_no_of_events" style="width:100"  class="IC2_100_msg_type_no_of_events "  name="IC2_100_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                ICUA2_100</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="ICUA2_100_enable"   name="ICUA2_100_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="ICUA2_100_msg_type_no_of_events" style="width:100"  class="ICUA2_100_msg_type_no_of_events "  name="ICUA2_100_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                ICUA2_SP</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="ICUA2_SP_enable"   name="ICUA2_SP_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="ICUA2_SP_msg_type_no_of_events" style="width:100"  class="ICUA2_SP_msg_type_no_of_events "  name="ICUA2_SP_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                ICUA_TEST</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="ICUA_TEST_enable"   name="ICUA_TEST_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="ICUA_TEST_msg_type_no_of_events" style="width:100"  class="ICUA_TEST_msg_type_no_of_events "  name="ICUA_TEST_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                MBFM1_100</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="MBFM1_100_enable"   name="MBFM1_100_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="MBFM1_100_msg_type_no_of_events" style="width:100"  class="MBFM1_100_msg_type_no_of_events "  name="MBFM1_100_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                MBFM5_100</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="MBFM5_100_enable"   name="MBFM5_100_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="MBFM5_100_msg_type_no_of_events" style="width:100"  class="MBFM5_100_msg_type_no_of_events "  name="MBFM5_100_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                MBFM6_100</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="MBFM6_100_enable"   name="MBFM6_100_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="MBFM6_100_msg_type_no_of_events" style="width:100"  class="MBFM6_100_msg_type_no_of_events "  name="MBFM6_100_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                MBFM7_100</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="MBFM7_100_enable"   name="MBFM7_100_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="MBFM7_100_msg_type_no_of_events" style="width:100"  class="MBFM7_100_msg_type_no_of_events "  name="MBFM7_100_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                MBFM_RPAS1_20</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="MBFM_RPAS1_20_enable"   name="MBFM_RPAS1_20_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="MBFM_RPAS1_20_msg_type_no_of_events" style="width:100"  class="MBFM_RPAS1_20_msg_type_no_of_events "  name="MBFM_RPAS1_20_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                MBFM_RPAS2_100</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="MBFM_RPAS2_100_enable"   name="MBFM_RPAS2_100_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="MBFM_RPAS2_100_msg_type_no_of_events" style="width:100"  class="MBFM_RPAS2_100_msg_type_no_of_events "  name="MBFM_RPAS2_100_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                MBFM_RPAS3_20</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="MBFM_RPAS3_20_enable"   name="MBFM_RPAS3_20_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="MBFM_RPAS3_20_msg_type_no_of_events" style="width:100"  class="MBFM_RPAS3_20_msg_type_no_of_events "  name="MBFM_RPAS3_20_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                RVC1_100</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="RVC1_100_enable"   name="RVC1_100_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="RVC1_100_msg_type_no_of_events" style="width:100"  class="RVC1_100_msg_type_no_of_events "  name="RVC1_100_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                SRS1_20</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="SRS1_20_enable"   name="SRS1_20_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="SRS1_20_msg_type_no_of_events" style="width:100"  class="SRS1_20_msg_type_no_of_events "  name="SRS1_20_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                GLOBAL_DIAG_REQ</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="GLOBAL_DIAG_REQ_enable"   name="GLOBAL_DIAG_REQ_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="GLOBAL_DIAG_REQ_msg_type_no_of_events" style="width:100"  class="GLOBAL_DIAG_REQ_msg_type_no_of_events "  name="GLOBAL_DIAG_REQ_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                IS_DIAG_REQ</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="IS_DIAG_REQ_enable"   name="IS_DIAG_REQ_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="IS_DIAG_REQ_msg_type_no_of_events" style="width:100"  class="IS_DIAG_REQ_msg_type_no_of_events "  name="IS_DIAG_REQ_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                MBFM_ACTIVE</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="MBFM_ACTIVE_enable"   name="MBFM_ACTIVE_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="MBFM_ACTIVE_msg_type_no_of_events" style="width:100"  class="MBFM_ACTIVE_msg_type_no_of_events "  name="MBFM_ACTIVE_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr><tr width="100%">
+                <td  width="33%" text-align="center" ><label class="w3-label w3-text-light-grey" >                MBFM_WAKEUP</label></td>
+<td width="33%" text-align="center"><input  class="enable" id="MBFM_WAKEUP_enable"   name="MBFM_WAKEUP_enable" checked="false" onclick="enable_clicked(this)"type="checkbox"></td>
+<td width="33%" text-align="center" ><select  id="MBFM_WAKEUP_msg_type_no_of_events" style="width:100"  class="MBFM_WAKEUP_msg_type_no_of_events "  name="MBFM_WAKEUP_msg_type_no_of_events"  onchange="holder_clicked(this)" style="width:100%"><option value="Appl">Appl</option>
+<option value="NM">NM</option>
+<option value="Diag">Diag</option>
+</tr> </table>
+    <input type="submit" value="Save and Back" id="form_submit">
+    </form>
+    </div> 
+    </div> 
+    </body>
+    </html>
+    <script>
+        window.onload = function() {
+        data={"IS1_100_enable":"on","IS1_100_msg_type_no_of_events":"Appl","IS3_500_enable":"on","IS3_500_msg_type_no_of_events":"Appl","IS_SP_enable":"on","IS_SP_msg_type_no_of_events":"Appl","IS_TEST_enable":"","IS_TEST_msg_type_no_of_events":"Appl","IS_ACTIVE_enable":"on","IS_ACTIVE_msg_type_no_of_events":"Appl","IS_DIAG_RES_enable":"on","IS_DIAG_RES_msg_type_no_of_events":"NM","EMS1_10_enable":"on","EMS1_10_msg_type_no_of_events":"Appl","EMS2_10_enable":"on","EMS2_10_msg_type_no_of_events":"Appl","EMS3_10_enable":"on","EMS3_10_msg_type_no_of_events":"Appl","EMS4_20_enable":"on","EMS4_20_msg_type_no_of_events":"Appl","EMS5_500_enable":"on","EMS5_500_msg_type_no_of_events":"Appl","EMS6_500_enable":"on","EMS6_500_msg_type_no_of_events":"Appl","EMS8_10_enable":"on","EMS8_10_msg_type_no_of_events":"Appl","ESC1_10_enable":"on","ESC1_10_msg_type_no_of_events":"Appl","ESC2_10_enable":"on","ESC2_10_msg_type_no_of_events":"Appl","ESC3_20_enable":"on","ESC3_20_msg_type_no_of_events":"Appl","FATC1_200_enable":"on","FATC1_200_msg_type_no_of_events":"Appl","IC1_100_enable":"on","IC1_100_msg_type_no_of_events":"Appl","IC2_100_enable":"on","IC2_100_msg_type_no_of_events":"Appl","ICUA2_100_enable":"on","ICUA2_100_msg_type_no_of_events":"Appl","ICUA2_SP_enable":"","ICUA2_SP_msg_type_no_of_events":"Appl","ICUA_TEST_enable":"","ICUA_TEST_msg_type_no_of_events":"Appl","MBFM1_100_enable":"on","MBFM1_100_msg_type_no_of_events":"Appl","MBFM5_100_enable":"on","MBFM5_100_msg_type_no_of_events":"Appl","MBFM6_100_enable":"on","MBFM6_100_msg_type_no_of_events":"Appl","MBFM7_100_enable":"on","MBFM7_100_msg_type_no_of_events":"Appl","MBFM_RPAS1_20_enable":"on","MBFM_RPAS1_20_msg_type_no_of_events":"Appl","MBFM_RPAS2_100_enable":"on","MBFM_RPAS2_100_msg_type_no_of_events":"Appl","MBFM_RPAS3_20_enable":"on","MBFM_RPAS3_20_msg_type_no_of_events":"Appl","RVC1_100_enable":"on","RVC1_100_msg_type_no_of_events":"Appl","SRS1_20_enable":"on","SRS1_20_msg_type_no_of_events":"Appl","GLOBAL_DIAG_REQ_enable":"on","GLOBAL_DIAG_REQ_msg_type_no_of_events":"Diag","IS_DIAG_REQ_enable":"on","IS_DIAG_REQ_msg_type_no_of_events":"Diag","MBFM_ACTIVE_enable":"on","MBFM_ACTIVE_msg_type_no_of_events":"NM","MBFM_WAKEUP_enable":"on","MBFM_WAKEUP_msg_type_no_of_events":"NM"};
+ document.getElementById("IS1_100_enable").checked = (data.IS1_100_enable == "on" ? true : false);
+document.getElementById("IS1_100_msg_type_no_of_events").value = data.IS1_100_msg_type_no_of_events;
+document.getElementById("IS3_500_enable").checked = (data.IS3_500_enable == "on" ? true : false);
+document.getElementById("IS3_500_msg_type_no_of_events").value = data.IS3_500_msg_type_no_of_events;
+document.getElementById("IS_SP_enable").checked = (data.IS_SP_enable == "on" ? true : false);
+document.getElementById("IS_SP_msg_type_no_of_events").value = data.IS_SP_msg_type_no_of_events;
+document.getElementById("IS_TEST_enable").checked = (data.IS_TEST_enable == "on" ? true : false);
+document.getElementById("IS_TEST_msg_type_no_of_events").value = data.IS_TEST_msg_type_no_of_events;
+ document.getElementById("IS_ACTIVE_enable").checked = (data.IS_ACTIVE_enable == "on" ? true : false);
+document.getElementById("IS_ACTIVE_msg_type_no_of_events").value = data.IS_ACTIVE_msg_type_no_of_events;
+document.getElementById("IS_DIAG_RES_enable").checked = (data.IS_DIAG_RES_enable == "on" ? true : false);
+document.getElementById("IS_DIAG_RES_msg_type_no_of_events").value = data.IS_DIAG_RES_msg_type_no_of_events;
+ document.getElementById("EMS1_10_enable").checked = (data.EMS1_10_enable == "on" ? true : false);
+document.getElementById("EMS1_10_msg_type_no_of_events").value = data.EMS1_10_msg_type_no_of_events;
+document.getElementById("EMS2_10_enable").checked = (data.EMS2_10_enable == "on" ? true : false);
+document.getElementById("EMS2_10_msg_type_no_of_events").value = data.EMS2_10_msg_type_no_of_events;
+document.getElementById("EMS3_10_enable").checked = (data.EMS3_10_enable == "on" ? true : false);
+document.getElementById("EMS3_10_msg_type_no_of_events").value = data.EMS3_10_msg_type_no_of_events;
+document.getElementById("EMS4_20_enable").checked = (data.EMS4_20_enable == "on" ? true : false);
+document.getElementById("EMS4_20_msg_type_no_of_events").value = data.EMS4_20_msg_type_no_of_events;
+document.getElementById("EMS5_500_enable").checked = (data.EMS5_500_enable == "on" ? true : false);
+document.getElementById("EMS5_500_msg_type_no_of_events").value = data.EMS5_500_msg_type_no_of_events;
+document.getElementById("EMS6_500_enable").checked = (data.EMS6_500_enable == "on" ? true : false);
+document.getElementById("EMS6_500_msg_type_no_of_events").value = data.EMS6_500_msg_type_no_of_events;
+document.getElementById("EMS8_10_enable").checked = (data.EMS8_10_enable == "on" ? true : false);
+document.getElementById("EMS8_10_msg_type_no_of_events").value = data.EMS8_10_msg_type_no_of_events;
+document.getElementById("ESC1_10_enable").checked = (data.ESC1_10_enable == "on" ? true : false);
+document.getElementById("ESC1_10_msg_type_no_of_events").value = data.ESC1_10_msg_type_no_of_events;
+document.getElementById("ESC2_10_enable").checked = (data.ESC2_10_enable == "on" ? true : false);
+document.getElementById("ESC2_10_msg_type_no_of_events").value = data.ESC2_10_msg_type_no_of_events;
+document.getElementById("ESC3_20_enable").checked = (data.ESC3_20_enable == "on" ? true : false);
+document.getElementById("ESC3_20_msg_type_no_of_events").value = data.ESC3_20_msg_type_no_of_events;
+document.getElementById("FATC1_200_enable").checked = (data.FATC1_200_enable == "on" ? true : false);
+document.getElementById("FATC1_200_msg_type_no_of_events").value = data.FATC1_200_msg_type_no_of_events;
+document.getElementById("IC1_100_enable").checked = (data.IC1_100_enable == "on" ? true : false);
+document.getElementById("IC1_100_msg_type_no_of_events").value = data.IC1_100_msg_type_no_of_events;
+document.getElementById("IC2_100_enable").checked = (data.IC2_100_enable == "on" ? true : false);
+document.getElementById("IC2_100_msg_type_no_of_events").value = data.IC2_100_msg_type_no_of_events;
+document.getElementById("ICUA2_100_enable").checked = (data.ICUA2_100_enable == "on" ? true : false);
+document.getElementById("ICUA2_100_msg_type_no_of_events").value = data.ICUA2_100_msg_type_no_of_events;
+document.getElementById("ICUA2_SP_enable").checked = (data.ICUA2_SP_enable == "on" ? true : false);
+document.getElementById("ICUA2_SP_msg_type_no_of_events").value = data.ICUA2_SP_msg_type_no_of_events;
+document.getElementById("ICUA_TEST_enable").checked = (data.ICUA_TEST_enable == "on" ? true : false);
+document.getElementById("ICUA_TEST_msg_type_no_of_events").value = data.ICUA_TEST_msg_type_no_of_events;
+document.getElementById("MBFM1_100_enable").checked = (data.MBFM1_100_enable == "on" ? true : false);
+document.getElementById("MBFM1_100_msg_type_no_of_events").value = data.MBFM1_100_msg_type_no_of_events;
+document.getElementById("MBFM5_100_enable").checked = (data.MBFM5_100_enable == "on" ? true : false);
+document.getElementById("MBFM5_100_msg_type_no_of_events").value = data.MBFM5_100_msg_type_no_of_events;
+document.getElementById("MBFM6_100_enable").checked = (data.MBFM6_100_enable == "on" ? true : false);
+document.getElementById("MBFM6_100_msg_type_no_of_events").value = data.MBFM6_100_msg_type_no_of_events;
+document.getElementById("MBFM7_100_enable").checked = (data.MBFM7_100_enable == "on" ? true : false);
+document.getElementById("MBFM7_100_msg_type_no_of_events").value = data.MBFM7_100_msg_type_no_of_events;
+document.getElementById("MBFM_RPAS1_20_enable").checked = (data.MBFM_RPAS1_20_enable == "on" ? true : false);
+document.getElementById("MBFM_RPAS1_20_msg_type_no_of_events").value = data.MBFM_RPAS1_20_msg_type_no_of_events;
+document.getElementById("MBFM_RPAS2_100_enable").checked = (data.MBFM_RPAS2_100_enable == "on" ? true : false);
+document.getElementById("MBFM_RPAS2_100_msg_type_no_of_events").value = data.MBFM_RPAS2_100_msg_type_no_of_events;
+document.getElementById("MBFM_RPAS3_20_enable").checked = (data.MBFM_RPAS3_20_enable == "on" ? true : false);
+document.getElementById("MBFM_RPAS3_20_msg_type_no_of_events").value = data.MBFM_RPAS3_20_msg_type_no_of_events;
+document.getElementById("RVC1_100_enable").checked = (data.RVC1_100_enable == "on" ? true : false);
+document.getElementById("RVC1_100_msg_type_no_of_events").value = data.RVC1_100_msg_type_no_of_events;
+document.getElementById("SRS1_20_enable").checked = (data.SRS1_20_enable == "on" ? true : false);
+document.getElementById("SRS1_20_msg_type_no_of_events").value = data.SRS1_20_msg_type_no_of_events;
+ document.getElementById("GLOBAL_DIAG_REQ_enable").checked = (data.GLOBAL_DIAG_REQ_enable == "on" ? true : false);
+document.getElementById("GLOBAL_DIAG_REQ_msg_type_no_of_events").value = data.GLOBAL_DIAG_REQ_msg_type_no_of_events;
+document.getElementById("IS_DIAG_REQ_enable").checked = (data.IS_DIAG_REQ_enable == "on" ? true : false);
+document.getElementById("IS_DIAG_REQ_msg_type_no_of_events").value = data.IS_DIAG_REQ_msg_type_no_of_events;
+document.getElementById("MBFM_ACTIVE_enable").checked = (data.MBFM_ACTIVE_enable == "on" ? true : false);
+document.getElementById("MBFM_ACTIVE_msg_type_no_of_events").value = data.MBFM_ACTIVE_msg_type_no_of_events;
+document.getElementById("MBFM_WAKEUP_enable").checked = (data.MBFM_WAKEUP_enable == "on" ? true : false);
+document.getElementById("MBFM_WAKEUP_msg_type_no_of_events").value = data.MBFM_WAKEUP_msg_type_no_of_events;
+
+
+        
+        
+String.prototype.endsWith = function(suffix) {
+            return this.indexOf(suffix, this.length - suffix.length) !== -1;
+        };
+        
+        function enable_disable(elem){
+        
+        var sig = elem.split('_enable')[0];
+        if (data[elem] == "on")
+        {
+            document.getElementById(sig+'_msg_type_no_of_events').disabled = false;            
+        }
+        else{   
+            document.getElementById(sig+'_msg_type_no_of_events').disabled = true;         
+        }
+        
+    };
+        var key,i;
+        key = Object.keys(data);
+        //
+        for ( i = 0, len = key.length; i < len; i++)
+        {
+             
+            if ((key[i].endsWith("_enable") != false)){
+               //alert(key[i]);
+               enable_disable(key[i]);
+            
+                
+              }
+         }};
+</script>

@@ -1,0 +1,206 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <title>IL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="data.json"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{'styl.css'|staticfile }}">
+    <script>
+    function accordionfn(id) {
+        var x = document.getElementById(id);
+        if (x.className.indexOf("w3-show") == -1) {
+            x.className += " w3-show";
+        } else { 
+            x.className = x.className.replace(" w3-show", "");
+        }
+    }</script>
+    </head>
+    <body onload="load()" class="w3-container w3-grey"><!--copy_start-->
+<div  class=" w3-dark-grey" style ="width:100%;height:100%;position:fixed">
+
+<div class="w3-sidenav w3-dark-grey" style ="width:15%;height:100%;float:left;overflow:auto">
+
+<div class="w3-card-4 w3-light-grey" style="width:100%;height:100%">
+    <header class="w3-container w3-light-green">
+        <h3>CAN Database </h3>
+    </header>
+    
+    <Br>
+            
+    <div class="w3-container ">
+        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_dbc0_msg" id="DRV" data-bind="true">+ TX/RX Message Configurations </a>
+    </div>
+  
+    <div class="w3-container ">
+        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_dbc0_sig" id="DRV" data-bind="true">+ TX/Rx signal Configurations </a>
+    </div>
+    <Br>
+   
+</div>
+
+</div>
+ 
+<div class=" w3-dark-grey w3-padding-medium" style ="width:85%;height:100%;float:right;overflow:auto">
+<form action="BackEnd.IL_SaveButton" id="form" data-bind="true">
+<table  class ="w3-table  w3-bordered  w3-border w3-hoverable">
+    <thead>
+    <tr>
+    <th> Configurable options </th>
+    <th>Channel 0</th>
+    </tr>
+    </thead><tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('IL_TASK_PERIOD_MS_ACC')" ><b>IL_TASK_PERIOD_MS</b></label><Br>
+      <div id="IL_TASK_PERIOD_MS_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey ">MAIN</p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" IL_TASK_PERIOD_MSvalidate()" style="width:30%" value="5" type="number" name="IL_TASK_PERIOD_MS"  id="IL_TASK_PERIOD_MS" min=0 max=255><Br>
+<script>
+    function IL_TASK_PERIOD_MSvalidate() {
+    var x = document.getElementById("IL_TASK_PERIOD_MS");
+    if( x.value <0  || x.value > 255)
+    { document.getElementById("IL_TASK_PERIOD_MS").style.background="red";
+    }
+    else{
+    document.getElementById("IL_TASK_PERIOD_MS").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CAN_IL_NUM_OF_CHANNELS_ACC')" ><b>CAN_IL_NUM_OF_CHANNELS</b></label><Br>
+      <div id="CAN_IL_NUM_OF_CHANNELS_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CAN_IL_NUM_OF_CHANNELSvalidate()" style="width:30%" value="1" type="number" name="CAN_IL_NUM_OF_CHANNELS"  id="CAN_IL_NUM_OF_CHANNELS" min=0 max=255><Br>
+<script>
+    function CAN_IL_NUM_OF_CHANNELSvalidate() {
+    var x = document.getElementById("CAN_IL_NUM_OF_CHANNELS");
+    if( x.value <0  || x.value > 255)
+    { document.getElementById("CAN_IL_NUM_OF_CHANNELS").style.background="red";
+    }
+    else{
+    document.getElementById("CAN_IL_NUM_OF_CHANNELS").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CAN_IL_DYNAMIC_LEN_SUPPORT_ACC')" ><b>CAN_IL_DYNAMIC_LEN_SUPPORT</b></label><Br>
+      <div id="CAN_IL_DYNAMIC_LEN_SUPPORT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CAN_IL_DYNAMIC_LEN_SUPPORT" class="w3-select " name="CAN_IL_DYNAMIC_LEN_SUPPORT"  id="CAN_IL_DYNAMIC_LEN_SUPPORT"style="width:40%"><Br>
+<option value="CANIL_YES">CANIL_YES</option>
+<option value="CANIL_NO">CANIL_NO</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANIL_TX_TIMEOUT_SUPPORT_ACC')" ><b>CANIL_TX_TIMEOUT_SUPPORT</b></label><Br>
+      <div id="CANIL_TX_TIMEOUT_SUPPORT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANIL_TX_TIMEOUT_SUPPORT" class="w3-select " name="CANIL_TX_TIMEOUT_SUPPORT"  id="CANIL_TX_TIMEOUT_SUPPORT"style="width:40%"><Br>
+<option value="CANIL_YES">CANIL_YES</option>
+<option value="CANIL_NO">CANIL_NO</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CAN_IL_TX_BURST_MODE_ACC')" ><b>CAN_IL_TX_BURST_MODE</b></label><Br>
+      <div id="CAN_IL_TX_BURST_MODE_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CAN_IL_TX_BURST_MODE" class="w3-select " name="CAN_IL_TX_BURST_MODE"  id="CAN_IL_TX_BURST_MODE"style="width:40%"><Br>
+<option value="CANIL_YES">CANIL_YES</option>
+<option value="CANIL_NO">CANIL_NO</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CAN_IL_TX_WITH_DLC0_SUPPORT_ACC')" ><b>CAN_IL_TX_WITH_DLC0_SUPPORT</b></label><Br>
+      <div id="CAN_IL_TX_WITH_DLC0_SUPPORT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CAN_IL_TX_WITH_DLC0_SUPPORT" class="w3-select " name="CAN_IL_TX_WITH_DLC0_SUPPORT"  id="CAN_IL_TX_WITH_DLC0_SUPPORT"style="width:40%"><Br>
+<option value="CANIL_YES">CANIL_YES</option>
+<option value="CANIL_NO">CANIL_NO</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CAN_IL_REQ_FRAME_SUPPORT_ACC')" ><b>CAN_IL_REQ_FRAME_SUPPORT</b></label><Br>
+      <div id="CAN_IL_REQ_FRAME_SUPPORT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CAN_IL_REQ_FRAME_SUPPORT" class="w3-select " name="CAN_IL_REQ_FRAME_SUPPORT"  id="CAN_IL_REQ_FRAME_SUPPORT"style="width:40%"><Br>
+<option value="CANIL_YES">CANIL_YES</option>
+<option value="CANIL_NO">CANIL_NO</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CAN_IL_PERIODIC_RESTART_AFTER_EVENT_ACC')" ><b>CAN_IL_PERIODIC_RESTART_AFTER_EVENT</b></label><Br>
+      <div id="CAN_IL_PERIODIC_RESTART_AFTER_EVENT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CAN_IL_PERIODIC_RESTART_AFTER_EVENT" class="w3-select " name="CAN_IL_PERIODIC_RESTART_AFTER_EVENT"  id="CAN_IL_PERIODIC_RESTART_AFTER_EVENT"style="width:40%"><Br>
+<option value="CANIL_YES">CANIL_YES</option>
+<option value="CANIL_NO">CANIL_NO</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CAN_IL_MESSAGE_VALIDATION_SUPPORT_ACC')" ><b>CAN_IL_MESSAGE_VALIDATION_SUPPORT</b></label><Br>
+      <div id="CAN_IL_MESSAGE_VALIDATION_SUPPORT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CAN_IL_MESSAGE_VALIDATION_SUPPORT" class="w3-select " name="CAN_IL_MESSAGE_VALIDATION_SUPPORT"  id="CAN_IL_MESSAGE_VALIDATION_SUPPORT"style="width:40%"><Br>
+<option value="CANIL_YES">CANIL_YES</option>
+<option value="CANIL_NO">CANIL_NO</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANIL_IFSUPPORT_ACC')" ><b>CANIL_IFSUPPORT</b></label><Br>
+      <div id="CANIL_IFSUPPORT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANIL_IFSUPPORT" class="w3-select " name="CANIL_IFSUPPORT"  id="CANIL_IFSUPPORT"style="width:40%"><Br>
+<option value="CANIL_YES">CANIL_YES</option>
+<option value="CANIL_NO">CANIL_NO</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANIL_BYTEENDIANNESS_ACC')" ><b>CANIL_BYTEENDIANNESS</b></label><Br>
+      <div id="CANIL_BYTEENDIANNESS_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANIL_BYTEENDIANNESS" class="w3-select " name="CANIL_BYTEENDIANNESS"  id="CANIL_BYTEENDIANNESS"style="width:40%"><Br>
+<option value="BIG">BIG</option>
+<option value="LITTLE">LITTLE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANIL_RXINDICATION_API_ACC')" ><b>CANIL_RXINDICATION_API</b></label><Br>
+      <div id="CANIL_RXINDICATION_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANIL_RXINDICATION_API" class="w3-select " name="CANIL_RXINDICATION_API"  id="CANIL_RXINDICATION_API"style="width:40%"><Br>
+<option value="CANIL_YES">CANIL_YES</option>
+<option value="CANIL_NO">CANIL_NO</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANIL_TXCONFIRMATION_API_ACC')" ><b>CANIL_TXCONFIRMATION_API</b></label><Br>
+      <div id="CANIL_TXCONFIRMATION_API_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANIL_TXCONFIRMATION_API" class="w3-select " name="CANIL_TXCONFIRMATION_API"  id="CANIL_TXCONFIRMATION_API"style="width:40%"><Br>
+<option value="CANIL_YES">CANIL_YES</option>
+<option value="CANIL_NO">CANIL_NO</option>
+</select><Br><Br>
+</td>
+</tr>
+ </table>
+    <br><input type="submit" value="Save and Back" id="form_submit">
+    </form>
+    </div> 
+    </div> 
+    </body>
+    </html>
+    

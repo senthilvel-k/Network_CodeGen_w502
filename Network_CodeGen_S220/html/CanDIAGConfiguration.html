@@ -1,0 +1,272 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <title>DIAG</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="data.json"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{'styl.css'|staticfile }}">
+    <script>
+    function accordionfn(id) {
+        var x = document.getElementById(id);
+        if (x.className.indexOf("w3-show") == -1) {
+            x.className += " w3-show";
+        } else { 
+            x.className = x.className.replace(" w3-show", "");
+        }
+    }</script>
+    </head>
+    <body onload="load()" class="w3-container w3-grey"><!--copy_start-->
+<div  class=" w3-dark-grey" style ="width:100%;height:100%;position:fixed">
+
+<div class="w3-sidenav w3-dark-grey" style ="width:15%;height:100%;float:left;overflow:auto">
+
+<div class="w3-card-4 w3-light-grey" style="width:100%;height:100%">
+    <header class="w3-container w3-light-green">
+        <h3>CAN Database </h3>
+    </header>
+    
+    <Br>
+            
+    <div class="w3-container ">
+        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_dbc0_msg" id="DRV" data-bind="true">+ TX/RX Message Configurations </a>
+    </div>
+  
+    <div class="w3-container ">
+        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_dbc0_sig" id="DRV" data-bind="true">+ TX/Rx signal Configurations </a>
+    </div>
+    <Br>
+   
+</div>
+
+</div>
+ 
+<div class=" w3-dark-grey w3-padding-medium" style ="width:85%;height:100%;float:right;overflow:auto">
+<form action="BackEnd.DIAG_SaveButton" id="form" data-bind="true">
+<table  class ="w3-table  w3-bordered  w3-border w3-hoverable">
+    <thead>
+    <tr>
+    <th> Configurable options </th>
+    <th>Channel 0</th>
+    </tr>
+    </thead><tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDIAG_NUMOFCHANNELS_ACC')" ><b>CANDIAG_NUMOFCHANNELS</b></label><Br>
+      <div id="CANDIAG_NUMOFCHANNELS_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey ">MAIN</p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CANDIAG_NUMOFCHANNELSvalidate()" style="width:30%" value="1" type="number" name="CANDIAG_NUMOFCHANNELS"  id="CANDIAG_NUMOFCHANNELS" min=0 max=255><Br>
+<script>
+    function CANDIAG_NUMOFCHANNELSvalidate() {
+    var x = document.getElementById("CANDIAG_NUMOFCHANNELS");
+    if( x.value <0  || x.value > 255)
+    { document.getElementById("CANDIAG_NUMOFCHANNELS").style.background="red";
+    }
+    else{
+    document.getElementById("CANDIAG_NUMOFCHANNELS").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDIAG_TPCHANNEL_ACC')" ><b>CANDIAG_TPCHANNEL</b></label><Br>
+      <div id="CANDIAG_TPCHANNEL_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CANDIAG_TPCHANNELvalidate()" style="width:30%" value="0" type="number" name="CANDIAG_TPCHANNEL"  id="CANDIAG_TPCHANNEL" min=0 max=255><Br>
+<script>
+    function CANDIAG_TPCHANNELvalidate() {
+    var x = document.getElementById("CANDIAG_TPCHANNEL");
+    if( x.value <0  || x.value > 255)
+    { document.getElementById("CANDIAG_TPCHANNEL").style.background="red";
+    }
+    else{
+    document.getElementById("CANDIAG_TPCHANNEL").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDIAG_CALLCYCLE_INMSEC_ACC')" ><b>CANDIAG_CALLCYCLE_INMSEC</b></label><Br>
+      <div id="CANDIAG_CALLCYCLE_INMSEC_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CANDIAG_CALLCYCLE_INMSECvalidate()" style="width:30%" value="1" type="number" name="CANDIAG_CALLCYCLE_INMSEC"  id="CANDIAG_CALLCYCLE_INMSEC" min=0 max=255><Br>
+<script>
+    function CANDIAG_CALLCYCLE_INMSECvalidate() {
+    var x = document.getElementById("CANDIAG_CALLCYCLE_INMSEC");
+    if( x.value <0  || x.value > 255)
+    { document.getElementById("CANDIAG_CALLCYCLE_INMSEC").style.background="red";
+    }
+    else{
+    document.getElementById("CANDIAG_CALLCYCLE_INMSEC").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDIAG_ASR_SUPPORT_ACC')" ><b>CANDIAG_ASR_SUPPORT</b></label><Br>
+      <div id="CANDIAG_ASR_SUPPORT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDIAG_ASR_SUPPORT" class="w3-select " name="CANDIAG_ASR_SUPPORT"  id="CANDIAG_ASR_SUPPORT"style="width:40%"><Br>
+<option value="CANDIAG_ENABLE">CANDIAG_ENABLE</option>
+<option value="CANDIAG_DISABLE">CANDIAG_DISABLE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDIAG_FUNC_NRC_SUPPRESS_ACC')" ><b>CANDIAG_FUNC_NRC_SUPPRESS</b></label><Br>
+      <div id="CANDIAG_FUNC_NRC_SUPPRESS_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDIAG_FUNC_NRC_SUPPRESS" class="w3-select " name="CANDIAG_FUNC_NRC_SUPPRESS"  id="CANDIAG_FUNC_NRC_SUPPRESS"style="width:40%"><Br>
+<option value="CANDIAG_ENABLE">CANDIAG_ENABLE</option>
+<option value="CANDIAG_DISABLE">CANDIAG_DISABLE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDIAG_PRECONDITIONS_CHECK_SUPPORT_ACC')" ><b>CANDIAG_PRECONDITIONS_CHECK_SUPPORT</b></label><Br>
+      <div id="CANDIAG_PRECONDITIONS_CHECK_SUPPORT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDIAG_PRECONDITIONS_CHECK_SUPPORT" class="w3-select " name="CANDIAG_PRECONDITIONS_CHECK_SUPPORT"  id="CANDIAG_PRECONDITIONS_CHECK_SUPPORT"style="width:40%"><Br>
+<option value="CANDIAG_ENABLE">CANDIAG_ENABLE</option>
+<option value="CANDIAG_DISABLE">CANDIAG_DISABLE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDIAG_PRECOND_CHECK_AT_START_ACC')" ><b>CANDIAG_PRECOND_CHECK_AT_START</b></label><Br>
+      <div id="CANDIAG_PRECOND_CHECK_AT_START_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDIAG_PRECOND_CHECK_AT_START" class="w3-select " name="CANDIAG_PRECOND_CHECK_AT_START"  id="CANDIAG_PRECOND_CHECK_AT_START"style="width:40%"><Br>
+<option value="CANDIAG_ENABLE">CANDIAG_ENABLE</option>
+<option value="CANDIAG_DISABLE">CANDIAG_DISABLE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDIAG_SECONDARY_RCRRP_SUPPORT_ACC')" ><b>CANDIAG_SECONDARY_RCRRP_SUPPORT</b></label><Br>
+      <div id="CANDIAG_SECONDARY_RCRRP_SUPPORT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<select id="CANDIAG_SECONDARY_RCRRP_SUPPORT" class="w3-select " name="CANDIAG_SECONDARY_RCRRP_SUPPORT"  id="CANDIAG_SECONDARY_RCRRP_SUPPORT"style="width:40%"><Br>
+<option value="CANDIAG_ENABLE">CANDIAG_ENABLE</option>
+<option value="CANDIAG_DISABLE">CANDIAG_DISABLE</option>
+</select><Br><Br>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDIAG_MAXPRIMARYBUFFLEN_ACC')" ><b>CANDIAG_MAXPRIMARYBUFFLEN</b></label><Br>
+      <div id="CANDIAG_MAXPRIMARYBUFFLEN_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CANDIAG_MAXPRIMARYBUFFLENvalidate()" style="width:30%" value="2" type="number" name="CANDIAG_MAXPRIMARYBUFFLEN"  id="CANDIAG_MAXPRIMARYBUFFLEN" min=0 max=65535><Br>
+<script>
+    function CANDIAG_MAXPRIMARYBUFFLENvalidate() {
+    var x = document.getElementById("CANDIAG_MAXPRIMARYBUFFLEN");
+    if( x.value <0  || x.value > 65535)
+    { document.getElementById("CANDIAG_MAXPRIMARYBUFFLEN").style.background="red";
+    }
+    else{
+    document.getElementById("CANDIAG_MAXPRIMARYBUFFLEN").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDIAG_MAXSECONDARYBUFFLEN_ACC')" ><b>CANDIAG_MAXSECONDARYBUFFLEN</b></label><Br>
+      <div id="CANDIAG_MAXSECONDARYBUFFLEN_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CANDIAG_MAXSECONDARYBUFFLENvalidate()" style="width:30%" value="2" type="number" name="CANDIAG_MAXSECONDARYBUFFLEN"  id="CANDIAG_MAXSECONDARYBUFFLEN" min=0 max=65535><Br>
+<script>
+    function CANDIAG_MAXSECONDARYBUFFLENvalidate() {
+    var x = document.getElementById("CANDIAG_MAXSECONDARYBUFFLEN");
+    if( x.value <0  || x.value > 65535)
+    { document.getElementById("CANDIAG_MAXSECONDARYBUFFLEN").style.background="red";
+    }
+    else{
+    document.getElementById("CANDIAG_MAXSECONDARYBUFFLEN").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDIAG_UDS_P2RESPTIME_IN_MSEC_ACC')" ><b>CANDIAG_UDS_P2RESPTIME_IN_MSEC</b></label><Br>
+      <div id="CANDIAG_UDS_P2RESPTIME_IN_MSEC_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CANDIAG_UDS_P2RESPTIME_IN_MSECvalidate()" style="width:30%" value="5" type="number" name="CANDIAG_UDS_P2RESPTIME_IN_MSEC"  id="CANDIAG_UDS_P2RESPTIME_IN_MSEC" min=0 max=65535><Br>
+<script>
+    function CANDIAG_UDS_P2RESPTIME_IN_MSECvalidate() {
+    var x = document.getElementById("CANDIAG_UDS_P2RESPTIME_IN_MSEC");
+    if( x.value <0  || x.value > 65535)
+    { document.getElementById("CANDIAG_UDS_P2RESPTIME_IN_MSEC").style.background="red";
+    }
+    else{
+    document.getElementById("CANDIAG_UDS_P2RESPTIME_IN_MSEC").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDIAG_UDS_S3TIME_INMSEC_ACC')" ><b>CANDIAG_UDS_S3TIME_INMSEC</b></label><Br>
+      <div id="CANDIAG_UDS_S3TIME_INMSEC_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CANDIAG_UDS_S3TIME_INMSECvalidate()" style="width:30%" value="5" type="number" name="CANDIAG_UDS_S3TIME_INMSEC"  id="CANDIAG_UDS_S3TIME_INMSEC" min=0 max=65535><Br>
+<script>
+    function CANDIAG_UDS_S3TIME_INMSECvalidate() {
+    var x = document.getElementById("CANDIAG_UDS_S3TIME_INMSEC");
+    if( x.value <0  || x.value > 65535)
+    { document.getElementById("CANDIAG_UDS_S3TIME_INMSEC").style.background="red";
+    }
+    else{
+    document.getElementById("CANDIAG_UDS_S3TIME_INMSEC").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDIAG_UDS_RCRRPTIME_INMSEC_ACC')" ><b>CANDIAG_UDS_RCRRPTIME_INMSEC</b></label><Br>
+      <div id="CANDIAG_UDS_RCRRPTIME_INMSEC_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CANDIAG_UDS_RCRRPTIME_INMSECvalidate()" style="width:30%" value="5" type="number" name="CANDIAG_UDS_RCRRPTIME_INMSEC"  id="CANDIAG_UDS_RCRRPTIME_INMSEC" min=0 max=65535><Br>
+<script>
+    function CANDIAG_UDS_RCRRPTIME_INMSECvalidate() {
+    var x = document.getElementById("CANDIAG_UDS_RCRRPTIME_INMSEC");
+    if( x.value <0  || x.value > 65535)
+    { document.getElementById("CANDIAG_UDS_RCRRPTIME_INMSEC").style.background="red";
+    }
+    else{
+    document.getElementById("CANDIAG_UDS_RCRRPTIME_INMSEC").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+<tr>
+    <td><label class="w3-label w3-text-light-grey" onclick="accordionfn('CANDIAG_UDS_RCRRPMAXCOUNT_ACC')" ><b>CANDIAG_UDS_RCRRPMAXCOUNT</b></label><Br>
+      <div id="CANDIAG_UDS_RCRRPMAXCOUNT_ACC" class="w3-accordion-content w3-animate-left "style="width:100%">      <BR>      <Div>
+    <p class="w3-container w3-text-light-grey  w3-border-blue-grey "></p>    </div>    </div>    </td>    <td>
+<input class="w3-input w3-validate " onblur=" CANDIAG_UDS_RCRRPMAXCOUNTvalidate()" style="width:30%" value="5" type="number" name="CANDIAG_UDS_RCRRPMAXCOUNT"  id="CANDIAG_UDS_RCRRPMAXCOUNT" min=0 max=65535><Br>
+<script>
+    function CANDIAG_UDS_RCRRPMAXCOUNTvalidate() {
+    var x = document.getElementById("CANDIAG_UDS_RCRRPMAXCOUNT");
+    if( x.value <0  || x.value > 65535)
+    { document.getElementById("CANDIAG_UDS_RCRRPMAXCOUNT").style.background="red";
+    }
+    else{
+    document.getElementById("CANDIAG_UDS_RCRRPMAXCOUNT").style.background="white";
+    }
+    }
+    </script>
+</td>
+</tr>
+ </table>
+    <br><input type="submit" value="Save and Back" id="form_submit">
+    </form>
+    </div> 
+    </div> 
+    </body>
+    </html>
+    

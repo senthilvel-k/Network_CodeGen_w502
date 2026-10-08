@@ -1,0 +1,904 @@
+VERSION ""
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_: IS
+
+
+BO_ 970 IS3_500: 8 IS
+ SG_ STS_NAV_ROUTE : 38|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ NATIVE_NAV_TURN_INDC : 44|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ NATIVE_NAV_DIST : 48|8@1+ (10,0) [0|500] "Mts" Vector__XXX
+ SG_ CLOCK_YEAR : 0|6@1+ (1,2000) [2016|2063] "" Vector__XXX
+ SG_ CLOCK_MONTH : 8|4@1+ (1,0) [1|12] "" Vector__XXX
+ SG_ CLOCK_DATE : 16|5@1+ (1,0) [1|31] "" Vector__XXX
+ SG_ CLOCK_FORMAT : 12|1@1- (1,0) [0|1] "" Vector__XXX
+ SG_ CLOCK_MIN : 32|6@1+ (1,0) [0|59] "Minute" Vector__XXX
+ SG_ CLOCK_HOUR : 24|5@1+ (1,0) [0|23] "Hour" Vector__XXX
+
+BO_ 566 MBFM_RPAS3_20: 8 Vector__XXX
+ SG_ BAR_SECT_RIGHT_CENTER : 20|4@1+ (1,0) [0|15] ""  IS
+ SG_ DISP_DISTANCE : 56|8@1+ (1,0) [0|250] "cm"  IS
+ SG_ BAR_SECTOR_RIGHT : 12|4@1+ (1,0) [0|15] ""  IS
+ SG_ BAR_SECT_LEFT_CENTER : 16|4@1+ (1,0) [0|15] ""  IS
+ SG_ BAR_SECTOR_LEFT : 8|4@1+ (1,0) [0|15] ""  IS
+
+BO_ 151 MBFM_WAKEUP: 8 Vector__XXX
+ SG_ MBFM_WAKEUP_REASON : 8|16@1+ (1,0) [0|65535] ""  IS
+
+BO_ 961 MBFM_ACTIVE: 8 Vector__XXX
+ SG_ RESERVED_2 : 0|64@1+ (1,0) [0|1.8446744074E+019] ""  IS
+
+BO_ 268 ABS1_10: 8 Vector__XXX
+ SG_ HDC_ACTIVE : 14|2@1+ (1,0) [0|3] ""  IS
+ SG_ ABS_ACTIVE : 13|1@1+ (1,0) [0|1] ""  IS
+
+BO_ 535 RVC1_100: 8 Vector__XXX
+ SG_ GUIDED_VOICE_REQ : 8|4@1+ (1,0) [0|15] ""  IS
+ SG_ RVC_OPERATION_STATE : 4|3@1+ (1,0) [0|5] ""  IS
+ SG_ RVC_BUTTON_GROUP : 0|4@1+ (1,0) [0|9] ""  IS
+
+BO_ 965 IS_ACTIVE: 8 IS
+ SG_ RESERVED_2 : 0|64@1+ (1,0) [0|1.8446744074] "" Vector__XXX
+
+BO_ 262 IS_SP: 8 IS
+ SG_ IS_SP : 0|64@1+ (1,0) [0|1.8446744074E+019] "" Vector__XXX
+
+BO_ 640 IS_TEST: 8 IS
+ SG_ IS_TEST1 : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 624 ICUA_TEST: 8 Vector__XXX
+ SG_ IMMO_TEST1 : 0|8@1+ (1,0) [0|255] ""  IS
+
+BO_ 260 ICUA2_SP: 8 Vector__XXX
+ SG_ IMMO2_VAL : 0|64@1+ (1,0) [0|1.8446744074E+019] ""  IS
+
+BO_ 768 FATC1_200: 8 Vector__XXX
+ SG_ PGR_SET_TEMP : 32|8@1+ (1,-40) [-40|215] "Deg C"  IS
+ SG_ DRV_SET_TEMP : 24|8@1+ (0.5,-40) [-40|87] "Deg C"  IS
+ SG_ DISP_DUAL : 42|2@1+ (1,0) [0|3] ""  IS
+ SG_ STS_REAR_AC : 51|1@1- (1,0) [0|1] ""  IS
+ SG_ DISP_AC : 49|2@1+ (1,0) [0|3] ""  IS
+ SG_ DISP_OFF : 56|2@1+ (1,0) [0|3] ""  IS
+ SG_ DISP_MODE : 16|4@1+ (1,0) [0|15] ""  IS
+ SG_ FRESH_RECIRC : 54|2@1+ (1,0) [0|3] ""  IS
+ SG_ DISP_BLOWER : 20|4@1+ (1,0) [0|15] ""  IS
+ SG_ FATC_ECON : 44|2@1+ (1,0) [0|3] ""  IS
+ SG_ FATC_AUTO : 40|2@1+ (1,0) [0|3] ""  IS
+
+BO_ 834 ICUA2_100: 8 Vector__XXX
+ SG_ SECURITY_MSG_IS : 24|16@1+ (1,0) [0|65535] ""  IS
+ SG_ STS_SECURITY_KEY : 0|2@1+ (1,0) [0|3] ""  IS
+
+BO_ 312 ABS3_20: 8 Vector__XXX
+ SG_ WHL_RR_SPD : 48|12@1+ (1,0) [0|4094] "rpm"  IS
+ SG_ WHL_RL_SPD : 32|12@1+ (1,0) [0|4094] "rpm"  IS
+ SG_ WHL_FR_SPD : 16|12@1+ (1,0) [0|4094] "rpm"  IS
+ SG_ WHL_FL_SPD : 0|12@1+ (1,0) [0|4094] "rpm"  IS
+
+BO_ 716 ABS2_10: 8 Vector__XXX
+ SG_ STS_HHC : 40|1@1+ (1,0) [0|1] ""  IS
+ SG_ STS_HDC : 39|1@1+ (1,0) [0|1] ""  IS
+ SG_ VEHICLE_SPEED_ABS : 0|16@1+ (0.015625,0) [0|300] "kmph"  IS
+ SG_ ODO_DISTANCE_ABS : 16|16@1+ (1,0) [0|65535] "m"  IS
+
+BO_ 293 EMS2_10: 8 Vector__XXX
+ SG_ VEHICLE_SPEED_EMS : 0|16@1+ (0.015625,0) [0|300] "Kmph"  IS
+ SG_ ODO_DISTANCE_EMS : 16|16@1+ (1,0) [0|65535] "m"  IS
+
+BO_ 553 MBFM_RPAS2_100: 8 Vector__XXX
+ SG_ RPAS_ERROR : 0|5@1+ (1,0) [0|31] ""  IS
+
+BO_ 2015 GLOBAL_DIAG_REQ: 8 Vector__XXX
+ SG_ DIAG_GLOBAL_REQ_DATA : 0|64@1+ (1,0) [0|1.8446744074E+019] ""  IS
+
+BO_ 1880 IS_DIAG_RES: 8 IS
+ SG_ DIAG_IS_RES_DATA : 0|64@1+ (1,0) [0|1.8446744074] "" Vector__XXX
+
+BO_ 1872 IS_DIAG_REQ: 8 Vector__XXX
+ SG_ DIAG_IS_REQ_DATA : 0|64@1+ (1,0) [0|1.8446744074E+019] ""  IS
+
+BO_ 294 EMS8_10: 8 Vector__XXX
+ SG_ TARGET_GEAR_GSI : 27|4@1+ (1,0) [0|15] ""  IS
+
+BO_ 544 IS1_100: 8 IS
+ SG_ VALET_MODE_STATE : 57|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ REQ_TRIP_RESET : 56|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ DRL_EN_SW : 62|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ STS_REAR_AC_IS : 54|2@1+ (1,0) [0|2] "" Vector__XXX
+ SG_ STS_REAR_DEFOG_IS : 42|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ DISP_ECON_IS : 46|2@1+ (1,0) [0|2] "" Vector__XXX
+ SG_ AC_REQ_IS : 44|2@1+ (1,0) [0|2] "" Vector__XXX
+ SG_ DISP_OFF_IS : 40|2@1+ (1,0) [0|2] "" Vector__XXX
+ SG_ SET_TEMP_IS : 32|8@1+ (0.5,-40) [-40|87.5] "Deg C" Vector__XXX
+ SG_ FRESH_RECIRC_IS : 30|2@1+ (1,0) [0|2] "" Vector__XXX
+ SG_ DISP_AUTO_IS : 28|2@1+ (1,0) [0|2] "" Vector__XXX
+ SG_ DISP_BLOWER_IS : 20|4@1+ (1,0) [0|14] "" Vector__XXX
+ SG_ DISP_MODE_IS : 16|4@1+ (1,0) [0|14] "" Vector__XXX
+ SG_ ILLUMINATION_LEVEL : 24|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ SECURITY_MSG_MBFM : 0|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ RESET_AFE : 63|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ IS_RVC_VIDEO_ENBL : 51|3@1+ (1,0) [0|7] "" Vector__XXX
+ SG_ CMD_USER_INPUT : 48|3@1+ (1,0) [0|6] "" Vector__XXX
+
+BO_ 540 MBFM7_100: 8 Vector__XXX
+ SG_ AUTO_RAIN : 1|1@1+ (1,0) [0|1] ""  IS
+ SG_ AUTO_LIGHT : 0|1@1+ (1,0) [0|1] ""  IS
+ SG_ SPARE_TYRE_PRESSURE : 48|8@1+ (0.25,0) [0|63.5] "Psi"  IS
+ SG_ SPARE_TYRE_TEMP : 40|8@1+ (1,-40) [-40|214] "Deg C"  IS
+
+BO_ 840 MBFM1_100: 8 Vector__XXX
+ SG_ DISP_AMBT_TEMP_MBFM : 56|8@1+ (1,-40) [-40|214] "deg C"  IS
+ SG_ STS_DOOR : 32|6@1+ (1,0) [0|63] ""  IS
+ SG_ ENG_OFF_TIME : 16|11@1+ (1,0) [0|1920] "min"  IS
+
+BO_ 536 MBFM6_100: 8 Vector__XXX
+ SG_ RR_TYRE_TEMP : 56|8@1+ (1,-40) [-40|214] "deg C"  IS
+ SG_ RL_TYRE_TEMP : 48|8@1+ (1,-40) [-40|214] "deg C"  IS
+ SG_ FR_TYRE_TEMP : 40|8@1+ (1,-40) [-40|214] "deg C"  IS
+ SG_ FL_TYRE_TEMP : 32|8@1+ (1,-40) [-40|214] "deg C"  IS
+ SG_ RR_TYRE_PRESSURE : 24|8@1+ (0.25,0) [0|63.5] "Psi"  IS
+ SG_ RL_TYRE_PRESSURE : 16|8@1+ (0.25,0) [0|63.5] "Psi"  IS
+ SG_ FR_TYRE_PRESSURE : 8|8@1+ (0.25,0) [0|63.5] "Psi"  IS
+ SG_ FL_TYRE_PRESSURE : 0|8@1+ (0.25,0) [0|63.5] "Psi"  IS
+
+BO_ 532 MBFM5_100: 8 Vector__XXX
+ SG_ STS_RKE : 5|3@1+ (1,0) [0|7] ""  IS
+ SG_ REQ_TFA_DISPLAY : 63|1@1+ (1,0) [0|1] ""  IS
+ SG_ REQ_TFA_PATTERN : 53|3@1+ (1,0) [0|7] ""  IS
+ SG_ TPMS_SYSTEM_FAULT : 48|5@1+ (1,0) [0|31] ""  IS
+ SG_ TPMS_LEAKAGE_ALERT : 40|5@1+ (1,0) [0|31] ""  IS
+ SG_ TPMS_SIGNAL_MISSING : 8|4@1+ (1,0) [0|15] ""  IS
+ SG_ TPMS_ID_NOT_LEARNT : 0|5@1+ (1,0) [0|31] ""  IS
+ SG_ HIGH_TYRE_PRESSURE_ALERT : 33|5@1+ (1,0) [0|31] ""  IS
+ SG_ HIGH_TYRE_TEMPERATURE_ALERT : 16|5@1+ (1,0) [0|31] ""  IS
+ SG_ LOW_TYRE_PRESSURE_ALERT : 24|5@1+ (1,0) [0|31] ""  IS
+ SG_ SPARE_TYRE_SWAP : 29|3@1+ (1,0) [0|7] ""  IS
+ SG_ TPMS_PROGRAM_MODE : 12|4@1+ (1,0) [0|15] ""  IS
+
+BO_ 832 IC2_100: 8 Vector__XXX
+ SG_ AVG_KMPL_GD : 48|9@1+ (0.1,0) [0|51] "km/l"  IS
+ SG_ STS_BRAKE_FLUID_LVL : 26|1@1+ (1,0) [0|1] ""  IS
+ SG_ ODOMTR_READING : 0|20@1+ (1,0) [0|999999] "km"  IS
+
+BO_ 529 IC1_100: 8 Vector__XXX
+ SG_ INSTANT_KMPL : 16|9@1+ (0.1,0) [0|50] ""  IS
+ SG_ INDC_LOW_FUEL : 31|1@1+ (1,0) [0|1] ""  IS
+ SG_ STS_PARK_BRK : 30|1@1+ (1,0) [0|1] ""  IS
+ SG_ SERVICE_REMINDER : 25|3@1+ (1,0) [0|7] ""  IS
+ SG_ RST_ACK_AFE : 13|2@1+ (1,0) [0|3] ""  IS
+ SG_ DIST_TO_EMPTY : 0|10@1+ (1,0) [0|1000] "Km"  IS
+ SG_ AVG_KMPL : 32|9@1+ (0.1,0) [0|51] "km/l"  IS
+
+BO_ 704 SRS1_20: 8 Vector__XXX
+ SG_ STS_SEAT_BLT_PSGR_SRS : 26|2@1+ (1,0) [0|3] ""  IS
+ SG_ STS_SEAT_BLT_DRVR_SRS : 24|2@1+ (1,0) [0|3] ""  IS
+ SG_ STS_CRASH : 3|1@1+ (1,0) [0|1] ""  IS
+ SG_ SRS_RESERVE1 : 5|2@1+ (1,0) [0|3] ""  IS
+ SG_ INDC_SRS : 0|2@1+ (1,0) [0|3] ""  IS
+ SG_ INDC_PADL : 4|1@1+ (1,0) [0|1] ""  IS
+ SG_ EVEN_PARITY_BIT : 7|1@1+ (1,0) [0|1] ""  IS
+ SG_ DOOR_UNLOCK : 2|1@1+ (1,0) [0|1] ""  IS
+
+BO_ 551 MBFM_RPAS1_20: 8 Vector__XXX
+ SG_ DISP_DIST : 56|8@1+ (1,0) [0|250] "cm"  IS
+ SG_ BAR_SECT_CENTER : 24|4@1+ (1,0) [0|15] ""  IS
+ SG_ BAR_SECT_RIGHT : 28|4@1+ (1,0) [0|15] ""  IS
+ SG_ BAR_SECT_LEFT : 20|4@1+ (1,0) [0|15] ""  IS
+
+BO_ 264 EMS3_10: 8 Vector__XXX
+ SG_ STS_ESS_INDC : 56|3@1+ (1,0) [0|7] ""  IS
+ SG_ ENG_TRQ_AFTR_RED : 16|11@1+ (1,-1024) [-1024|1022] "Nm"  IS
+ SG_ CLUTCH_STS : 29|3@1+ (1,0) [0|7] ""  IS
+
+BO_ 776 EMS6_500: 8 Vector__XXX
+ SG_ VALET_MODE_STATUS : 2|1@1+ (1,0) [0|1] ""  IS
+ SG_ ENG_ON_TIME : 16|16@1+ (1,0) [0|65534] "min"  IS
+
+BO_ 960 EMS5_500: 8 Vector__XXX
+ SG_ VIN_DATA_2 m2 : 0|24@1+ (1,0) [0|16777215] ""  IS
+ SG_ VIN_DATA_1 m1 : 0|56@1+ (1,0) [0|7.2057594038E+016] ""  IS
+ SG_ VIN_DATA_0 m0 : 0|56@1+ (1,0) [0|7.2057594038E+016] ""  IS
+ SG_ VIN_INDEX M : 56|2@1+ (1,0) [0|3] ""  IS
+
+BO_ 304 EMS4_20: 8 Vector__XXX
+ SG_ ENGINE_DRIVE_MODE : 53|3@1+ (1,0) [0|7] ""  IS
+ SG_ ENG_OIL_PRESSURE : 41|1@1+ (1,0) [0|1] ""  IS
+
+BO_ 292 EMS1_10: 8 Vector__XXX
+ SG_ STS_ENG : 53|3@1+ (1,0) [0|7] ""  IS
+ SG_ STS_AC_COMPRESSOR : 48|2@1+ (1,0) [0|3] ""  IS
+ SG_ INJ_QTY : 24|11@1+ (0.1,0) [0|204.6] "mg/cyl"  IS
+ SG_ ENG_TEMP : 56|8@1+ (1,-40) [-40|214] "DegC"  IS
+ SG_ ENG_SPD : 8|16@1+ (1,0) [0|7999] "rpm"  IS
+ SG_ CURRENT_GEAR_MT : 40|4@1+ (1,0) [0|15] ""  IS
+ SG_ BRK_PEDAL : 45|2@1+ (1,0) [0|3] ""  IS
+ SG_ ACC_PED : 0|8@1+ (0.4,0) [0|100] "%"  IS
+
+
+
+CM_ BU_ IS "Infotainment System";
+CM_ BO_ 640 "for testing";
+CM_ SG_ 624 IMMO_TEST1 "protection - transmission of message during testing ";
+CM_ BO_ 768 "Measurment of cabin temparature.";
+CM_ SG_ 768 PGR_SET_TEMP "Protected signal for w105 program.";
+CM_ SG_ 768 DRV_SET_TEMP "Protected signal for w105 program.
+";
+CM_ SG_ 768 DISP_DUAL "Protected signal for w105 program.";
+CM_ SG_ 768 STS_REAR_AC "this signal is protected for w105 program.";
+CM_ SG_ 768 DISP_AC "this signal is protected for w105 program.";
+CM_ SG_ 768 DISP_MODE "FATC mode display";
+CM_ SG_ 768 FRESH_RECIRC "Fresh Air/Recirc";
+CM_ SG_ 768 DISP_BLOWER "Blower Display";
+CM_ SG_ 768 FATC_ECON "Protected signal for w105 program.";
+CM_ SG_ 768 FATC_AUTO "Automatic FATC ON or OFF";
+CM_ SG_ 716 ODO_DISTANCE_ABS "Requirement for EcoScore Logic";
+CM_ SG_ 293 ODO_DISTANCE_EMS "required for Ecoscore logic";
+CM_ SG_ 553 RPAS_ERROR "bit 0: RL corner
+bit 1: RLC
+bit 2: RRC
+bit 3: RR corner
+bit 4: ECU fault (RPAS not functional)
+
+0 - No error
+1 - Error";
+CM_ SG_ 2015 DIAG_GLOBAL_REQ_DATA "Keyword 2000 Diagnostic Message Request Data";
+CM_ SG_ 540 AUTO_RAIN "Wiper ON/OFF";
+CM_ SG_ 540 AUTO_LIGHT "Auto Light ON /OFF";
+CM_ SG_ 540 SPARE_TYRE_PRESSURE "spare tyre pressure";
+CM_ SG_ 540 SPARE_TYRE_TEMP "spare tyre temparature";
+CM_ SG_ 840 DISP_AMBT_TEMP_MBFM "Display Ambient temperature in deg C
+RPAS reveive OFV= 25deg c
+
+check IC, EMS & ESC for which function they will use ??";
+CM_ SG_ 840 STS_DOOR "Status of Back, Hood, Front-Left, Front-Right, Rear Left and Rear Right Doors. 
+Bit0 - Back , Bit1 - Hood ,Bit2 - Front Left  , Bit3 - Front Right , Bit4 -Rear Left , Bit5 - Rear Right
+0 - Closed, 1 - Open
+";
+CM_ SG_ 840 ENG_OFF_TIME "Engine off time
+EMS - does used this signal??
+IS - ??
+";
+CM_ SG_ 536 RR_TYRE_TEMP "rear right tyre temparature
+
+The display unit shall show __ upon receiving this default value
+The display unit shall show __ upon MBFM node absent
+";
+CM_ SG_ 536 RL_TYRE_TEMP "rear left tyre temparature
+
+The display unit shall show __ upon receiving this default value
+The display unit shall show __ upon MBFM node absent
+";
+CM_ SG_ 536 FR_TYRE_TEMP "front right tyre temparature
+
+The display unit shall show __ upon receiving this default value
+The display unit shall show __ upon MBFM node absent
+";
+CM_ SG_ 536 FL_TYRE_TEMP "front left tyre temparature
+
+The display unit shall show __ upon receiving this default value
+The display unit shall show __ upon MBFM node absent
+";
+CM_ SG_ 536 RR_TYRE_PRESSURE "rear right tyre pressure
+
+The display unit shall show __ upon receiving this default value
+The display unit shall show __ upon MBFM node absent
+";
+CM_ SG_ 536 RL_TYRE_PRESSURE "rear left tyre pressure
+
+The display unit shall show __ upon receiving this default value
+The display unit shall show __ upon MBFM node absent
+";
+CM_ SG_ 536 FR_TYRE_PRESSURE "front right tyre pressure
+
+The display unit shall show __ upon receiving this default value
+The display unit shall show __ upon MBFM node absent
+";
+CM_ SG_ 536 FL_TYRE_PRESSURE "front left tyre pressure
+The display unit shall show __ upon receiving this default value
+The display unit shall show __ upon MBFM node absent
+";
+CM_ SG_ 532 STS_RKE "already signal available in MBFM1. as per XUV for PKE variant considered from MBFM7.";
+CM_ SG_ 532 REQ_TFA_DISPLAY "for U321 this signal is protected  - it is required for TPMS";
+CM_ SG_ 532 REQ_TFA_PATTERN "for U321 this signal is protected  - it is required for TPMS";
+CM_ SG_ 532 TPMS_SYSTEM_FAULT "TPMS Malfunction Indication - Sensor Low Battery/ Transmitter Fault
+
+Bit    description
+0      Front Left tyre
+1      Front Right tyre
+2      Rear Right tyre
+3      Rear Left tyre
+4      TPMS Receiver Fault
+
+
+  0 : Normal
+  1 : Faulty";
+CM_ SG_ 532 TPMS_LEAKAGE_ALERT "Bit Position Description :-
+Bit 0 : FL tyre
+Bit 1 : FR tyre
+Bit 2 : RR tyre
+Bit 3 : RL tyre
+Bit 4 : Spare tyre
+
+Value Description :-
+0 : Normal
+1 : Leakage";
+CM_ SG_ 532 TPMS_SIGNAL_MISSING "Bit Position Description :-
+Bit 0 : FL tyre
+Bit 1 : FR tyre
+Bit 2 : RR tyre
+Bit 3 : RL tyre
+
+Value Description :-
+0 : Normal
+1 : Signal missing";
+CM_ SG_ 532 TPMS_ID_NOT_LEARNT "tpms id not learned";
+CM_ SG_ 532 HIGH_TYRE_PRESSURE_ALERT "monitor high tyre pressure for All tyres.";
+CM_ SG_ 532 HIGH_TYRE_TEMPERATURE_ALERT "monitoring temparature of All tyres.";
+CM_ SG_ 532 LOW_TYRE_PRESSURE_ALERT "indication for low tyre pressure";
+CM_ SG_ 532 SPARE_TYRE_SWAP "indication for spare tyre swape";
+CM_ SG_ 532 TPMS_PROGRAM_MODE "programming mode for TPMS";
+CM_ SG_ 832 AVG_KMPL_GD "required for Ecoscore";
+CM_ SG_ 832 STS_BRAKE_FLUID_LVL "status of break fluid level - IN LOW END
+
+Bosch team confirmed on 23.06.2015 - Brake Fluid information not required to function ABS / ESP.";
+CM_ SG_ 832 ODOMTR_READING "ODOMETER VALUE";
+CM_ SG_ 529 INDC_LOW_FUEL "indication for low fuel warning. protection for disel platform.. it may be required in gasolin platform. 
+1 bit information is sufficient to transmit status. actual fuel level would be detected using FUEL_LEVEL CAN signal.";
+CM_ SG_ 529 STS_PARK_BRK "Protection for W105 - hand brake signal indication.";
+CM_ SG_ 529 SERVICE_REMINDER "To be defined during Phase II development";
+CM_ SG_ 529 RST_ACK_AFE "ACknowledge from Cluster to IS that it has reset the AFE.";
+CM_ SG_ 529 DIST_TO_EMPTY "Distance to empty";
+CM_ SG_ 529 AVG_KMPL "Average kilometer per litre";
+CM_ SG_ 704 EVEN_PARITY_BIT "Transmitter:
+If no. of 1s in Bit 0 to Bit 6 of Byte 0 is ODD, then Bit 7=1 to make it EVEN Parity.
+If no. of 1s in Bit 0 to Bit 6 of Byte 0 is EVEN, then Bit 7=0 to retain EVEN Parity.
+Receiver: 
+No of 1s in Byte 0 should be EVEN to check Even Parity.";
+CM_ SG_ 304 ENG_OIL_PRESSURE "Engine oil pressure status normal/low  switch is HW to Cluster.";
+CM_ SG_ 292 STS_ENG "during vehicle crank all partner ECU would observe Battery Voltage dip.
+
+ 
+hence Network monitoring should be OFF during this event & Low voltage DTC should not logged by any ECU.";
+CM_ SG_ 292 BRK_PEDAL "MBFM - during panic braking HAZARD LAMP will be ON.";
+BA_DEF_  "BusType" STRING ;
+BA_DEF_  "DBName" STRING ;
+BA_DEF_ EV_  "GenEnvIsGeneratedDsp" ENUM  "No","Yes";
+BA_DEF_ EV_  "GenEnvMsgName" STRING ;
+BA_DEF_ EV_  "GenEnvMsgOffset" INT 0 2147483647;
+BA_DEF_ EV_  "GenEnvAutoGenCtrl" ENUM  "No","Yes";
+BA_DEF_ SG_  "GenSigSendType" ENUM  "Cyclic","OnWrite","OnWriteWithRepetition","OnChange","OnChangeWithRepetition","IfActive","IfActiveWithRepetition","NoSigSendType","OnChangeAndIfActive","OnChangeAndIfActiveWithRepetition";
+BA_DEF_ SG_  "SigCreator" STRING ;
+BA_DEF_ SG_  "GenSigInactiveValue" INT 0 0;
+BA_DEF_ SG_  "GenSigEVName" STRING ;
+BA_DEF_ SG_  "GenSigEnvVarType" ENUM  "int","float","undef";
+BA_DEF_ SG_  "GenSigStartValue" FLOAT -100000000000 100000000000;
+BA_DEF_ SG_  "GenSigTimeoutTime_EMS" INT 0 65535;
+BA_DEF_ SG_  "GenSigTimeoutTime_TCU" INT 0 65535;
+BA_DEF_ SG_  "GenSigTimeoutTime_ABS" INT 0 65535;
+BA_DEF_ SG_  "GenSigTimeoutTime_FATC" INT 0 65535;
+BA_DEF_ SG_  "GenSigTimeoutTime_IC" INT 0 65535;
+BA_DEF_ SG_  "GenSigTimeoutTime_IMMO" INT 0 65535;
+BA_DEF_ SG_  "GenSigTimeoutTime_IS" INT 0 65535;
+BA_DEF_ SG_  "GenSigTimeoutTime_MBFM" INT 0 65535;
+BA_DEF_ SG_  "GenSigTimeoutTime_RPAS" INT 0 65535;
+BA_DEF_ SG_  "GenSigTimeoutTime_SRS" INT 0 65535;
+BA_DEF_ SG_  "NWM-WakeupAllowed" ENUM  "No","Yes";
+BA_DEF_ BO_  "GenMsgSendType" ENUM  "Cyclic","not_used","not_used","not_used","not_used","not_used","not_used","IfActive","NoMsgSendType";
+BA_DEF_ BO_  "GenMsgCycleTime" INT 0 65535;
+BA_DEF_ BO_  "MsgCreator" STRING ;
+BA_DEF_ BO_  "GenMsgTimeOut" INT 0 65535;
+BA_DEF_ BO_  "GenMsgILSupport" ENUM  "NO","YES";
+BA_DEF_ BO_  "DiagState" ENUM  "NO","YES";
+BA_DEF_ BO_  "DiagRequest" ENUM  "NO","YES";
+BA_DEF_ BO_  "DiagResponse" ENUM  "NO","YES";
+BA_DEF_ BO_  "DiagUudtResponse" ENUM  "False","True";
+BA_DEF_ BO_  "GenMsgDelayTime" INT 0 65535;
+BA_DEF_ BO_  "NmMessage" ENUM  "no","yes";
+BA_DEF_ BO_  "GenMsgCycleTimeFast" INT 2 50000;
+BA_DEF_ BO_  "GenMsgNrOfRepetition" INT 0 999999;
+BA_DEF_ BO_  "GenMsgFastOnStart" INT 0 100000;
+BA_DEF_ BO_  "GenMsgStartDelayTime" INT 0 100000;
+BA_DEF_ BU_  "NmStationAddress" HEX 0 0;
+BA_DEF_ BU_  "NodeLayerModules" STRING ;
+BA_DEF_ BU_  "ILUsed" ENUM  "NO","YES";
+BA_DEF_ BU_  "GenNodSleepTime" INT 0 1000000;
+BA_DEF_ BU_  "NmNode" ENUM  "no","yes";
+BA_DEF_DEF_  "BusType" "";
+BA_DEF_DEF_  "DBName" "";
+BA_DEF_DEF_  "GenEnvIsGeneratedDsp" "No";
+BA_DEF_DEF_  "GenEnvMsgName" "";
+BA_DEF_DEF_  "GenEnvMsgOffset" 0;
+BA_DEF_DEF_  "GenEnvAutoGenCtrl" "No";
+BA_DEF_DEF_  "GenSigSendType" "Cyclic";
+BA_DEF_DEF_  "SigCreator" "M&M-IVN";
+BA_DEF_DEF_  "GenSigInactiveValue" 0;
+BA_DEF_DEF_  "GenSigEVName" "";
+BA_DEF_DEF_  "GenSigEnvVarType" "undef";
+BA_DEF_DEF_  "GenSigStartValue" 0;
+BA_DEF_DEF_  "GenSigTimeoutTime_EMS" 0;
+BA_DEF_DEF_  "GenSigTimeoutTime_TCU" 0;
+BA_DEF_DEF_  "GenSigTimeoutTime_ABS" 0;
+BA_DEF_DEF_  "GenSigTimeoutTime_FATC" 0;
+BA_DEF_DEF_  "GenSigTimeoutTime_IC" 0;
+BA_DEF_DEF_  "GenSigTimeoutTime_IMMO" 0;
+BA_DEF_DEF_  "GenSigTimeoutTime_IS" 0;
+BA_DEF_DEF_  "GenSigTimeoutTime_MBFM" 0;
+BA_DEF_DEF_  "GenSigTimeoutTime_RPAS" 0;
+BA_DEF_DEF_  "GenSigTimeoutTime_SRS" 0;
+BA_DEF_DEF_  "NWM-WakeupAllowed" "";
+BA_DEF_DEF_  "GenMsgSendType" "Cyclic";
+BA_DEF_DEF_  "GenMsgCycleTime" 0;
+BA_DEF_DEF_  "MsgCreator" "M&M-IVN";
+BA_DEF_DEF_  "GenMsgTimeOut" 0;
+BA_DEF_DEF_  "GenMsgILSupport" "NO";
+BA_DEF_DEF_  "DiagState" "NO";
+BA_DEF_DEF_  "DiagRequest" "NO";
+BA_DEF_DEF_  "DiagResponse" "NO";
+BA_DEF_DEF_  "DiagUudtResponse" "False";
+BA_DEF_DEF_  "GenMsgDelayTime" 0;
+BA_DEF_DEF_  "NmMessage" "no";
+BA_DEF_DEF_  "GenMsgCycleTimeFast" 100;
+BA_DEF_DEF_  "GenMsgNrOfRepetition" 0;
+BA_DEF_DEF_  "GenMsgFastOnStart" 0;
+BA_DEF_DEF_  "GenMsgStartDelayTime" 0;
+BA_DEF_DEF_  "NmStationAddress" 0;
+BA_DEF_DEF_  "NodeLayerModules" "dmoseknm.dll,CANoeILNLVector.dll";
+BA_DEF_DEF_  "ILUsed" "NO";
+BA_DEF_DEF_  "GenNodSleepTime" 0;
+BA_DEF_DEF_  "NmNode" "no";
+BA_ "BusType" "CAN";
+BA_ "DBName" "IS";
+BA_ "NmStationAddress" BU_ IS 0;
+BA_ "ILUsed" BU_ IS 1;
+BA_ "GenMsgCycleTime" BO_ 970 500;
+BA_ "GenMsgILSupport" BO_ 970 1;
+BA_ "GenMsgCycleTime" BO_ 566 20;
+BA_ "GenMsgTimeOut" BO_ 566 200;
+BA_ "GenMsgILSupport" BO_ 566 1;
+BA_ "GenMsgCycleTime" BO_ 151 20;
+BA_ "GenMsgCycleTime" BO_ 961 100;
+BA_ "GenMsgCycleTime" BO_ 268 10;
+BA_ "GenMsgILSupport" BO_ 268 1;
+BA_ "GenMsgCycleTime" BO_ 535 100;
+BA_ "GenMsgCycleTime" BO_ 965 100;
+BA_ "GenMsgSendType" BO_ 262 1;
+BA_ "GenMsgILSupport" BO_ 262 1;
+BA_ "GenMsgSendType" BO_ 640 0;
+BA_ "GenMsgCycleTime" BO_ 640 100;
+BA_ "GenMsgTimeOut" BO_ 640 1000;
+BA_ "GenMsgILSupport" BO_ 640 1;
+BA_ "GenMsgSendType" BO_ 624 0;
+BA_ "GenMsgCycleTime" BO_ 624 100;
+BA_ "GenMsgTimeOut" BO_ 624 1000;
+BA_ "GenMsgILSupport" BO_ 624 1;
+BA_ "GenMsgSendType" BO_ 260 1;
+BA_ "GenMsgILSupport" BO_ 260 1;
+BA_ "GenMsgSendType" BO_ 768 0;
+BA_ "GenMsgCycleTime" BO_ 768 200;
+BA_ "MsgCreator" BO_ 768 "M&M-IVN";
+BA_ "GenMsgTimeOut" BO_ 768 1000;
+BA_ "GenMsgILSupport" BO_ 768 1;
+BA_ "GenMsgSendType" BO_ 834 0;
+BA_ "GenMsgCycleTime" BO_ 834 100;
+BA_ "MsgCreator" BO_ 834 "M&M-IVN";
+BA_ "GenMsgTimeOut" BO_ 834 500;
+BA_ "GenMsgILSupport" BO_ 834 1;
+BA_ "GenMsgSendType" BO_ 312 0;
+BA_ "GenMsgCycleTime" BO_ 312 20;
+BA_ "MsgCreator" BO_ 312 "M&M-IVN";
+BA_ "GenMsgTimeOut" BO_ 312 200;
+BA_ "GenMsgILSupport" BO_ 312 1;
+BA_ "GenMsgSendType" BO_ 716 0;
+BA_ "GenMsgCycleTime" BO_ 716 10;
+BA_ "MsgCreator" BO_ 716 "M&M-IVN";
+BA_ "GenMsgTimeOut" BO_ 716 100;
+BA_ "GenMsgILSupport" BO_ 716 1;
+BA_ "GenMsgSendType" BO_ 293 0;
+BA_ "GenMsgCycleTime" BO_ 293 10;
+BA_ "MsgCreator" BO_ 293 "M&M-IVN";
+BA_ "GenMsgTimeOut" BO_ 293 100;
+BA_ "GenMsgILSupport" BO_ 293 1;
+BA_ "GenMsgSendType" BO_ 553 0;
+BA_ "GenMsgCycleTime" BO_ 553 100;
+BA_ "MsgCreator" BO_ 553 "M&M-IVN";
+BA_ "GenMsgTimeOut" BO_ 553 1000;
+BA_ "GenMsgILSupport" BO_ 553 1;
+BA_ "GenMsgSendType" BO_ 2015 8;
+BA_ "GenMsgCycleTime" BO_ 2015 0;
+BA_ "MsgCreator" BO_ 2015 "M&M-IVN";
+BA_ "GenMsgTimeOut" BO_ 2015 0;
+BA_ "DiagState" BO_ 2015 1;
+BA_ "GenMsgSendType" BO_ 1880 8;
+BA_ "GenMsgCycleTime" BO_ 1880 0;
+BA_ "MsgCreator" BO_ 1880 "M&M-IVN";
+BA_ "GenMsgTimeOut" BO_ 1880 0;
+BA_ "DiagResponse" BO_ 1880 1;
+BA_ "GenMsgSendType" BO_ 1872 1;
+BA_ "GenMsgCycleTime" BO_ 1872 0;
+BA_ "MsgCreator" BO_ 1872 "M&M-IVN";
+BA_ "GenMsgTimeOut" BO_ 1872 0;
+BA_ "DiagRequest" BO_ 1872 1;
+BA_ "GenMsgSendType" BO_ 294 0;
+BA_ "GenMsgCycleTime" BO_ 294 10;
+BA_ "MsgCreator" BO_ 294 "M&M-IVN";
+BA_ "GenMsgTimeOut" BO_ 294 100;
+BA_ "GenMsgILSupport" BO_ 294 1;
+BA_ "GenMsgSendType" BO_ 544 0;
+BA_ "GenMsgCycleTime" BO_ 544 100;
+BA_ "MsgCreator" BO_ 544 "M&M-IVN";
+BA_ "GenMsgTimeOut" BO_ 544 500;
+BA_ "GenMsgILSupport" BO_ 544 1;
+BA_ "GenMsgSendType" BO_ 540 0;
+BA_ "GenMsgCycleTime" BO_ 540 100;
+BA_ "MsgCreator" BO_ 540 "M&M-IVN";
+BA_ "GenMsgTimeOut" BO_ 540 1000;
+BA_ "GenMsgILSupport" BO_ 540 1;
+BA_ "GenMsgSendType" BO_ 840 0;
+BA_ "GenMsgCycleTime" BO_ 840 100;
+BA_ "MsgCreator" BO_ 840 "M&M-IVN";
+BA_ "GenMsgTimeOut" BO_ 840 500;
+BA_ "GenMsgILSupport" BO_ 840 1;
+BA_ "GenMsgSendType" BO_ 536 0;
+BA_ "GenMsgCycleTime" BO_ 536 100;
+BA_ "MsgCreator" BO_ 536 "M&M-IVN";
+BA_ "GenMsgTimeOut" BO_ 536 1000;
+BA_ "GenMsgILSupport" BO_ 536 1;
+BA_ "GenMsgSendType" BO_ 532 0;
+BA_ "GenMsgCycleTime" BO_ 532 100;
+BA_ "MsgCreator" BO_ 532 "M&M-IVN";
+BA_ "GenMsgTimeOut" BO_ 532 1000;
+BA_ "GenMsgILSupport" BO_ 532 1;
+BA_ "GenMsgSendType" BO_ 832 0;
+BA_ "GenMsgCycleTime" BO_ 832 100;
+BA_ "MsgCreator" BO_ 832 "M&M-IVN";
+BA_ "GenMsgTimeOut" BO_ 832 1000;
+BA_ "GenMsgILSupport" BO_ 832 1;
+BA_ "GenMsgSendType" BO_ 529 0;
+BA_ "GenMsgCycleTime" BO_ 529 100;
+BA_ "MsgCreator" BO_ 529 "M&M-IVN";
+BA_ "GenMsgTimeOut" BO_ 529 1000;
+BA_ "GenMsgILSupport" BO_ 529 1;
+BA_ "GenMsgSendType" BO_ 704 0;
+BA_ "GenMsgCycleTime" BO_ 704 20;
+BA_ "MsgCreator" BO_ 704 "M&M-IVN";
+BA_ "GenMsgTimeOut" BO_ 704 100;
+BA_ "GenMsgILSupport" BO_ 704 1;
+BA_ "GenMsgSendType" BO_ 551 0;
+BA_ "GenMsgCycleTime" BO_ 551 20;
+BA_ "MsgCreator" BO_ 551 "M&M-IVN";
+BA_ "GenMsgTimeOut" BO_ 551 100;
+BA_ "GenMsgILSupport" BO_ 551 1;
+BA_ "GenMsgSendType" BO_ 264 0;
+BA_ "GenMsgCycleTime" BO_ 264 10;
+BA_ "MsgCreator" BO_ 264 "M&M-IVN";
+BA_ "GenMsgTimeOut" BO_ 264 100;
+BA_ "GenMsgILSupport" BO_ 264 1;
+BA_ "GenMsgSendType" BO_ 776 0;
+BA_ "GenMsgCycleTime" BO_ 776 500;
+BA_ "MsgCreator" BO_ 776 "M&M-IVN";
+BA_ "GenMsgTimeOut" BO_ 776 5000;
+BA_ "GenMsgILSupport" BO_ 776 1;
+BA_ "GenMsgSendType" BO_ 960 0;
+BA_ "GenMsgCycleTime" BO_ 960 500;
+BA_ "MsgCreator" BO_ 960 "M&M-IVN";
+BA_ "GenMsgTimeOut" BO_ 960 5000;
+BA_ "GenMsgILSupport" BO_ 960 1;
+BA_ "GenMsgSendType" BO_ 304 0;
+BA_ "GenMsgCycleTime" BO_ 304 20;
+BA_ "MsgCreator" BO_ 304 "M&M-IVN";
+BA_ "GenMsgTimeOut" BO_ 304 200;
+BA_ "GenMsgILSupport" BO_ 304 1;
+BA_ "GenMsgSendType" BO_ 292 0;
+BA_ "GenMsgCycleTime" BO_ 292 10;
+BA_ "MsgCreator" BO_ 292 "M&M-IVN";
+BA_ "GenMsgTimeOut" BO_ 292 100;
+BA_ "GenMsgILSupport" BO_ 292 1;
+BA_ "GenSigStartValue" SG_ 970 CLOCK_YEAR 16;
+BA_ "GenSigStartValue" SG_ 970 CLOCK_MONTH 1;
+BA_ "GenSigStartValue" SG_ 970 CLOCK_DATE 1;
+BA_ "GenSigEnvVarType" SG_ 768 PGR_SET_TEMP 0;
+BA_ "GenSigEnvVarType" SG_ 768 DRV_SET_TEMP 0;
+BA_ "GenSigStartValue" SG_ 768 DRV_SET_TEMP 0;
+BA_ "GenSigEnvVarType" SG_ 768 DISP_DUAL 0;
+BA_ "GenSigEnvVarType" SG_ 768 STS_REAR_AC 0;
+BA_ "GenSigEnvVarType" SG_ 768 DISP_AC 0;
+BA_ "GenSigEnvVarType" SG_ 768 DISP_OFF 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 768 DISP_OFF 1000;
+BA_ "GenSigEnvVarType" SG_ 768 DISP_MODE 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 768 DISP_MODE 1000;
+BA_ "GenSigEnvVarType" SG_ 768 FRESH_RECIRC 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 768 FRESH_RECIRC 1000;
+BA_ "GenSigEnvVarType" SG_ 768 DISP_BLOWER 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 768 DISP_BLOWER 1000;
+BA_ "GenSigEnvVarType" SG_ 768 FATC_ECON 0;
+BA_ "GenSigEnvVarType" SG_ 768 FATC_AUTO 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 768 FATC_AUTO 1000;
+BA_ "GenSigSendType" SG_ 2015 DIAG_GLOBAL_REQ_DATA 7;
+BA_ "SigCreator" SG_ 2015 DIAG_GLOBAL_REQ_DATA "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 2015 DIAG_GLOBAL_REQ_DATA 0;
+BA_ "GenSigEnvVarType" SG_ 2015 DIAG_GLOBAL_REQ_DATA 0;
+BA_ "SigCreator" SG_ 540 AUTO_RAIN "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 540 AUTO_RAIN 0;
+BA_ "GenSigEnvVarType" SG_ 540 AUTO_RAIN 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 540 AUTO_RAIN 1000;
+BA_ "SigCreator" SG_ 540 AUTO_LIGHT "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 540 AUTO_LIGHT 0;
+BA_ "GenSigEnvVarType" SG_ 540 AUTO_LIGHT 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 540 AUTO_LIGHT 1000;
+BA_ "SigCreator" SG_ 540 SPARE_TYRE_PRESSURE "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 540 SPARE_TYRE_PRESSURE 0;
+BA_ "GenSigEnvVarType" SG_ 540 SPARE_TYRE_PRESSURE 1;
+BA_ "GenSigTimeoutTime_IS" SG_ 540 SPARE_TYRE_PRESSURE 1000;
+BA_ "SigCreator" SG_ 540 SPARE_TYRE_TEMP "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 540 SPARE_TYRE_TEMP 0;
+BA_ "GenSigEnvVarType" SG_ 540 SPARE_TYRE_TEMP 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 540 SPARE_TYRE_TEMP 1000;
+BA_ "SigCreator" SG_ 840 DISP_AMBT_TEMP_MBFM "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 840 DISP_AMBT_TEMP_MBFM 0;
+BA_ "GenSigEnvVarType" SG_ 840 DISP_AMBT_TEMP_MBFM 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 840 DISP_AMBT_TEMP_MBFM 1000;
+BA_ "SigCreator" SG_ 840 STS_DOOR "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 840 STS_DOOR 0;
+BA_ "GenSigEnvVarType" SG_ 840 STS_DOOR 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 840 STS_DOOR 1000;
+BA_ "GenSigSendType" SG_ 840 ENG_OFF_TIME 7;
+BA_ "SigCreator" SG_ 840 ENG_OFF_TIME "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 840 ENG_OFF_TIME 0;
+BA_ "GenSigEnvVarType" SG_ 840 ENG_OFF_TIME 0;
+BA_ "SigCreator" SG_ 536 RR_TYRE_TEMP "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 536 RR_TYRE_TEMP 0;
+BA_ "GenSigEnvVarType" SG_ 536 RR_TYRE_TEMP 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 536 RR_TYRE_TEMP 1000;
+BA_ "SigCreator" SG_ 536 RL_TYRE_TEMP "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 536 RL_TYRE_TEMP 0;
+BA_ "GenSigEnvVarType" SG_ 536 RL_TYRE_TEMP 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 536 RL_TYRE_TEMP 1000;
+BA_ "SigCreator" SG_ 536 FR_TYRE_TEMP "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 536 FR_TYRE_TEMP 0;
+BA_ "GenSigEnvVarType" SG_ 536 FR_TYRE_TEMP 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 536 FR_TYRE_TEMP 1000;
+BA_ "SigCreator" SG_ 536 FL_TYRE_TEMP "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 536 FL_TYRE_TEMP 0;
+BA_ "GenSigEnvVarType" SG_ 536 FL_TYRE_TEMP 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 536 FL_TYRE_TEMP 1000;
+BA_ "SigCreator" SG_ 536 RR_TYRE_PRESSURE "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 536 RR_TYRE_PRESSURE 0;
+BA_ "GenSigEnvVarType" SG_ 536 RR_TYRE_PRESSURE 1;
+BA_ "GenSigTimeoutTime_IS" SG_ 536 RR_TYRE_PRESSURE 1000;
+BA_ "SigCreator" SG_ 536 RL_TYRE_PRESSURE "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 536 RL_TYRE_PRESSURE 0;
+BA_ "GenSigEnvVarType" SG_ 536 RL_TYRE_PRESSURE 1;
+BA_ "GenSigTimeoutTime_IS" SG_ 536 RL_TYRE_PRESSURE 1000;
+BA_ "SigCreator" SG_ 536 FR_TYRE_PRESSURE "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 536 FR_TYRE_PRESSURE 0;
+BA_ "GenSigEnvVarType" SG_ 536 FR_TYRE_PRESSURE 1;
+BA_ "GenSigTimeoutTime_IS" SG_ 536 FR_TYRE_PRESSURE 1000;
+BA_ "SigCreator" SG_ 536 FL_TYRE_PRESSURE "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 536 FL_TYRE_PRESSURE 0;
+BA_ "GenSigEnvVarType" SG_ 536 FL_TYRE_PRESSURE 1;
+BA_ "GenSigTimeoutTime_IS" SG_ 536 FL_TYRE_PRESSURE 1000;
+BA_ "GenSigEnvVarType" SG_ 532 TPMS_SYSTEM_FAULT 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 532 TPMS_SYSTEM_FAULT 500;
+BA_ "SigCreator" SG_ 532 TPMS_LEAKAGE_ALERT "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 532 TPMS_LEAKAGE_ALERT 0;
+BA_ "GenSigEnvVarType" SG_ 532 TPMS_LEAKAGE_ALERT 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 532 TPMS_LEAKAGE_ALERT 500;
+BA_ "SigCreator" SG_ 532 TPMS_SIGNAL_MISSING "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 532 TPMS_SIGNAL_MISSING 0;
+BA_ "GenSigEnvVarType" SG_ 532 TPMS_SIGNAL_MISSING 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 532 TPMS_SIGNAL_MISSING 500;
+BA_ "SigCreator" SG_ 532 TPMS_ID_NOT_LEARNT "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 532 TPMS_ID_NOT_LEARNT 0;
+BA_ "GenSigEnvVarType" SG_ 532 TPMS_ID_NOT_LEARNT 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 532 TPMS_ID_NOT_LEARNT 500;
+BA_ "SigCreator" SG_ 532 HIGH_TYRE_PRESSURE_ALERT "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 532 HIGH_TYRE_PRESSURE_ALERT 0;
+BA_ "GenSigEnvVarType" SG_ 532 HIGH_TYRE_PRESSURE_ALERT 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 532 HIGH_TYRE_PRESSURE_ALERT 500;
+BA_ "SigCreator" SG_ 532 HIGH_TYRE_TEMPERATURE_ALERT "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 532 HIGH_TYRE_TEMPERATURE_ALERT 0;
+BA_ "GenSigEnvVarType" SG_ 532 HIGH_TYRE_TEMPERATURE_ALERT 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 532 HIGH_TYRE_TEMPERATURE_ALERT 500;
+BA_ "SigCreator" SG_ 532 LOW_TYRE_PRESSURE_ALERT "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 532 LOW_TYRE_PRESSURE_ALERT 0;
+BA_ "GenSigEnvVarType" SG_ 532 LOW_TYRE_PRESSURE_ALERT 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 532 LOW_TYRE_PRESSURE_ALERT 500;
+BA_ "SigCreator" SG_ 532 SPARE_TYRE_SWAP "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 532 SPARE_TYRE_SWAP 0;
+BA_ "GenSigEnvVarType" SG_ 532 SPARE_TYRE_SWAP 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 532 SPARE_TYRE_SWAP 500;
+BA_ "SigCreator" SG_ 532 TPMS_PROGRAM_MODE "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 532 TPMS_PROGRAM_MODE 0;
+BA_ "GenSigEnvVarType" SG_ 532 TPMS_PROGRAM_MODE 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 532 TPMS_PROGRAM_MODE 500;
+BA_ "GenSigSendType" SG_ 832 STS_BRAKE_FLUID_LVL 7;
+BA_ "SigCreator" SG_ 832 STS_BRAKE_FLUID_LVL "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 832 STS_BRAKE_FLUID_LVL 0;
+BA_ "GenSigEnvVarType" SG_ 832 STS_BRAKE_FLUID_LVL 0;
+BA_ "SigCreator" SG_ 832 ODOMTR_READING "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 832 ODOMTR_READING 0;
+BA_ "GenSigEnvVarType" SG_ 832 ODOMTR_READING 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 832 ODOMTR_READING 1000;
+BA_ "GenSigTimeoutTime_IS" SG_ 529 INDC_LOW_FUEL 500;
+BA_ "GenSigSendType" SG_ 529 STS_PARK_BRK 0;
+BA_ "SigCreator" SG_ 529 STS_PARK_BRK "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 529 STS_PARK_BRK 0;
+BA_ "GenSigEnvVarType" SG_ 529 STS_PARK_BRK 0;
+BA_ "SigCreator" SG_ 529 SERVICE_REMINDER "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 529 SERVICE_REMINDER 0;
+BA_ "GenSigEnvVarType" SG_ 529 SERVICE_REMINDER 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 529 SERVICE_REMINDER 500;
+BA_ "SigCreator" SG_ 529 RST_ACK_AFE "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 529 RST_ACK_AFE 0;
+BA_ "GenSigEnvVarType" SG_ 529 RST_ACK_AFE 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 529 RST_ACK_AFE 500;
+BA_ "SigCreator" SG_ 529 DIST_TO_EMPTY "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 529 DIST_TO_EMPTY 0;
+BA_ "GenSigEnvVarType" SG_ 529 DIST_TO_EMPTY 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 529 DIST_TO_EMPTY 500;
+BA_ "SigCreator" SG_ 529 AVG_KMPL "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 529 AVG_KMPL 0;
+BA_ "GenSigEnvVarType" SG_ 529 AVG_KMPL 1;
+BA_ "GenSigTimeoutTime_IS" SG_ 529 AVG_KMPL 500;
+BA_ "GenSigStartValue" SG_ 264 ENG_TRQ_AFTR_RED 1024;
+BA_ "GenSigSendType" SG_ 960 VIN_DATA_0 7;
+BA_ "GenSigSendType" SG_ 960 VIN_INDEX 7;
+BA_ "GenSigSendType" SG_ 304 ENGINE_DRIVE_MODE 7;
+BA_ "SigCreator" SG_ 304 ENG_OIL_PRESSURE "M&M-IVN";
+BA_ "GenSigInactiveValue" SG_ 304 ENG_OIL_PRESSURE 0;
+BA_ "GenSigEnvVarType" SG_ 304 ENG_OIL_PRESSURE 0;
+BA_ "GenSigTimeoutTime_IS" SG_ 304 ENG_OIL_PRESSURE 500;
+BA_ "GenSigStartValue" SG_ 292 ENG_TEMP 40;
+VAL_ 970 STS_NAV_ROUTE 3 "Reserved" 2 "Android Auto NAV Route set" 1 "Native NAV Route set" 0 "No Active Route / DV" ;
+VAL_ 970 NATIVE_NAV_TURN_INDC 15 "Reserved" 14 "Reserved" 13 "Reserved" 12 "Reserved" 11 "Reserved" 10 "Reserved" 9 "Reserved" 8 "Destination Reached" 7 "Round about Right" 6 "Round about Left" 5 "U Turn Right" 4 "U Turn Left" 3 "Turn Right" 2 "Turn Left" 1 "Straight" 0 "No Alert / Default" ;
+VAL_ 970 NATIVE_NAV_DIST 255 "Signal Invalid" 254 "Distance above 500 mts" 0 "Default" ;
+VAL_ 970 CLOCK_FORMAT 1 "24 Hour mode " 0 "12 Hour mode / Default" ;
+VAL_ 566 BAR_SECT_RIGHT_CENTER 15 "Reserved" 14 "Reserved" 13 "Reserved" 12 "STOP" 11 "STOP" 10 "STOP" 9 " BAR 4,5,6,7,8,9,10,11,12 ON" 8 " BAR 5,6,7,8,9,10,11,12 ON" 7 " BAR 6,7,8,9,10,11,12 ON" 6 " BAR 7,8,9,10,11,12 ON" 5 " BAR 8,9,10,11,12 ON" 4 " BAR 9,10,11,12 ON" 3 " BAR 10,11,12 ON" 2 " BAR 11,12 ON" 1 " BAR 12 ON" 0 "No Warning/Default" ;
+VAL_ 566 DISP_DISTANCE 255 "DisplayOFF/Not Available/Default" 254 "Reserved" 253 "Reserved" 252 "Reserved" 251 "Reserved" ;
+VAL_ 566 BAR_SECTOR_RIGHT 15 "Reserved" 14 "Reserved" 13 "Reserved" 12 "STOP" 11 "STOP" 10 "STOP" 9 "BAR 4,5,6,7,8-ON" 8 "BAR 5,6,7,8-ON" 7 "BAR 6,7,8-ON" 6 "BAR 7,8-ON" 5 "BAR 8-ON" 4 "BAR 9,10,11,12-ON" 3 "BAR 10,11,12-ON" 2 "BAR 11,12-ON" 1 "BAR 12-ON" 0 "No Warning/Default" ;
+VAL_ 566 BAR_SECT_LEFT_CENTER 15 "Reserved" 14 "Reserved" 13 "Reserved" 12 "STOP" 11 "STOP" 10 "STOP" 9 " BAR 4,5,6,7,8,9,10,11,12 ON" 8 " BAR 5,6,7,8,9,10,11,12 ON" 7 " BAR 6,7,8,9,10,11,12 ON" 6 " BAR 7,8,9,10,11,12 ON" 5 " BAR 8,9,10,11,12 ON" 4 " BAR 9,10,11,12 ON" 3 " BAR 10,11,12 ON" 2 " BAR 11,12 ON" 1 " BAR 12 ON" 0 "No Warning/Default" ;
+VAL_ 566 BAR_SECTOR_LEFT 15 "Reserved" 14 "Reserved" 13 "Reserved" 12 "STOP" 11 "STOP" 10 "STOP" 9 "BAR 4,5,6,7,8-ON" 8 "BAR 5,6,7,8-ON" 7 "BAR 6,7,8-ON" 6 "BAR 7,8-ON" 5 "BAR 8-ON" 4 "BAR 9,10,11,12-ON" 3 "BAR 10,11,12-ON" 2 "BAR 11,12-ON" 1 "BAR 12-ON" 0 "No Warning/Default" ;
+VAL_ 151 MBFM_WAKEUP_REASON 10 "Park Lamp Input status changed" 9 "Key In status changed" 8 "Wake Up due to RKE" 7 "Wake Up due to PKE" 6 "CDL Status Changed" 5 "Arm Status Changed" 4 "Tailgate Door Status Changed" 3 "RL Door Status Changed" 2 "RR Door Status Changed" 1 "Co-DRV Door Status Changed" 0 "DRV Door Status Changed" ;
+VAL_ 268 HDC_ACTIVE 3 "HDC Failure" 2 "Active and In Control" 1 "Active but Control not Necessary" 0 "Inactive / Default Value" ;
+VAL_ 268 ABS_ACTIVE 1 "ABS Active" 0 "ABS Inactive / Default" ;
+VAL_ 535 GUIDED_VOICE_REQ 7 "Angle_Parking_VMS_2" 6 "Angle_Parking_VMS_1" 5 "Parallel Parking_VMS_4" 4 "Parallel Parking_VMS_3" 3 "Parallel Parking_VMS_2" 2 "Parallel Parking_VMS_1" 1 "Parking Slection" 0 "No Reminder Info" ;
+VAL_ 535 RVC_OPERATION_STATE 7 "Reserved" 6 "Reserved" 5 "Test Mode(Internal)-video ON" 4 "RVC Faulty(RVC OFF)" 3 "Calibration EOL/Dealer Vedio ON" 2 "Fault(Video ON)" 1 "Operation(Video ON)" 0 "Standby(Video OFF)" ;
+VAL_ 535 RVC_BUTTON_GROUP 15 "Reserved" 14 "Reserved" 13 "Reserved" 12 "Reserved" 11 "Reserved" 10 "Reserved" 9 "Button_Group_9" 8 "Button_Group_8" 7 "Button_Group_7" 6 "Button_Group_6" 5 "Button_Group_5" 4 "Button_Group_4" 3 "Button_Group_3" 2 "Button_Group_2" 1 "Button_Group_1" 0 "No Button / Default" ;
+VAL_ 768 PGR_SET_TEMP 1 "signal Invalid" 0 "Default value" ;
+VAL_ 768 DRV_SET_TEMP 255 "Signal Invalid" 0 "default value" ;
+VAL_ 768 DISP_DUAL 3 "Signal Invalid" 2 "Not Used" 1 "Dual ON" 0 "Dual OFF / DV" ;
+VAL_ 768 STS_REAR_AC 1 "ON" 0 "OFF / DV" ;
+VAL_ 768 DISP_AC 3 "Signal Invalid" 2 "Not Used" 1 "AC ON" 0 "AC OFF /DV" ;
+VAL_ 768 DISP_OFF 3 "Signal Invalid" 2 "FATC system OFF(Blower OFF)" 1 "ON" 0 "OFF / Default" ;
+VAL_ 768 DISP_MODE 15 "Signal invalid" 14 "Reserve" 13 "Reserve" 12 "Reserve" 11 "Reserve" 10 "Reserve" 9 "Reserve" 8 "Reserve" 7 "Reserve" 6 "Reserve" 5 "Def" 4 "Floor / Def" 3 "Floor" 2 "Vent / Floor" 1 "Vent" 0 "OFF/ Default value" ;
+VAL_ 768 FRESH_RECIRC 3 "Signal Invalid" 2 "Reserved" 1 "Recirculation" 0 "Fresh / DV" ;
+VAL_ 768 DISP_BLOWER 15 "Signal Invalid" 14 "Reserve" 13 "Reserve" 12 "Reserve" 11 "Reserve" 10 "Reserve" 9 "8-Step" 8 "7-Step" 7 "6-Step" 6 "5-Step" 5 "4-Step" 4 "3-Step" 3 "2-Step" 2 "1-Step" 1 "0-Step" 0 "OFF/Default" ;
+VAL_ 768 FATC_ECON 3 "Signal Invalid" 2 "Not Used" 1 "ECON ON" 0 "ECON OFF / DV" ;
+VAL_ 768 FATC_AUTO 3 "Signal Invalid" 2 "Reserved" 1 "AUTO ON" 0 "AUTO OFF / DV" ;
+VAL_ 834 STS_SECURITY_KEY 3 "Reserved" 2 "Pattern2" 1 "Pattern3" 0 "OFF/Default" ;
+VAL_ 312 WHL_RR_SPD 4095 "Signal Invalid" 0 "Default Value" ;
+VAL_ 312 WHL_RL_SPD 4095 "Signal Invalid" 0 "Default Value" ;
+VAL_ 312 WHL_FR_SPD 4095 "Signal Invalid" 0 "Default Value" ;
+VAL_ 312 WHL_FL_SPD 4095 "Signal Invalid" 0 "Default Value" ;
+VAL_ 716 STS_HHC 1 "Available" 0 "Not Available / Default Value" ;
+VAL_ 716 STS_HDC 1 "Available" 0 "Not Available / Default Value" ;
+VAL_ 716 VEHICLE_SPEED_ABS 65535 "Signal Invalid" 65534 "Default Value" ;
+VAL_ 716 ODO_DISTANCE_ABS 65535 "Signal Invalid" 0 "Default Value" ;
+VAL_ 293 VEHICLE_SPEED_EMS 65535 "Signal Invalid" 65534 "Default " ;
+VAL_ 293 ODO_DISTANCE_EMS 65535 "Signal Invalid" 0 "Default" ;
+VAL_ 553 RPAS_ERROR 16 "RPAS ECU Faulty" 8 "RR sensor Faulty" 4 "RR center sensor Faulty" 2 "RL center sensor Faulty" 1 "RL sensor Faulty" 0 "Default" ;
+VAL_ 294 TARGET_GEAR_GSI 15 "Signal Invalid" 14 "Reserved" 13 "Reserved" 12 "Reserved" 11 "Reserved" 10 "Reserved" 9 "Reserved" 8 "Reserved" 7 "Reverse" 6 "6th" 5 "5th" 4 "4th" 3 "3rd" 2 "2nd" 1 "1st" 0 "neutral / Default" ;
+VAL_ 544 VALET_MODE_STATE 3 "Reserved" 2 "Reserved" 1 "Activate VAlet Mode" 0 "Normal Mode / Default Value" ;
+VAL_ 544 REQ_TRIP_RESET 1 "Reset request" 0 "Default Value" ;
+VAL_ 544 DRL_EN_SW 1 "DRL OFF" 0 "DRL ON / Default" ;
+VAL_ 544 STS_REAR_AC_IS 3 "Signal Invalid" 2 "Default Value" 1 "ON" 0 "OFF" ;
+VAL_ 544 STS_REAR_DEFOG_IS 3 "Signal Invalid" 2 "ON" 1 "OFF" 0 "Default Value" ;
+VAL_ 544 DISP_ECON_IS 3 "Signal Invalid" 2 "Default Value" 1 "ECON ON" 0 "ECON OFF" ;
+VAL_ 544 AC_REQ_IS 3 "Signal Invalid" 2 "Default Value" 1 "AC ON" 0 "AC OFF" ;
+VAL_ 544 DISP_OFF_IS 3 "Signal Invalid" 2 "HVAC system OFF(Blower OFF)" 1 "ON" 0 "Default Value" ;
+VAL_ 544 SET_TEMP_IS 255 "Signal Invalid" 254 "Default Value" ;
+VAL_ 544 FRESH_RECIRC_IS 3 "Signal Invalid" 2 "Default Value" 1 "Recirculation" 0 "Freash" ;
+VAL_ 544 DISP_AUTO_IS 3 "Signal Invalid" 2 "Default Value" 1 "Auto ON" 0 "Auto OFF" ;
+VAL_ 544 DISP_BLOWER_IS 15 "Signal Invalid" 14 "Default Value" 13 "Reserved" 12 "Reserved" 11 "Reserved" 10 "Reserved" 9 "8 - Step" 8 "7 - Step" 7 "6 - Step" 6 "5 - Step" 5 "4 - Step" 4 "3 - Step" 3 "2 - Step" 2 "1 - Step" 1 "0 - Step" 0 "OFF" ;
+VAL_ 544 DISP_MODE_IS 15 "Signal Invalid" 14 "Default Value" 13 "Reserved" 12 "Reserved" 11 "Reserved" 10 "Reserved" 9 "Reserved" 8 "Reserved" 7 "Reserved" 6 "Reserved" 5 "Def" 4 "Floor/Def" 3 "Floor" 2 "Vent/Floor" 1 "Vent" 0 "Off" ;
+VAL_ 544 ILLUMINATION_LEVEL 15 "Signal Invalid" 8 "Illumination Level 8" 7 "Illumination Level 7" 6 "Illumination Level 6" 5 "Illumination Level 5" 4 "Illumination Level 4" 3 "Illumination Level 3" 2 "Illumination Level 2" 1 "Illumination Level 1" 0 "Default Value" ;
+VAL_ 544 RESET_AFE 1 "Reset Request" 0 "No Reset Request/Default" ;
+VAL_ 544 IS_RVC_VIDEO_ENBL 7 "Description for the value '0x7'" 6 "Description for the value '0x6'" 5 "Description for the value '0x5'" 4 "Description for the value '0x4'" 3 "Description for the value '0x3'" 2 "Description for the value '0x2'" 1 "Description for the value '0x1'" 0 "Description for the value '0x0'" ;
+VAL_ 544 CMD_USER_INPUT 7 "Reserved" 6 "Zoom Out" 5 "Zoom In" 4 "Reset to parallel parking" 3 "Normal parking" 2 "Angle Parking" 1 "Parallel Parking" 0 "No Input/ Default" ;
+VAL_ 540 AUTO_RAIN 1 "Auto Wiper ON" 0 "Auto Wiper OFF / Default value" ;
+VAL_ 540 AUTO_LIGHT 1 "AUTO LIGHT ON" 0 "AUTO LIGHT OFF / Default value" ;
+VAL_ 540 SPARE_TYRE_PRESSURE 255 "Signal invalid" 0 "Default value" ;
+VAL_ 540 SPARE_TYRE_TEMP 255 "Signal invalid" 0 "Default value" ;
+VAL_ 840 DISP_AMBT_TEMP_MBFM 255 "Signal invalid" 0 "Default value" ;
+VAL_ 840 STS_DOOR 63 "All Door open" 32 "Only RR Door Open" 16 "Only RL Door Open" 8 "Only FR Door Open" 4 "Only FL Door Open" 2 "Only Hood Door Open" 1 "Only Back Door Open" 0 "All Closed / Default Value" ;
+VAL_ 840 ENG_OFF_TIME 2047 "Signal invalid" 0 "Default value" ;
+VAL_ 536 RR_TYRE_TEMP 255 "Signal invalid" 0 "Default value" ;
+VAL_ 536 RL_TYRE_TEMP 255 "Signal invalid" 0 "Default value" ;
+VAL_ 536 FR_TYRE_TEMP 255 "Signal invalid" 0 "Default value" ;
+VAL_ 536 FL_TYRE_TEMP 255 "Signal invalid" 0 "Default value" ;
+VAL_ 536 RR_TYRE_PRESSURE 255 "Signal Invalid" 0 "Default" ;
+VAL_ 536 RL_TYRE_PRESSURE 255 "Signal invalid" 0 "Default value" ;
+VAL_ 536 FR_TYRE_PRESSURE 255 "Signal invalid" 0 "Default value" ;
+VAL_ 536 FL_TYRE_PRESSURE 255 "Signal invalid" 0 "Default value" ;
+VAL_ 532 STS_RKE 7 "TG unarm,veh armed door locked" 6 "TG unarm,veh armed doorunlocked" 5 "Reserved" 4 "Reserved" 3 "TG armed, veh armed, door locked" 2 "TG armed,veh armed,door unlocked" 1 "All doors locked unarmed" 0 "All doors unlocked unarmed/DV" ;
+VAL_ 532 REQ_TFA_DISPLAY 1 "TFA Dispaly request" 0 "No Request / Default" ;
+VAL_ 532 REQ_TFA_PATTERN 5 "Pattern 5" 4 "Pattern 4" 3 "Pattern 3" 2 "Pattern 2" 1 "Pattern 1" 0 "Default" ;
+VAL_ 532 TPMS_SYSTEM_FAULT 0 "Default Value" ;
+VAL_ 532 TPMS_LEAKAGE_ALERT 0 "Default Value" ;
+VAL_ 532 TPMS_SIGNAL_MISSING 0 "Default Value" ;
+VAL_ 532 TPMS_ID_NOT_LEARNT 31 "All sensor not learnt" 30 "(FR+RR+RL+Spare) tyre sensor not" 29 "(FL+RR+RL+Spare) tyre sensor not" 28 "(RR+RL+Spare) tyre sensor not le" 27 "(FL+FR+RL+Spare) tyre sensor not" 26 "(FR+RL+Spare) tyre sensor not le" 25 "(FL+RL+Spare) tyre sensor not le" 24 "(RL+Spare) tyre sensor not learn" 23 "(FL+FR+RR+Spare) tyre sensor not" 21 "(FL+RR+Spare) tyre sensor not le" 20 "(RR+Spare) tyre sensor not learn" 19 "(FL+FR+Spare) tyre sensor not le" 18 "(FR+Spare) tyre sensor not learn" 17 "(FL+Spare) tyre sensor not learn" 16 "Spare tyre sensor not learnt" 15 "(FL+FR+RR+RL) tyre sensor not le" 14 "(FR+RR+RL) tyre sensor not learn" 13 "(FL+RR+RL) tyre sensor not learn" 12 "(RR+RL) tyre sensor not learnt" 11 "(FL+FR+RL) tyre sensor not learn" 10 "(FR+RL) tyre sensor not learnt" 9 "(FL+RL) tyre sensor not learnt" 7 "(FL+FR+RR) tyre sensor not learn" 6 "(FR+RR) tyre sensor not learnt" 5 "(FL+RR) tyre sensor not learnt" 3 "(FL+FR) tyre sensor not learnt" 22 "(FR+RR+Spare) tyre sensor not le" 8 "RL tyre sensor not learnt" 4 "RR tyre sensor not learnt" 2 "FR tyre sensor not learnt" 1 "FL tyre sensor not learnt" 0 "All sensor learnt / Default value" ;
+VAL_ 532 HIGH_TYRE_PRESSURE_ALERT 31 "All tyre high pressure" 30 "(FR+RR+RL+Spare) tyre high press" 29 "(FL+RR+RL+Spare) tyre high press" 28 "(RR+RL+Spare) tyre high pressure" 27 "(FL+FR+RL+Spare) tyre high press" 26 "(FR+RL+Spare) tyre high pressure" 25 "(FL+RL+Spare) tyre high pressure" 24 "(RL+Spare) tyre high pressure" 23 "(FL+FR+RR+Spare) tyre high press" 21 "(FL+RR+Spare) tyre high pressure" 20 "(RR+Spare) tyre high pressure" 19 "(FL+FR+Spare) tyre high pressure" 18 "(FR+Spare) tyre high pressure" 17 "(FL+Spare) tyre high pressure" 16 "Spare tyre high pressure" 15 "(FL+FR+RR+RL) tyre high pressure" 14 "(FR+RR+RL) tyre high pressure" 13 "(FL+RR+RL) tyre high pressure" 12 "(RR+RL) tyre high pressure" 11 "(FL+FR+RL) tyre high pressure" 10 "(FR+RL) tyre high pressure" 9 "(FL+RL) tyre high pressure" 7 "(FL+FR+RR) tyre high pressure" 6 "(FR+RR) tyre high pressure" 5 "(FL+RR) tyre high pressure" 3 "(FL+FR) tyre high pressure" 22 "(FR+RR+Spare) tyre high pressure" 8 "RL tyre high pressure" 4 "RR tyre high pressure" 2 "FR tyre high pressure" 1 "FL tyre high pressure" 0 "All tyre normal / Default value" ;
+VAL_ 532 HIGH_TYRE_TEMPERATURE_ALERT 31 "All tyre high temperature" 30 "(FR+RR+RL+Spare) tyre high tempe" 29 "(FL+RR+RL+Spare) tyre high tempe" 28 "(RR+RL+Spare) tyre high temperat" 27 "(FL+FR+RL+Spare) tyre high tempe" 26 "(FR+RL+Spare) tyre high temperat" 25 "(FL+RL+Spare) tyre high temperat" 24 "(RL+Spare) tyre high temperature" 23 "(FL+FR+RR+Spare) tyre high tempe" 21 "(FL+RR+Spare) tyre high temperat" 20 "(RR+Spare) tyre high temperature" 19 "(FL+FR+Spare) tyre high temperat" 18 "(FR+Spare) tyre high temperature" 17 "(FL+Spare) tyre high temperature" 16 "Spare tyre high temperature" 15 "(FL+FR+RR+RL) tyre high temperat" 14 "(FR+RR+RL) tyre high temperature" 13 "(FL+RR+RL) tyre high temperature" 12 "(RR+RL) tyre high temperature" 11 "(FL+FR+RL) tyre high temperature" 10 "(FR+RL) tyre high temperature" 9 "(FL+RL) tyre high temperature" 7 "(FL+FR+RR) tyre high temperature" 6 "(FR+RR) tyre high temperature" 5 "(FL+RR) tyre high temperature" 3 "(FL+FR) tyre high temperature" 22 "(FR+RR+Spare) tyre high temperat" 8 "RL tyre high temperature" 4 "RR tyre high temperature" 2 "FR tyre high temperature" 1 "FL tyre high temperature" 0 "All tyre normal / Default value" ;
+VAL_ 532 LOW_TYRE_PRESSURE_ALERT 31 "All tyre low pressure" 30 "(FR+RR+RL+Spare) tyre low pressu" 29 "(FL+RR+RL+Spare) tyre low pressu" 28 "(RR+RL+Spare) tyre low pressure" 27 "(FL+FR+RL+Spare) tyre low pressu" 26 "(FR+RL+Spare) tyre low pressure" 25 "(FL+RL+Spare) tyre low pressure" 24 "(RL+Spare) tyre low pressure" 23 "(FL+FR+RR+Spare) tyre low pressu" 21 "(FL+RR+Spare) tyre low pressure" 20 "(RR+Spare) tyre low pressure" 19 "(FL+FR+Spare) tyre low pressure" 18 "(FR+Spare) tyre low pressure" 17 "(FL+Spare) tyre low pressure" 16 "Spare tyre low pressure" 15 "(FL+FR+RR+RL) tyre low pressure" 14 "(FR+RR+RL) tyre low pressure" 13 "(FL+RR+RL) tyre low pressure" 12 "(RR+RL) tyre low pressure" 11 "(FL+FR+RL) tyre low pressure" 10 "(FR+RL) tyre low pressure" 9 "(FL+RL) tyre low pressure" 7 "(FL+FR+RR) tyre low pressure" 6 "(FR+RR) tyre low pressure" 5 "(FL+RR) tyre low pressure" 3 "(FL+FR) tyre low pressure" 22 "(FR+RR+Spare) tyre low pressure" 8 "RL tyre low pressure" 4 "RR tyre low pressure" 2 "FR tyre low pressure" 1 "FL tyre low pressure" 0 "All tyre normal / Default value" ;
+VAL_ 532 SPARE_TYRE_SWAP 4 "Rear left tyre swapped" 3 "Rear right tyre swapped" 2 "Front right tyre swapped" 1 "Front left tyre swapped" 0 "No spare tyre swap / Default value" ;
+VAL_ 532 TPMS_PROGRAM_MODE 15 "Signal Invalid" 8 "Learning not completed" 7 "All tyres learned" 6 "Learn spare tyre" 5 "Learn rear left tyre" 4 "Learn rear right tyre" 3 "Learn front right tyre" 2 "Learn front left tyre" 1 "Entered program mode" 0 "Normal mode / Default value" ;
+VAL_ 832 AVG_KMPL_GD 511 "Signal Invalid" 0 "Default Value" ;
+VAL_ 832 STS_BRAKE_FLUID_LVL 1 "Low" 0 "Normal / Default value" ;
+VAL_ 832 ODOMTR_READING 0 "Default value" 1048575 "Signal invalid" ;
+VAL_ 529 INSTANT_KMPL 511 "Signal Invalid" 0 "Default Value" ;
+VAL_ 529 INDC_LOW_FUEL 1 "Low Fuel Warning" 0 "Normal Fuel / Default Value" ;
+VAL_ 529 STS_PARK_BRK 1 "Engage" 0 "Default value" ;
+VAL_ 529 SERVICE_REMINDER 7 "7th service" 6 "6th service" 5 "5th service" 4 "4th service" 3 "3rd service" 2 "2nd service" 1 "1st service" 0 "Default value" ;
+VAL_ 529 RST_ACK_AFE 3 "Signal Invalid" 2 "Reserved" 1 "Reset acknowledged / done" 0 "Default value" ;
+VAL_ 529 DIST_TO_EMPTY 1023 "signal invalid" 0 "default value" ;
+VAL_ 529 AVG_KMPL 511 "Signal invalid" 0 "Default value" ;
+VAL_ 704 STS_SEAT_BLT_PSGR_SRS 3 "Reserved" 2 "Buckle Faulty" 1 "Buckled" 0 "Not Buckled/Default" ;
+VAL_ 704 STS_SEAT_BLT_DRVR_SRS 3 "Reserved" 2 "Buckle Faulty" 1 "Buckled" 0 "Not Buckled/Default" ;
+VAL_ 704 STS_CRASH 1 "CRASH(Request to stop engine)" 0 "No Request / Default" ;
+VAL_ 704 INDC_SRS 3 "Flashing 1Hz" 2 "Signal Invalid" 1 "Lamp ON" 0 "Lamp OFF/Default" ;
+VAL_ 704 INDC_PADL 1 "Lamp ON" 0 "Lamp OFF/Default" ;
+VAL_ 704 EVEN_PARITY_BIT 1 "Even" 0 "ODD/Default" ;
+VAL_ 704 DOOR_UNLOCK 1 "Request to unlock Doors" 0 "No Request / Default" ;
+VAL_ 551 DISP_DIST 255 "DisplayOFF/Not Available/Default" 254 "Reserved" 253 "Reserved" 252 "Reserved" 251 "Reserved" ;
+VAL_ 551 BAR_SECT_CENTER 15 "Reserved" 14 "Reserved" 13 "Reserved" 12 "Reserved" 11 "Reserved" 10 "Reserved" 9 "Reserved" 8 "Reserved" 7 "Reserved" 6 "Reserved" 5 "Reserved" 4 "BAR1,2,3,4, STOP-ON" 3 "BAR1,STOP-OFF: BAR 2,3,4-ON" 2 "BAR1,2,STOP-OFF: BAR 3,4-ON" 1 "BAR1,2,3,STOP-OFF: BAR 4-ON" 0 "BAR 1,2,3,4, STOP-OFF/Default" ;
+VAL_ 551 BAR_SECT_RIGHT 15 "Reserved" 14 "Reserved" 13 "Reserved" 12 "Reserved" 11 "Reserved" 10 "Reserved" 9 "Reserved" 8 "Reserved" 7 "Reserved" 6 "Reserved" 5 "Reserved" 4 "BAR1,2,3,4, STOP-ON" 3 "BAR1,STOP-OFF: BAR 2,3,4-ON" 2 "BAR1,2,STOP-OFF: BAR 3,4-ON" 1 "BAR1,2,3,STOP-OFF: BAR 4-ON" 0 "BAR 1,2,3,4, STOP-OFF/Default" ;
+VAL_ 551 BAR_SECT_LEFT 15 "Reserved" 14 "Reserved" 13 "Reserved" 12 "Reserved" 11 "Reserved" 10 "Reserved" 9 "Reserved" 8 "Reserved" 7 "Reserved" 6 "Reserved" 5 "Reserved" 4 "BAR1,2,3,4, STOP-ON" 3 "BAR1,STOP-OFF: BAR 2,3,4-ON" 2 "BAR1,2,STOP-OFF: BAR 3,4-ON" 1 "BAR1,2,3,STOP-OFF: BAR 4-ON" 0 "BAR 1,2,3,4, STOP-OFF/Default" ;
+VAL_ 264 STS_ESS_INDC 7 "Signal Invalid" 6 "Reserved" 5 "Reserved" 4 "LAmp Blink before Engine Start" 3 "Lamp blink due to Voltage Mon" 2 "Lamp blink before Engine stop" 1 "Lamp ON after Engine Stop" 0 "Lamp OFF/Default" ;
+VAL_ 264 ENG_TRQ_AFTR_RED 2047 "Signal Invalid" 0 "Default" ;
+VAL_ 264 CLUTCH_STS 7 "Signal Invalid" 6 "Reserved" 5 "Reserved" 4 "Reserved" 3 "Reserved" 2 "90% Pressed" 1 "10% Pressed" 0 "Not Pressed / Default" ;
+VAL_ 776 VALET_MODE_STATUS 1 "Valet Mode" 0 "Normal Mode/Default Value" ;
+VAL_ 776 ENG_ON_TIME 65535 "Signal Invalid" 0 "Default" ;
+VAL_ 960 VIN_INDEX 3 "Signal Invalid" 2 "VIN_DATA2" 1 "VIN_DATA1" 0 "VIN_DATA0" ;
+VAL_ 304 ENGINE_DRIVE_MODE 7 "Signal Invalid" 6 "Reserved" 5 "Reserved" 4 "Reserved" 3 "Reserved" 2 "Reserved" 1 "ECO Mode" 0 "Power Mode / Default Value" ;
+VAL_ 304 ENG_OIL_PRESSURE 1 "Oil pressure Low" 0 "Normal / Default value" ;
+VAL_ 292 STS_ENG 7 "Reserved" 6 "Reserved" 5 "Engine cranking due to ESS" 4 "Engine Stalled" 3 "Engine Auto Stop(ESS)" 2 "Engine Running" 1 "Engine Cranking dut to T50" 0 "Engine Not Running / Default" ;
+VAL_ 292 STS_AC_COMPRESSOR 3 "Signal Invalid" 2 "Reserved" 1 "ON" 0 "OFF/Default" ;
+VAL_ 292 INJ_QTY 2047 "Signal Invalid" 0 "Default" ;
+VAL_ 292 ENG_TEMP 255 "Signal Invalid" 130 "Default" ;
+VAL_ 292 ENG_SPD 65535 "Signal Invalid" 0 "Default" ;
+VAL_ 292 CURRENT_GEAR_MT 15 "Signal Invalid" 14 "Reserved" 13 "Reserved" 12 "Reserved" 11 "Reserved" 10 "reserved" 9 "Reserved" 8 "Reserved" 7 "Reverse" 6 "Sixth" 5 "Fifth" 4 "Fourth" 3 "Third" 2 "Second" 1 "First" 0 "Neutral/Default" ;
+VAL_ 292 BRK_PEDAL 3 "Signal Invalid" 2 "Reserved" 1 "Depressed" 0 "Not Pressed / Default" ;
+VAL_ 292 ACC_PED 255 "Signal Invalid" 0 "Default" ;
+

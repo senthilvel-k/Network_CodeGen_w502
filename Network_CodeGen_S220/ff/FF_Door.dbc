@@ -1,0 +1,267 @@
+VERSION ""
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_: RRDP RLDP PDP DDP TOOL BCG
+
+
+BO_ 1761 RRDP_NM: 4 RRDP
+ SG_ RRDP_NM_PNByte : 23|16@0+ (1,0) [0|0] ""  RLDP,PDP,DDP
+ SG_ RRDP_NM_NodeId : 15|8@0+ (1,0) [0|0] ""  RLDP,PDP,DDP
+ SG_ RRDP_NM_CBV : 7|8@0+ (1,0) [0|0] ""  RLDP,PDP,DDP
+
+BO_ 1721 RLDP_NM: 4 RLDP
+ SG_ RLDP_NM_PNByte : 23|16@0+ (1,0) [0|0] ""  RRDP,PDP,DDP
+ SG_ RLDP_NM_NodeId : 15|8@0+ (1,0) [0|0] ""  RRDP,PDP,DDP
+ SG_ RLDP_NM_CBV : 7|8@0+ (1,0) [0|0] ""  RRDP,PDP,DDP
+
+BO_ 1641 PDP_NM: 4 PDP
+ SG_ PDP_NM_PNByte : 23|16@0+ (1,0) [0|0] ""  RRDP,RLDP,DDP
+ SG_ PDP_NM_NodeId : 15|8@0+ (1,0) [0|0] ""  RRDP,RLDP,DDP
+ SG_ PDP_NM_CBV : 7|8@0+ (1,0) [0|0] ""  RRDP,RLDP,DDP
+
+BO_ 1657 DDP_NM: 4 DDP
+ SG_ DDP_NM_PNByte : 23|16@0+ (1,0) [0|0] ""  RRDP,RLDP,PDP
+ SG_ DDP_NM_NodeId : 15|8@0+ (1,0) [0|0] ""  RRDP,RLDP,PDP
+ SG_ DDP_NM_CBV : 7|8@0+ (1,0) [0|0] ""  RRDP,RLDP,PDP
+
+BO_ 701 TOOL_RLDP_IlluminationControl: 8 TOOL
+ SG_ IlluminationControl_RLDP_TOOL : 7|8@0+ (1,0) [0|0] ""  RLDP
+
+BO_ 741 TOOL_RRDP_IlluminationControl: 8 TOOL
+ SG_ IlluminationControl_RRDP_TOOL : 7|8@0+ (1,0) [0|0] ""  RRDP
+
+BO_ 224 RRDP_Request: 8 RRDP
+ SG_ AppAudioMuteReq_RRDP : 39|8@0+ (1,0) [0|0] ""  BCG
+ SG_ AppVolumeAdjustReq_RRDP : 15|8@0+ (1,0) [0|0] ""  BCG
+ SG_ AppTempAdjustReq_RRDP : 7|8@0+ (1,0) [0|0] ""  BCG
+ SG_ AppSeatCtrlHeatVentAjustReq_RRDP : 31|8@0+ (1,0) [0|0] ""  BCG
+
+BO_ 184 RLDP_Request: 8 RLDP
+ SG_ AppVolumeAdjustReq_RLDP : 7|8@0+ (1,0) [0|0] ""  BCG
+ SG_ AppTempAdjustReq_RLDP : 31|8@0+ (1,0) [0|0] ""  BCG
+ SG_ AppSeatCtrlHeatVentAjustReq_RLDP : 55|8@0+ (1,0) [0|0] ""  BCG
+ SG_ AppAudioMuteReq_RLDP : 39|8@0+ (1,0) [0|0] ""  BCG
+
+BO_ 152 PDP_Request: 8 PDP
+ SG_ AppVolumeAdjustReq_PDP : 15|8@0+ (1,0) [0|0] ""  BCG
+ SG_ AppTempAdjustReq_PDP : 7|8@0+ (1,0) [0|0] ""  BCG
+ SG_ AppSeatCtrlHeatVentAjustReq_PDP : 31|8@0+ (1,0) [0|0] ""  BCG
+ SG_ AppAudioMuteReq_PDP : 23|8@0+ (1,0) [0|0] ""  BCG
+
+BO_ 120 DDP_Request: 8 DDP
+ SG_ AppSeatCtrlHeatVentAjustReq_DDP : 31|8@0+ (1,0) [0|0] ""  BCG
+ SG_ AppAudioMuteReq_DDP : 23|8@0+ (1,0) [0|0] ""  BCG
+ SG_ AppVolumeAdjustReq_DDP : 15|8@0+ (1,0) [0|0] ""  BCG
+ SG_ AppTempAdjustReq_DDP : 7|8@0+ (1,0) [0|0] ""  BCG
+
+BO_ 669 TOOL_PDP_IlluminationControl: 8 TOOL
+ SG_ IlluminationControl_PDP_TOOL : 7|64@0+ (1,0) [0|1] ""  PDP
+
+BO_ 1661 TOOL_ClientToServerPhysicalAddrs: 8 TOOL
+ SG_ ClientToServerPhysicalAddrs_TOOL : 7|64@0+ (1,0) [0|1] ""  DDP
+
+BO_ 637 TOOL_DDP_IlluminationControl: 8 TOOL
+ SG_ IlluminationControl_DDP_TOOL : 7|64@0+ (1,0) [0|1] ""  DDP
+
+BO_ 2047 TOOL_UDSFunctionalAddress: 8 TOOL
+ SG_ UDSFunctionalAddress_TOOL : 7|64@0+ (1,0) [0|1] ""  DDP
+
+BO_ 2046 DDP_NetworkManagementMessage: 8 DDP
+ SG_ NetworkManagementMessage_DDP : 7|64@0+ (1,0) [0|1] ""  BCG
+
+BO_ 1656 DDP_ResetDiagnostic: 8 DDP
+ SG_ HardwarePartNumber_DDP : 7|32@0+ (1,0) [0|4294967295] ""  BCG
+ SG_ HardwareRevisionID_DDP : 39|16@0+ (1,0) [0|65535] ""  BCG
+ SG_ BootloaderStuck_DDP : 55|8@0+ (1,0) [0|1] ""  BCG
+ SG_ ResetCauseSignal_DDP : 63|8@0+ (1,0) [0|1] ""  BCG
+
+BO_ 1662 DDP_UDSServerToClient: 8 DDP
+ SG_ UDSServertoClient_DDP : 7|64@0+ (1,0) [0|1] ""  TOOL
+
+BO_ 1663 DDP_VersionNumber: 8 DDP
+ SG_ AppMajorSWVersion_DDP : 7|8@0+ (1,0) [0|1] ""  BCG
+ SG_ AppMinorSWVersion_DDP : 15|8@0+ (1,0) [0|1] ""  BCG
+ SG_ AppSubminorVersion_DDP : 23|8@0+ (1,0) [0|1] ""  BCG
+ SG_ AppSoftwareBuildMachineID_DDP : 31|8@0+ (1,0) [0|1] ""  BCG
+ SG_ BootloaderMajorSWVersion_DDP : 39|8@0+ (1,0) [0|1] ""  BCG
+ SG_ BootloaderMinorVersion_DDP : 47|8@0+ (1,0) [0|1] ""  BCG
+ SG_ BootloaderSubminorVersion_DDP : 55|8@0+ (1,0) [0|1] ""  BCG
+ SG_ BootloaderbuildmachineID_DDP : 63|8@0+ (1,0) [0|1] ""  BCG
+
+
+
+BA_DEF_ BO_  "GenMsgIlSupport" ENUM  "No","Yes";
+BA_DEF_ BO_  "TpMessage" ENUM  "No","Yes";
+BA_DEF_ BO_  "NmMessage" ENUM  "No","Yes";
+BA_DEF_ SG_  "ValueTableE" STRING ;
+BA_DEF_ SG_  "CommentRxE" STRING ;
+BA_DEF_ SG_  "CommentRxJ" STRING ;
+BA_DEF_ SG_  "CommentTxE" STRING ;
+BA_DEF_ SG_  "CommentTxJ" STRING ;
+BA_DEF_ SG_  "DescriptionE" STRING ;
+BA_DEF_ SG_  "DescriptionJ" STRING ;
+BA_DEF_ SG_  "GenSigStartValue" INT 0 3000;
+BA_DEF_ BO_  "PS" ENUM  "+B","ACC","IG1","IG2","*","vector_leerstring";
+BA_DEF_ BO_  "PF" HEX 0 65535;
+BA_DEF_ BO_  "PRI" INT 0 7;
+BA_DEF_ BO_  "FrameType" INT 0 2;
+BA_DEF_ SG_  "GenSigSendType" ENUM  "Cyclic","OnWrite","OnWriteWithRepetition","OnChange","OnChangeWithRepetition","IfActive","IfActiveWithRepetition","NoSigSendType";
+BA_DEF_ SG_  "GenSigInactiveValue" INT 0 0;
+BA_DEF_ BO_  "GenMsgCycleTime" INT 0 0;
+BA_DEF_ BO_  "GenMsgSendType" ENUM  "Cyclic","Event","not_used","not_used","not_used","Combined(Event/Periodic)","not_used","IfActive","NoMsgSendType";
+BA_DEF_ BU_  "NmStationAddress" HEX 0 0;
+BA_DEF_  "DBName" STRING ;
+BA_DEF_  "BusType" STRING ;
+BA_DEF_ BU_  "NodeLayerModules" STRING ;
+BA_DEF_ BU_  "ECU" STRING ;
+BA_DEF_ BU_  "CANoeJitterMax" INT 0 0;
+BA_DEF_ BU_  "CANoeJitterMin" INT 0 0;
+BA_DEF_ BU_  "CANoeDrift" INT 0 0;
+BA_DEF_ BU_  "CANoeStartDelay" INT 0 0;
+BA_DEF_DEF_  "GenMsgIlSupport" "Yes";
+BA_DEF_DEF_  "TpMessage" "No";
+BA_DEF_DEF_  "NmMessage" "No";
+BA_DEF_DEF_  "ValueTableE" "";
+BA_DEF_DEF_  "CommentRxE" "";
+BA_DEF_DEF_  "CommentRxJ" "";
+BA_DEF_DEF_  "CommentTxE" "";
+BA_DEF_DEF_  "CommentTxJ" "";
+BA_DEF_DEF_  "DescriptionE" "";
+BA_DEF_DEF_  "DescriptionJ" "";
+BA_DEF_DEF_  "GenSigStartValue" 0;
+BA_DEF_DEF_  "PS" "";
+BA_DEF_DEF_  "PF" 0;
+BA_DEF_DEF_  "PRI" 0;
+BA_DEF_DEF_  "FrameType" 2;
+BA_DEF_DEF_  "GenSigSendType" "";
+BA_DEF_DEF_  "GenSigInactiveValue" 0;
+BA_DEF_DEF_  "GenMsgCycleTime" 0;
+BA_DEF_DEF_  "GenMsgSendType" "NoMsgSendType";
+BA_DEF_DEF_  "NmStationAddress" 0;
+BA_DEF_DEF_  "DBName" "";
+BA_DEF_DEF_  "BusType" "CAN";
+BA_DEF_DEF_  "NodeLayerModules" "";
+BA_DEF_DEF_  "ECU" "";
+BA_DEF_DEF_  "CANoeJitterMax" 0;
+BA_DEF_DEF_  "CANoeJitterMin" 0;
+BA_DEF_DEF_  "CANoeDrift" 0;
+BA_DEF_DEF_  "CANoeStartDelay" 0;
+BA_ "DBName" "FF";
+BA_ "NmStationAddress" BU_ RRDP 28;
+BA_ "NmStationAddress" BU_ RLDP 23;
+BA_ "NmStationAddress" BU_ PDP 19;
+BA_ "NmStationAddress" BU_ DDP 15;
+BA_ "NmStationAddress" BU_ BCG 1;
+BA_ "GenMsgSendType" BO_ 1761 0;
+BA_ "GenMsgCycleTime" BO_ 1761 40;
+BA_ "NmMessage" BO_ 1721 1;
+BA_ "GenMsgIlSupport" BO_ 1721 0;
+BA_ "GenMsgIlSupport" BO_ 1641 0;
+BA_ "NmMessage" BO_ 1641 1;
+BA_ "GenMsgIlSupport" BO_ 1657 0;
+BA_ "NmMessage" BO_ 1657 1;
+BA_ "TpMessage" BO_ 1661 1;
+BA_ "PS" BO_ 1661 5;
+BA_ "PRI" BO_ 1661 0;
+BA_ "PF" BO_ 1661 2;
+BA_ "FrameType" BO_ 1661 2;
+BA_ "GenMsgCycleTime" BO_ 1661 500;
+BA_ "GenMsgSendType" BO_ 1661 0;
+BA_ "GenMsgIlSupport" BO_ 1661 0;
+BA_ "PS" BO_ 637 5;
+BA_ "PRI" BO_ 637 0;
+BA_ "PF" BO_ 637 2;
+BA_ "FrameType" BO_ 637 2;
+BA_ "GenMsgCycleTime" BO_ 637 100;
+BA_ "GenMsgSendType" BO_ 637 0;
+BA_ "TpMessage" BO_ 2047 1;
+BA_ "GenMsgIlSupport" BO_ 2047 0;
+BA_ "PS" BO_ 2047 5;
+BA_ "PRI" BO_ 2047 0;
+BA_ "PF" BO_ 2047 2;
+BA_ "FrameType" BO_ 2047 2;
+BA_ "GenMsgCycleTime" BO_ 2047 500;
+BA_ "GenMsgSendType" BO_ 2047 0;
+BA_ "GenMsgIlSupport" BO_ 2046 0;
+BA_ "NmMessage" BO_ 2046 1;
+BA_ "PS" BO_ 2046 5;
+BA_ "PRI" BO_ 2046 0;
+BA_ "PF" BO_ 2046 2;
+BA_ "FrameType" BO_ 2046 2;
+BA_ "GenMsgCycleTime" BO_ 2046 0;
+BA_ "GenMsgSendType" BO_ 2046 1;
+BA_ "PS" BO_ 1656 5;
+BA_ "PRI" BO_ 1656 0;
+BA_ "PF" BO_ 1656 2;
+BA_ "FrameType" BO_ 1656 2;
+BA_ "GenMsgCycleTime" BO_ 1656 10;
+BA_ "GenMsgSendType" BO_ 1656 0;
+BA_ "TpMessage" BO_ 1662 1;
+BA_ "GenMsgIlSupport" BO_ 1662 0;
+BA_ "PS" BO_ 1662 5;
+BA_ "PRI" BO_ 1662 0;
+BA_ "PF" BO_ 1662 2;
+BA_ "FrameType" BO_ 1662 2;
+BA_ "GenMsgCycleTime" BO_ 1662 0;
+BA_ "GenMsgSendType" BO_ 1662 1;
+BA_ "PS" BO_ 1663 5;
+BA_ "PRI" BO_ 1663 0;
+BA_ "PF" BO_ 1663 2;
+BA_ "FrameType" BO_ 1663 2;
+BA_ "GenMsgCycleTime" BO_ 1663 10;
+BA_ "GenMsgSendType" BO_ 1663 0;
+BA_ "GenSigSendType" SG_ 1661 ClientToServerPhysicalAddrs_TOOL 0;
+BA_ "GenSigSendType" SG_ 637 IlluminationControl_DDP_TOOL 0;
+BA_ "GenSigSendType" SG_ 2047 UDSFunctionalAddress_TOOL 0;
+BA_ "GenSigSendType" SG_ 2046 NetworkManagementMessage_DDP 1;
+BA_ "GenSigSendType" SG_ 1656 HardwarePartNumber_DDP 0;
+BA_ "GenSigSendType" SG_ 1656 HardwareRevisionID_DDP 0;
+BA_ "GenSigSendType" SG_ 1656 BootloaderStuck_DDP 0;
+BA_ "GenSigSendType" SG_ 1656 ResetCauseSignal_DDP 0;
+BA_ "GenSigSendType" SG_ 1662 UDSServertoClient_DDP 1;
+BA_ "GenSigSendType" SG_ 1663 AppMajorSWVersion_DDP 0;
+BA_ "GenSigSendType" SG_ 1663 AppMinorSWVersion_DDP 0;
+BA_ "GenSigSendType" SG_ 1663 AppSubminorVersion_DDP 0;
+BA_ "GenSigSendType" SG_ 1663 AppSoftwareBuildMachineID_DDP 0;
+BA_ "GenSigSendType" SG_ 1663 BootloaderMajorSWVersion_DDP 0;
+BA_ "GenSigSendType" SG_ 1663 BootloaderMinorVersion_DDP 0;
+BA_ "GenSigSendType" SG_ 1663 BootloaderSubminorVersion_DDP 0;
+BA_ "GenSigSendType" SG_ 1663 BootloaderbuildmachineID_DDP 0;
+VAL_ 224 AppSeatCtrlHeatVentAjustReq_RRDP 114 "SeatPosition4Increment" 113 "SeatPosition4Decrement" 98 "SeatPosition3Increment" 97 "SeatPosition3Decrement" 82 "SeatPosition2Increment" 81 "SeatPosition2Decrement" 66 "SeatPosition1Increment" 65 "SeatPosition1Decrement" 48 "NoChangeReq_SendStatus" 33 "VentDecrement" 17 "HeatDecrement" 0 "NoChangeReq_SendNoStatus" ;
+VAL_ 184 AppSeatCtrlHeatVentAjustReq_RLDP 114 "SeatPosition4Increment" 113 "SeatPosition4Decrement" 98 "SeatPosition3Increment" 97 "SeatPosition3Decrement" 82 "SeatPosition2Increment" 81 "SeatPosition2Decrement" 66 "SeatPosition1Increment" 65 "SeatPosition1Decrement" 48 "NoChangeReq_SendStatus" 33 "VentDecrement" 17 "HeatDecrement" 0 "NoChangeReq_SendNoStatus" ;
+VAL_ 152 AppSeatCtrlHeatVentAjustReq_PDP 114 "SeatPosition4Increment" 113 "SeatPosition4Decrement" 98 "SeatPosition3Increment" 97 "SeatPosition3Decrement" 82 "SeatPosition2Increment" 81 "SeatPosition2Decrement" 66 "SeatPosition1Increment" 65 "SeatPosition1Decrement" 48 "NoChangeReq_SendStatus" 33 "VentDecrement" 17 "HeatDecrement" 0 "NoChangeReq_SendNoStatus" ;
+VAL_ 120 AppSeatCtrlHeatVentAjustReq_DDP 114 "SeatPosition4Increment" 113 "SeatPosition4Decrement" 98 "SeatPosition3Increment" 97 "SeatPosition3Decrement" 82 "SeatPosition2Increment" 81 "SeatPosition2Decrement" 66 "SeatPosition1Increment" 65 "SeatPosition1Decrement" 48 "NoChangeReq_SendStatus" 33 "VentDecrement" 17 "HeatDecrement" 0 "NoChangeReq_SendNoStatus" ;
+VAL_ 120 AppAudioMuteReq_DDP 1 "MuteON" 0 "MuteOff" ;
+

@@ -1,0 +1,10 @@
+'''# Old implementation 
+    if len(gptx_range) != 0:
+        if len(gptx_index_ran) ==1:
+            print '''{ /*     0 */             '''+str(gptx_index_ran[0])+'''U,            '''+str(gptx_index_ran[0]+1)+'''U }   /* [Basic CAN Start and Stop message indices] */'''
+        else:
+            print '''{ /*     0 */             '''+str(min(gptx_index_ran))+'''U,            '''+str(max(gptx_index_ran)+1)+'''U }   /* [Basic CAN Start and Stop message indices] */'''
+                
+    else:
+        print '''{ /*     0 */             0xffU,            0xffU }   /* [Basic CAN Start and Stop message indices] */'''
+        '''
