@@ -48,10 +48,14 @@ CoGeNT.pyw ──> back_end.py ──────────────┐  Ba
    code gen     └─> cogent_generate.run_code_generation(dbc, node, time)
                       1. checks: DBC exists, data/CanDbcMsg|SigConfiguration.data exist + valid JSON,
                          msg.find_unsupported_multiplex()
-                      2. runs the 5 generators (same order as legacy) into CODE_GEN\.staging
+                      2. plans the CAN receive rules (can_rx_filt_gen.plan_rx_rules + cogent_fifo,
+                         data/CanFifoConfiguration.data) and checks the 192 / 64-per-FIFO limits
+                      3. runs the 5 generators (same order as legacy) into CODE_GEN\.staging
                          (cogent_io.open_output/close_output redirect print() into the file)
-                      3. moves the 11 files into CODE_GEN only when all succeeded
-                      4. on failure: CogentError -> popup; traceback -> CODE_GEN\errorlog.txt + logs\cogent.log
+                      4. checks the staged can_rxrule.cfg / nw_can_dll.h against the plan, writes
+                         fifo_plan.json + MANUAL_ACTIONS.md into the staging folder
+                      5. moves the 11 files + 2 reports into CODE_GEN only when all succeeded
+                      6. on failure: CogentError -> popup; traceback -> CODE_GEN\errorlog.txt + logs\cogent.log
 ```
 
 Key modules (all under `Network_CodeGen_S220/`):
@@ -61,7 +65,8 @@ Key modules (all under `Network_CodeGen_S220/`):
 | `CoGeNT.pyw` | Entry point (`app.bind(BackEnd()); app.start()`). |
 | `back_end.py` | GUI controller: slots `upload_dbc`, `code_gen`, `Can_dbc0_msg`, `Can_dbc0_sig`, `Can_Filter`, `*_SaveButton`, `save_cfg`, `load_cfg`, `file_browse`, `default_page`, `onpageload`, `unlock`, `pythonfn` (test hook). Session state is held in name-mangled attributes (`__dbc`, `__node`, `__load`, `__msg_saved`, `__sig_saved`). |
 | `cogent_gui/webgui.py`, `cogent_gui/bridge.js` | Replacement for htmlPy on PySide6 (template rendering, JS bridge, alerts, `evaluate_javascript` queued until a page has loaded). |
-| `cogent_generate.py` | Code-generation pipeline used by `code_gen` (staging, checks, error translation). |
+| `cogent_generate.py` | Code-generation pipeline used by `code_gen` (staging, checks, error translation, FIFO pre/post checks, reports). Returns `GenerationResult`. |
+| `cogent_fifo.py` | Receive-rule planning: `CanFifoConfiguration.data` (limits, `merge_blocks`, `additional_rx_messages`), merged ID blocks ("FIFO multiplexing"), `check_limits`, `suggest_merge_blocks`, `dispatch_snippet`, `fifo_plan.json`, `MANUAL_ACTIONS.md`. User guide: `FIFO_MULTIPLEXING.md`. |
 | `cogent_errors.py` | `CogentError` (operation / reason / item / hint / log path), `log_failure`, `missing_config_entry`. |
 | `cogent_io.py` | `open_output`, `close_output`, `abort_output`; tracks `current_output` for messages. |
 | `py2compat.py` | `Py2Dict` (CPython 2.7 dict iteration order, **32-bit** `size_t`), `py2_print` (print-statement softspace). Both are visible in the generated files. |
@@ -69,7 +74,7 @@ Key modules (all under `Network_CodeGen_S220/`):
 | `msg.py`, `il_par_h_generation.py`, `il_par_c_generation.py`, `vnim_app_signals_par.py`, `can_rx_filt_gen.py` | Generators (2to3 + `//` + encodings; `print` is `py2_print`). `msg.py` also has `multiplex_layout_problem`, `find_unsupported_multiplex`, `UnsupportedMultiplexLayout`. |
 | `Can_dbc_gen.py`, `Can_filter_python_gen.py` | HTML/JS page generators. |
 | `CoGeNT.spec` | PyInstaller onedir build (files beside the exe, like the old py2exe layout). |
-| `tools/` | `gen_harness.py` (headless generation, Py2/Py3 compatible), `compare_legacy.py`, `build_fixtures.py`, `dump_dbc.py`, `make_expected.py` (Python 2.7 oracle), `find_divisions.py`, `apply_output_helpers.py` (one-off port tools). |
+| `tools/` | `gen_harness.py` (headless generation, Py2/Py3 compatible), `compare_legacy.py`, `build_fixtures.py`, `dump_dbc.py`, `make_expected.py` (Python 2.7 oracle), `find_divisions.py`, `apply_output_helpers.py` (one-off port tools), `compare_reference.py` (generated vs edited workspace: text, rules, dispatch, `nw_can_dll.c` check), `carry_forward.py` (three-way re-application of hand edits to a new generation, uses `git merge-file`). |
 | `tests/` | pytest suite (see section 7). |
 
 Encodings: DBC input and C/HTML/JS outputs use `latin-1` (byte pass-through, like Python 2 `str`);
@@ -148,6 +153,14 @@ Done (merged to `main`):
   `docs/superpowers/specs/2026-10-08-error-popups.md`).
 - PyInstaller packaging; headless harness and tools; 283 automated tests.
 
+Done on branch `fifo-multiplexing` (2026-10-09):
+- 192-rule receive limit checked before generation (counts, overflowing messages, candidate ID blocks)
+  and after generation (generated rules = plan). Limits are configurable.
+- Merged ID blocks and receive-only messages from `data/CanFifoConfiguration.data` reproduce the manual
+  FIFO edits of the S2XX workspace exactly (184 rules, dispatch vectors 64/64/56).
+- `CODE_GEN/MANUAL_ACTIONS.md` (Manual Action Required report) and `CODE_GEN/fifo_plan.json`.
+- `tools/carry_forward.py` re-applies the remaining hand edits; `tools/compare_reference.py` verifies.
+
 Remaining (see section 8 for the ordered list): multiplex layouts beyond VCU5_500, the Python 2.7 oracle
 comparison, the optional workflow fixes (load configuration also loads the DBC; working-directory
 independence), a non-blocking UI during code gen, and repository hygiene/cleanup items.
@@ -219,8 +232,8 @@ Full table: `docs/superpowers/specs/2026-10-08-error-popups.md`.
 
 ## 7. Tests
 
-283 tests are collected. GUI tests need an interactive Windows desktop session; the e2e test needs the
-built exe.
+332 tests are collected (283 before the FIFO work). GUI tests need an interactive Windows desktop session;
+the e2e test needs the built exe.
 
 | File | Count | What it checks |
 |---|---|---|
@@ -234,7 +247,11 @@ built exe.
 | `tests/test_parser_encoding.py`, `tests/test_pages_encoding.py` | 1 + 1 | non-cp1252 bytes in DBC |
 | `tests/gui/test_webgui.py` | 9 | shim: slots, queued calls, backslash/quote paths, QtWebKit checkbox rule, >2 MB page, alerts, temp cleanup, static files |
 | `tests/gui/test_gui_generate.py` | 6 | full GUI flow = legacy (36144_2), real Save and Back forms keep `.data` byte-identical, repeat, Browse, save/load configuration, failure then page still opens |
-| `tests/gui/test_gui_errors.py` | 18 | every reworked popup, with the real 40024 `_Edited` DBC from a folder named `input DBC (Rev 40024, it's edited)`; code gen = `CODE_GEN/DBC_40024_2` |
+| `tests/gui/test_gui_errors.py` | 21 | every reworked popup, with the real 40024 `_Edited` DBC from a folder named `input DBC (Rev 40024, it's edited)`; code gen = `CODE_GEN/DBC_40024_2` (with legacy limits); FIFO overflow popup, success popup with rule count and manual actions, FIFO file in saved archives, old archive sets the FIFO file aside |
+| `tests/test_fifo.py` | 20 | FIFO configuration file, 192/193 boundary, per-FIFO limit, merge rules (lowest ID keeps slot, same DLC, same layer, non-empty), additional messages, 40024 overflow + candidates, 40024 reference config = 64/64/56, determinism, dispatch snippet, readers |
+| `tests/test_fifo_pipeline.py` | 11 | pipeline: overflow explained before writing, 184/183 boundary on real data, invalid config, unknown message, generated rules checked against the plan, reports, repeat run identical incl. reports, archive handling |
+| `tests/test_carry_forward.py` | 9 | three-way merge: separate edits kept, conflicts reported with location and all versions, white-space and header-stamp resolution, origin warning, missing files, CRLF, inputs never written, idempotence, exit codes |
+| `tests/test_reference_workspace.py` | 6 | needs `D:\networkgen\dc.app.scl.vehiclecomm` (or `COGENT_REFERENCE_WS`), skipped otherwise: rules and dispatch identical to the workspace, normalized text identical, workspace `nw_can_dll.c` maps every merged ID, generation + carry-forward = workspace except the header stamp (workspace hashes unchanged) |
 | `tests/e2e/test_exe_smoke.py` | 2 | packaged exe (36144_2 and 40024): Load DBC, both pages with real Save and Back, code gen, outputs = legacy. Web content driven via Chrome DevTools Protocol (`QTWEBENGINE_REMOTE_DEBUGGING`, 127.0.0.1), native alert dialogs via UI Automation. |
 
 Fixtures (`tests/fixtures/<name>/`, rebuilt by `tools/build_fixtures.py`): `s2xx_40024`
@@ -250,6 +267,14 @@ Latest results (2026-10-08, code = `ad5fbd0`, identical to current `main`):
 | `.venv/Scripts/python.exe -m pytest tests/gui` | **33 passed**, 2 min 54 s |
 | `.venv/Scripts/python.exe -m pytest tests/e2e` (after a PyInstaller build) | **2 passed**, 1 min 58 s |
 | `python -W error -m py_compile` on all 15 runtime modules (2026-10-09) | no errors or warnings |
+
+Results on branch `fifo-multiplexing` (2026-10-09, after the FIFO work):
+
+| Command | Result |
+|---|---|
+| `.venv/Scripts/python.exe -m pytest -m "not gui and not e2e"` | **150 passed, 144 skipped** (all skips = Python 2.7 oracle), 10 min 38 s |
+| `.venv/Scripts/python.exe -m pytest tests/gui -m gui` | **36 passed**, 2 min 55 s |
+| `.venv/Scripts/python.exe -m pytest tests/e2e -m e2e` (after a PyInstaller build) | **2 passed**, 1 min 43 s |
 
 Other verification done:
 - Your scenario: 40024 `_Edited` DBC + `CODE_GEN/DBC_40024_2` config gives 11/11 files identical to
@@ -267,11 +292,12 @@ Test notes:
 
 ## 8. Next steps (in order)
 
-1. **Decide multiplex support** for `BMS19_100`/`BMS20_100`-type messages (issue 1). Write down the
-   intended C layout (union per multiplexer value with several signals at offsets, multiplexor
-   position), then extend `msg.msg_struct_gen_multiplex` and `msg.multiplex_layout_problem`, check how
-   `il_par_h/c` and `vnim_app_signals_par` handle multiplexed Rx messages, and add a fixture with BMS19
-   enabled. Until then the popup tells users to untick it.
+1. **Decide multiplex support** for `BMS19_100`/`BMS20_100`-type messages (issue 1). The user's S2XX
+   workspace has hand-written C for both messages, but in two different layouts (details in the local,
+   uncommitted `local_reports/reference_workspace_analysis.md`). Choose one layout with the user, then extend `msg.msg_struct_gen_multiplex` and
+   `msg.multiplex_layout_problem`, check how `il_par_h/c` and `vnim_app_signals_par` handle multiplexed Rx
+   messages, and add a fixture with BMS19 enabled. Until then they are received via
+   `additional_rx_messages` and their code is carried forward with `tools/carry_forward.py`.
 2. **Python 2.7 oracle** (issue 2), if allowed: install 2.7.18, run `tools/make_expected.py`, commit
    `tests/expected/`, re-run the suite (the 144 skipped tests then run).
 3. **Working-directory independence** (issue 4): add `os.chdir(os.path.dirname(os.path.abspath(__file__)))`

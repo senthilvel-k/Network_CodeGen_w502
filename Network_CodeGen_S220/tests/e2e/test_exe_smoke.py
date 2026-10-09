@@ -27,6 +27,10 @@ pytestmark = pytest.mark.e2e
 EXE_DIR = ROOT / "dist_py3" / "CoGeNT"
 # s2xx_40024: the real "_Edited" 40024 DBC with the configuration saved in CODE_GEN/DBC_40024_2
 FIXTURES = ["s237_36144_2", "s2xx_40024"]
+# 40024 needs 209 receive rules without merging; with the merges of the S2XX workspace it needs 184.
+FIFO_CONFIGS = {"s2xx_40024": {"merge_blocks": [{"base": "0x3D0", "mask": "0x7F0"}, {"base": "0x4F0", "mask": "0x7F0"}],
+                               "additional_rx_messages": ["BMS19_100", "BMS20_100"]}}
+FIFO_FILES = ["can_rxrule.cfg", "nw_can_dll.h"]
 
 
 def _free_port():
@@ -105,7 +109,10 @@ def test_exe_generates_code_like_legacy(tmp_path, fixture_name):
     home = tmp_path / "CoGeNT exe copy"
     shutil.copytree(EXE_DIR, home)
     fx = load_fixture(fixture_name)
-    shutil.copytree(fx.data_dir, home / "data", dirs_exist_ok=True)
+    shutil.rmtree(home / "data")                    # the fixture's data folder is the whole project configuration
+    shutil.copytree(fx.data_dir, home / "data")
+    if fixture_name in FIFO_CONFIGS:
+        (home / "data" / "CanFifoConfiguration.data").write_text(json.dumps(FIFO_CONFIGS[fixture_name]), encoding="utf-8")
     dbc = tmp_path / "input DBC" / fx.dbc.name
     dbc.parent.mkdir()
     shutil.copyfile(fx.dbc, dbc)
@@ -138,8 +145,15 @@ def test_exe_generates_code_like_legacy(tmp_path, fixture_name):
         legacy_dir = LEGACY_REFS[fixture_name][0]
         for name in CODE_FILES:
             assert (home / "CODE_GEN" / name).stat().st_size > 0, name
+            if fixture_name in FIFO_CONFIGS and name in FIFO_FILES:
+                continue                            # merged ID blocks: checked against the plan below
             assert normalize_header((home / "CODE_GEN" / name).read_bytes()) == \
                 normalize_header((legacy_dir / name).read_bytes()), name
+        plan = json.loads((home / "CODE_GEN" / "fifo_plan.json").read_text(encoding="utf-8"))
+        assert plan["total_rules"] <= 192
+        assert (home / "CODE_GEN" / "MANUAL_ACTIONS.md").exists()
+        if fixture_name in FIFO_CONFIGS:
+            assert plan["fifo_counts"] == [64, 64, 56]
     finally:
         if cdp:
             cdp.close()

@@ -4,6 +4,7 @@ Uses the real 40024 "_Edited" DBC (from a folder whose name contains spaces and 
 with the configuration saved in CODE_GEN/DBC_40024_2. Tests run in file order and share one app."""
 import json
 import shutil
+import zipfile
 
 import pytest
 
@@ -15,12 +16,18 @@ FIXTURE = "s2xx_40024"
 MSG_LINK = "document.querySelector('a[href=\"BackEnd.Can_dbc0_msg\"]').click()"
 SIG_LINK = "document.querySelector('a[href=\"BackEnd.Can_dbc0_sig\"]').click()"
 CODE_GEN_BTN = "document.querySelector('input[name=code_generate]').click()"
+FIFO_FILE = "CanFifoConfiguration.data"
+# The legacy runs of 40024 use 209 receive rules; these limits keep the legacy comparisons meaningful.
+LEGACY_LIMITS = {"max_rx_rules": 256, "max_rules_per_fifo": 128}
+REFERENCE_CONFIG = {"merge_blocks": [{"base": "0x3D0", "mask": "0x7F0"}, {"base": "0x4F0", "mask": "0x7F0"}],
+                    "additional_rx_messages": ["BMS19_100", "BMS20_100"]}
 
 
 @pytest.fixture(scope="module")
 def app(tmp_path_factory):
     back_end, home, fx, dbc, restore = start_app_copy(tmp_path_factory, FIXTURE,
                                                      dbc_folder="input DBC (Rev 40024, it's edited)")
+    (home / "data" / FIFO_FILE).write_text(json.dumps(LEGACY_LIMITS), encoding="utf-8")
     yield back_end, home, fx, dbc
     restore()
 
@@ -165,6 +172,39 @@ def test_code_gen_failure_explains_and_keeps_previous_files(qtbot, app):
     gui.alerts.clear()
 
 
+def test_code_gen_overflow_popup_names_rules_messages_and_candidates(qtbot, app):
+    back_end, home, fx, dbc = app
+    gui = back_end.app
+    before = {n: (home / "CODE_GEN" / n).read_bytes() for n in CODE_FILES}
+    (home / "data" / FIFO_FILE).unlink()                     # platform defaults: 192 rules, 64 per FIFO
+    gui.alerts.clear()
+    navigate(qtbot, gui, CODE_GEN_BTN)
+    settle(qtbot, gui)
+    assert len(gui.alerts) == 1, gui.alerts
+    text = gui.alerts[0]
+    assert text.startswith("Code generation failed while planning the CAN receive rules")
+    assert "209 receive rules are needed but the controller accepts at most 192" in text
+    assert "0x4F0-0x4FF: 16 messages" in text and "merge_blocks" in text and "Traceback" not in text
+    assert {n: (home / "CODE_GEN" / n).read_bytes() for n in CODE_FILES} == before
+    gui.alerts.clear()
+
+
+def test_code_gen_with_merged_blocks_reports_rules_and_manual_actions(qtbot, app):
+    back_end, home, fx, dbc = app
+    gui = back_end.app
+    (home / "data" / FIFO_FILE).write_text(json.dumps(REFERENCE_CONFIG), encoding="utf-8")
+    gui.alerts.clear()
+    navigate(qtbot, gui, CODE_GEN_BTN)
+    text = wait_alert(qtbot, gui, "Code Generated in CODE_GEN folder")
+    assert "CAN receive rules: 184 of 192 (FIFO 0/1/2: 64/64/56)" in text
+    assert "Manual action required: 5 item(s), see CODE_GEN\\MANUAL_ACTIONS.md" in text
+    report = (home / "CODE_GEN" / "MANUAL_ACTIONS.md").read_text(encoding="utf-8")
+    assert "nw_can_dll.c dispatch for the merged block 0x3D0-0x3DF" in report
+    assert json.loads((home / "CODE_GEN" / "fifo_plan.json").read_text(encoding="utf-8"))["total_rules"] == 184
+    settle(qtbot, gui)
+    gui.alerts.clear()
+
+
 def test_save_configuration_failure_is_not_reported_as_success(qtbot, app):
     back_end, home, fx, dbc = app
     gui = back_end.app
@@ -184,6 +224,8 @@ def test_save_configuration_reports_the_archive_path(qtbot, app):
     text = wait_alert(qtbot, gui, "Configuration saved successfully")
     saved = list((home / "Config").glob("*.cfg"))
     assert len(saved) == 1 and saved[0].name in text
+    with zipfile.ZipFile(saved[0]) as z:                       # the FIFO configuration belongs to the project
+        assert json.loads(z.read("data/" + FIFO_FILE).decode("utf-8")) == REFERENCE_CONFIG
     settle(qtbot, gui)
     gui.alerts.clear()
 
@@ -209,6 +251,25 @@ def test_load_configuration_rejects_a_non_archive_with_reason(qtbot, app, monkey
     assert len(gui.alerts) == 1, gui.alerts
     assert "Loading the configuration failed" in gui.alerts[0] and "notes.txt" in gui.alerts[0]
     assert "configuration archive" in gui.alerts[0]
+    gui.alerts.clear()
+
+
+def test_load_archive_without_fifo_configuration_sets_the_current_one_aside(qtbot, app, monkeypatch):
+    back_end, home, fx, dbc = app
+    gui = back_end.app
+    old = home / "older project.cfg"
+    with zipfile.ZipFile(old, "w") as z:                       # as saved before the FIFO configuration existed
+        for name in ("dbc_details.data", "CanDbcMsgConfiguration.data", "CanDbcSigConfiguration.data"):
+            z.write(home / "data" / name, "data/" + name)
+    monkeypatch.setattr(back_end.QtWidgets.QFileDialog, "getOpenFileName", staticmethod(lambda *a, **k: (str(old), "")))
+    js(qtbot, gui, "document.querySelector('input[name=load_cofiguration]').click(); 1")
+    text = wait_alert(qtbot, gui, "Configuration loaded successfully")
+    assert "renamed to CanFifoConfiguration.data.previous" in text
+    assert not (home / "data" / FIFO_FILE).exists()
+    aside = home / "data" / (FIFO_FILE + ".previous")
+    assert json.loads(aside.read_text(encoding="utf-8")) == REFERENCE_CONFIG
+    aside.replace(home / "data" / FIFO_FILE)
+    settle(qtbot, gui)
     gui.alerts.clear()
 
 
