@@ -3,3 +3,5 @@ CODE_GEN/errorlog.txt
 .pytest_cache/
 dist_py3/
 build_py3/
+logs/
+CODE_GEN/.staging/
