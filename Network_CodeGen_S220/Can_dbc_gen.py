@@ -202,7 +202,7 @@ def html_mes(file_name,node):
     </head>
     <body onload="load()" class="w3-container w3-grey">"""
 
-    file1=open(html_dir+'Tool_Index_Page.html','r')
+    file1=open(html_dir+'Tool_Index_Page.html','r',encoding='latin-1')
     start=0
     for line in file1.readlines():
         if '<!--copy_start-->' == line.rstrip('\n'):
@@ -407,11 +407,11 @@ def html_mes(file_name,node):
     """
 
     #print html_css_content
-    html= open(html_dir+'CanDbcMsgConfiguration.html', 'w')
+    html= open(html_dir+'CanDbcMsgConfiguration.html', 'w',encoding='latin-1')
     html.write(html_css_content)
     html.close()
     #print js
-    jscript = open(java_dir+'CanDbcMsgConfiguration.js', 'w')
+    jscript = open(java_dir+'CanDbcMsgConfiguration.js', 'w',encoding='latin-1')
    
     jscript.write(js)
     
@@ -477,7 +477,7 @@ def html_sig(file_name,node):
     </head>
     <body onload="load()" class="w3-container w3-grey">"""
 
-    file1=open(html_dir+'Tool_Index_Page.html','r')
+    file1=open(html_dir+'Tool_Index_Page.html','r',encoding='latin-1')
     start=0
     for line in file1.readlines():
         if '<!--copy_start-->' == line.rstrip('\n'):
@@ -587,7 +587,7 @@ def html_sig(file_name,node):
     dbc=dbc_parser(file_name,node)
     
     
-    vnim_cfg_file = open(data_dir+"CanDbcMsgConfiguration.data",'r')
+    vnim_cfg_file = open(data_dir+"CanDbcMsgConfiguration.data",'r',encoding='utf-8')
     vnim_msg_cfg_data = json.loads(vnim_cfg_file.read())
     vnim_cfg_file.close()
   
@@ -691,11 +691,11 @@ def html_sig(file_name,node):
     </html>
     """
     #print html_css_content
-    html= open(html_dir+'CanDbcSigConfiguration.html', 'w')
+    html= open(html_dir+'CanDbcSigConfiguration.html', 'w',encoding='latin-1')
     html.write(html_css_content)
     html.close()
     #print js
-    jscript = open(java_dir+'CanDbcSigConfiguration.js', 'w')
+    jscript = open(java_dir+'CanDbcSigConfiguration.js', 'w',encoding='latin-1')
 
     jscript.write(js)
     

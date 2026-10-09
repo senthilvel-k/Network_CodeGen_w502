@@ -1,0 +1,7 @@
+{
+ "dbc": "S220&S237_IVN_Communication_Matrix_SMART_CORE_Rev36144_080224_Edited.dbc",
+ "node": "SMART_CORE",
+ "source_cfg": "Config/Config_DBC_36144_2.cfg",
+ "source_dbc": "DBC/S220&S237_IVN_Communication_Matrix_SMART_CORE_Rev36144_080224_Edited.dbc",
+ "dbc_patches": []
+}

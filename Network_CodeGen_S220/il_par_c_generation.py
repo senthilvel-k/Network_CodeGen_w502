@@ -1,5 +1,7 @@
 import sys,json
 import os
+from cogent_io import open_output, close_output
+from py2compat import py2_print as print, Py2Dict  # Python 2 print/dict-order semantics
 dbc=None
 dbc_file_name=None
 
@@ -54,7 +56,7 @@ Change Description	: Tool Generated code
 def message_Put_tx():
   global dbc,datatype_16,datatype_8,datatype_32,il_data_dir,tp_generic_config,nm_generic_config,il_generic_config
   
-  vnim_cfg_file = open(il_data_dir+"CanDbcMsgConfiguration.data",'r')
+  vnim_cfg_file = open(il_data_dir+"CanDbcMsgConfiguration.data",'r',encoding='utf-8')
   vnim_msg_cfg_data = json.loads(vnim_cfg_file.read())
   vnim_cfg_file.close()
   
@@ -71,10 +73,10 @@ def message_Put_tx():
   
   il_sorted_mes_tx = sorted(il_msg_tx,key = lambda x: x['Msg_name'])
           
-  print '''/* ====================================================================================
+  print('''/* ====================================================================================
   Interaction Layer Receive Signal Tx Put Functions
   =====================================================================================*/
-'''
+''')
   for mes in il_sorted_mes_tx:
     if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_tx_enable'] in ['on','On',1,'1','ON']:
       sig_list =[]
@@ -96,15 +98,15 @@ def message_Put_tx():
         for signals in sorted_bit:
           signal_occur=0
           sig_start_bit = int(signals['Endbit'])
-          layout_row_start=int(signals['Endbit'])/8
+          layout_row_start=int(signals['Endbit'])//8
           layout_col_start=int(signals['Endbit'])%8
           signal_length=int(signals['Len'])
           sig_name = signals['Sig_name']
           end_bit=int(signals['Endbit'])+signal_length-1
-          layout_row_end = end_bit/8
+          layout_row_end = end_bit//8
 
           byte_no=0
-          byte_no_1=(signal_length/8)-1 if signal_length%8 == 0 else signal_length/8
+          byte_no_1=(signal_length//8)-1 if signal_length%8 == 0 else signal_length//8
 
     
           if signals['Order'] == 'Intel':  
@@ -112,8 +114,8 @@ def message_Put_tx():
               #print datatype_8+' sigData)'
               #print '   IlEnterCritical(INST0);'
               if layout_row_start != layout_row_end: 
-                print 'void ILPutTx_'+sig_name.upper()+'_data('+datatype_8+' sigData)'
-                print '{'
+                print('void ILPutTx_'+sig_name.upper()+'_data('+datatype_8+' sigData)')
+                print('{')
                 bits_left = 8 - (sig_start_bit % 8)
                 if (bits_left < signal_length):
                   rem = signal_length
@@ -128,16 +130,16 @@ def message_Put_tx():
                     a = '1' * bits_to_be_filled
                     if a != '11111111':
                       if cl != 0:
-                        print '   ' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + sig_name.upper() + '_' + str(cl) + ' = ((' + datatype_8 + ') (((sigData) >> '+str(bits_left)+') & ' + "0x%02x" % int(a, 2) + '));'
+                        print('   ' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + sig_name.upper() + '_' + str(cl) + ' = ((' + datatype_8 + ') (((sigData) >> '+str(bits_left)+') & ' + "0x%02x" % int(a, 2) + '));')
                       else:
-                        print '   ' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + sig_name.upper() + '_' + str(cl) + ' = ((' + datatype_8 + ') (sigData & ' + "0x%02x" % int(a, 2) + '));'
+                        print('   ' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + sig_name.upper() + '_' + str(cl) + ' = ((' + datatype_8 + ') (sigData & ' + "0x%02x" % int(a, 2) + '));')
                     else:
-                      print '   ' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + sig_name.upper() + '_' + str(cl) + ' = ((' + datatype_8 + ') sigData );'
+                      print('   ' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + sig_name.upper() + '_' + str(cl) + ' = ((' + datatype_8 + ') sigData );')
                     cl += 1
 
                 else:
                   rem=signal_length
-                  start_bit_1=sig_start_bit/8
+                  start_bit_1=sig_start_bit//8
                   cl=0
                   while(rem>0):
                     if cl==0:
@@ -148,13 +150,13 @@ def message_Put_tx():
                       rem -= bits_to_be_filled
                     a='1'*bits_to_be_filled
                     if a!='11111111':
-                      print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') (sigData & '+"0x%02x"%int(a,2)+'));'
+                      print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') (sigData & '+"0x%02x"%int(a,2)+'));')
                     else:
-                      print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') sigData );'
+                      print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') sigData );')
                     cl+=1
 
               #print '   IlLeaveCritical(INST0);\n}\n'
-                print '}\n'
+                print('}\n')
 
             elif signal_length>8 and signal_length <= 32:
               start_bit=sig_start_bit
@@ -165,12 +167,12 @@ def message_Put_tx():
               byt = 0
               
               if signal_length <=16:
-                print 'void ILPutTx_'+sig_name.upper()+'_data('+datatype_16+' sig_Data)'
-                print '{'
+                print('void ILPutTx_'+sig_name.upper()+'_data('+datatype_16+' sig_Data)')
+                print('{')
                 #print'   IlEnterCritical(INST0);'
               elif signal_length >16 and signal_length <= 32:
-                print 'void ILPutTx_'+sig_name.upper()+'_data('+datatype_32+' sig_Data)'
-                print '{' 
+                print('void ILPutTx_'+sig_name.upper()+'_data('+datatype_32+' sig_Data)')
+                print('{') 
               else:
                 pass
                 
@@ -182,70 +184,70 @@ def message_Put_tx():
                   rem-=bit_to_be_filled
                   start_bit=start_bit+bit_to_be_filled
                   a='1'*bit_to_be_filled
-                  print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((sig_Data) & '+"0x%02x"%int(a,2)+');'
+                  print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((sig_Data) & '+"0x%02x"%int(a,2)+');')
                   cl+=1
                 else:
                   if path != 0:
                     if rem >=8:
                       rem=rem-8
-                      print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((sig_Data) >> '+str(bit_to_be_filled)+') & 0xff);'
+                      print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((sig_Data) >> '+str(bit_to_be_filled)+') & 0xff);')
                       bit_to_be_filled+=8
                     elif rem>0 and rem<8:
                       a='1'*rem
                       #((vuint8) ((sigData >> 8) & (vuint8) 0x03u));
-                      print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((sig_Data) >> '+str(bit_to_be_filled)+') & '+"0x%02x"%int(a,2)+');'
+                      print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((sig_Data) >> '+str(bit_to_be_filled)+') & '+"0x%02x"%int(a,2)+');')
                       rem=0
                     start_bit+=8
                     cl+=1
                   else:
                     if rem>=8:
                       if cl == 0:
-                        print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((sig_Data) & 0xff);'
+                        print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((sig_Data) & 0xff);')
                       else:
                         byt+=8
-                        print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((sig_Data) >>' +str(byt)+') & 0xff);'
+                        print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((sig_Data) >>' +str(byt)+') & 0xff);')
                         #print 'byte'+str(cl)+'data'+'>>8'
                       rem-=8
                     else:
                       byt += 8
                       a='1'*rem
-                      print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((sig_Data) >> ' +str(byt)+') & '+"0x%02x"%int(a,2)+');'
+                      print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((sig_Data) >> ' +str(byt)+') & '+"0x%02x"%int(a,2)+');')
                       #print 'byte'+str(cl)+'data'+'>>8'+"0x%02x"%int(a,2)
                       rem-=rem
                     cl+=1
                     #print '   IlLeaveCritical(INST0);\n}\n'
-              print '}\n'
+              print('}\n')
           
             elif signal_length <=64 and signal_length >32 :
               co = 0
-              print 'void ILPutTx_'+sig_name.upper()+'_data('+datatype_8+' const * const pData)'
-              print '{\n'
+              print('void ILPutTx_'+sig_name.upper()+'_data('+datatype_8+' const * const pData)')
+              print('{\n')
               #print '   IlEnterCritical(INST0);'
               #print co,signal_length
-              while (co < signal_length/8):
-                print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(co) +' = pData['+str(co)+'];'
+              while (co < signal_length//8):
+                print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(co) +' = pData['+str(co)+'];')
                 co+=1
                 #print '   IlLeaveCritical(INST0);\n}\n'
-              print '}\n'
+              print('}\n')
 
             else:
-              print 'fail'
+              print('fail')
       
           elif signals['Order'] == 'Motorola':
             if sig_start_bit == 7 and sig_start_bit ==1 :
               start_bit=sig_start_bit
             else:
-              start_bit = (sig_start_bit-7) + 8*((signal_length/8)-1)
+              start_bit = (sig_start_bit-7) + 8*((signal_length//8)-1)
               
               if signal_length>32 and signal_length<=64:
-                print 'void ILPutTx_'+sig_name.upper()+'_data('+datatype_8+' const * const pData)'
-                print '{\n'
+                print('void ILPutTx_'+sig_name.upper()+'_data('+datatype_8+' const * const pData)')
+                print('{\n')
                 #print '   IlEnterCritical(INST0);'
                 co = 0
-                while (co < signal_length/8):
-                  print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(co) +' = pData['+str(co)+'];'
+                while (co < signal_length//8):
+                  print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(co) +' = pData['+str(co)+'];')
                   co+=1
-                print '}\n'
+                print('}\n')
               elif signal_length>8 and signal_length <= 32:
                   length=signal_length
                   rem=length
@@ -253,12 +255,12 @@ def message_Put_tx():
                   path=0
                   byt = 0
                   if signal_length<=16:
-                    print 'void ILPutTx_'+sig_name.upper()+'_data('+datatype_16+' sig_Data)'
-                    print '{'
+                    print('void ILPutTx_'+sig_name.upper()+'_data('+datatype_16+' sig_Data)')
+                    print('{')
                     #print'   IlEnterCritical(INST0);'
                   elif signal_length>16 and signal_length <=32:
-                    print 'void ILPutTx_'+sig_name.upper()+'_data('+datatype_32+' sig_Data)'
-                    print '{' 
+                    print('void ILPutTx_'+sig_name.upper()+'_data('+datatype_32+' sig_Data)')
+                    print('{') 
                   else:
                     pass
                     
@@ -271,45 +273,45 @@ def message_Put_tx():
                       rem-=bit_to_be_filled
                       start_bit=start_bit+bit_to_be_filled
                       a='1'*bit_to_be_filled
-                      print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((sig_Data) & '+"0x%02x"%int(a,2)+');'
+                      print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((sig_Data) & '+"0x%02x"%int(a,2)+');')
                       cl+=1
                     else:
                       if path != 0:
                         if rem >=8:
                           rem=rem-8
-                          print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((sig_Data) >> '+str(bit_to_be_filled)+') & 0xff);'
+                          print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((sig_Data) >> '+str(bit_to_be_filled)+') & 0xff);')
                           bit_to_be_filled+=8
                         elif rem>0 and rem<8:
                           a='1'*rem
                           #((vuint8) ((sigData >> 8) & (vuint8) 0x03u));
-                          print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((sig_Data) >> '+str(bit_to_be_filled)+') & '+"0x%02x"%int(a,2)+');'
+                          print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((sig_Data) >> '+str(bit_to_be_filled)+') & '+"0x%02x"%int(a,2)+');')
                           rem=0
                         start_bit+=8
                         cl+=1
                       else:
                         if rem>=8:
                           if cl == 0:
-                            print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((sig_Data) & 0xff);'
+                            print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((sig_Data) & 0xff);')
                           else:
                             byt+=8
-                            print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((sig_Data) >>' +str(byt)+') & 0xff);'
+                            print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((sig_Data) >>' +str(byt)+') & 0xff);')
                             #print 'byte'+str(cl)+'data'+'>>8'
                           rem-=8
                         else:
                           a='1'*rem
-                          print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((sig_Data) >> 8'+') & '+"0x%02x"%int(a,2)+');'
+                          print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((sig_Data) >> 8'+') & '+"0x%02x"%int(a,2)+');')
                           #print 'byte'+str(cl)+'data'+'>>8'+"0x%02x"%int(a,2)
                           rem-=rem
                         cl+=1
-                  print '}\n'
+                  print('}\n')
               elif signal_length <=8 :
-                layout_row_start = start_bit/8
-                layout_row_end = (sig_start_bit/8)
+                layout_row_start = start_bit//8
+                layout_row_end = (sig_start_bit//8)
                 if layout_row_start != layout_row_end: 
-                  print 'void ILPutTx'+sig_name.upper()+'_data('+datatype_8+' sigData)'
-                  print '{'
+                  print('void ILPutTx'+sig_name.upper()+'_data('+datatype_8+' sigData)')
+                  print('{')
                   rem=signal_length
-                  start_bit_1=sig_start_bit/8
+                  start_bit_1=sig_start_bit//8
                   cl=0
                   while(rem>0):
                     if cl==0:
@@ -320,16 +322,16 @@ def message_Put_tx():
                       rem -= bits_to_be_filled
                     a='1'*bits_to_be_filled
                     if a!='11111111':
-                      print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') (sigData & '+"0x%02x"%int(a,2)+'));'
+                      print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') (sigData & '+"0x%02x"%int(a,2)+'));')
                     else:
-                      print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') sigData );'
+                      print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') sigData );')
                     cl+=1
-                  print '}\n'
+                  print('}\n')
                 
 def message_Put_rx():
   global dbc,datatype_16,datatype_8,datatype_32,il_data_dir,tp_generic_config,nm_generic_config,il_generic_config
   
-  vnim_cfg_file = open(il_data_dir+"CanDbcMsgConfiguration.data",'r')
+  vnim_cfg_file = open(il_data_dir+"CanDbcMsgConfiguration.data",'r',encoding='utf-8')
   vnim_msg_cfg_data = json.loads(vnim_cfg_file.read())
   vnim_cfg_file.close()
 
@@ -380,10 +382,10 @@ def message_Put_rx():
       if mes['Msg_name'] == order_msg:
         il_sorted_mes_rx_ordered.append(mes)
   
-  print '''/* ====================================================================================
+  print('''/* ====================================================================================
   Interaction Layer Receive Signal Rx Put Functions
   =====================================================================================*/
-'''
+''')
 
   for mes in il_sorted_mes_rx_ordered:
     #print mes
@@ -415,15 +417,15 @@ def message_Put_rx():
                 multiplexor_index=mul_msg['Multiplex_group'].index(sig_list)
           signal_occur=0
           sig_start_bit = int(signals['Endbit'])
-          layout_row_start=int(signals['Endbit'])/8
+          layout_row_start=int(signals['Endbit'])//8
           layout_col_start=int(signals['Endbit'])%8
           signal_length=int(signals['Len'])
           sig_name = signals['Sig_name']
           end_bit=int(signals['Endbit'])+signal_length-1
-          layout_row_end = end_bit/8
+          layout_row_end = end_bit//8
 
           byte_no=0
-          byte_no_1=(signal_length/8)-1 if signal_length%8 == 0 else signal_length/8
+          byte_no_1=(signal_length//8)-1 if signal_length%8 == 0 else signal_length//8
 
     
           if signals['Order'] == 'Intel':  
@@ -433,13 +435,13 @@ def message_Put_rx():
                 # print datatype_8+' sigData)'
                 # print '   IlEnterCritical(INST0);'
                 if layout_row_start != layout_row_end:
-                  print 'void ILRxPut_' + sig_name.upper() + '(' + datatype_8 + ' data)'
-                  print '{'
+                  print('void ILRxPut_' + sig_name.upper() + '(' + datatype_8 + ' data)')
+                  print('{')
                   # print '   CAN_CCR     saveCcr;'
-                  print '    CAN_ENTER_CRITICAL_SECTION(0);'
+                  print('    CAN_ENTER_CRITICAL_SECTION(0);')
                   # print'   IlEnterCritical(INST0);'
                   rem = signal_length
-                  start_bit_1 = sig_start_bit / 8
+                  start_bit_1 = sig_start_bit // 8
                   cl = 0
                   while (rem > 0):
                     if cl == 0:
@@ -453,49 +455,49 @@ def message_Put_rx():
                       if cl != 0:
                         if mes['Multiplex'] == 'YES':
                           if signals['Mul_order'] != 'root':
-                            print '   ' + mes['Msg_name'].upper() + '.' + mes[
-                              'Msg_name'].lower() + '.' + multiplexor_id.lower() + '_data' + '.' + multiplexor_id.lower() + '_' + str( multiplexor_index) + '.' + sig_name.upper() + '_' + str(cl) + ' = ((' + datatype_8 + ') (((data) >> '+str(bits_left)+') & ' + "0x%02x" % int(a, 2) + '));'
+                            print('   ' + mes['Msg_name'].upper() + '.' + mes[
+                              'Msg_name'].lower() + '.' + multiplexor_id.lower() + '_data' + '.' + multiplexor_id.lower() + '_' + str( multiplexor_index) + '.' + sig_name.upper() + '_' + str(cl) + ' = ((' + datatype_8 + ') (((data) >> '+str(bits_left)+') & ' + "0x%02x" % int(a, 2) + '));')
                           else:
                             # print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') (data & '+"0x%02x"%int(a,2)+'));'
-                            print '   ' + mes['Msg_name'].upper() + '.' + mes[
-                              'Msg_name'].lower() + '.' + sig_name.upper() + '_' + str(cl) + ' = ((' + datatype_8 + ') (((data) >> '+str(bits_left)+') & ' + "0x%02x" % int(a, 2) + '));'
+                            print('   ' + mes['Msg_name'].upper() + '.' + mes[
+                              'Msg_name'].lower() + '.' + sig_name.upper() + '_' + str(cl) + ' = ((' + datatype_8 + ') (((data) >> '+str(bits_left)+') & ' + "0x%02x" % int(a, 2) + '));')
                         else:
-                          print '   ' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + sig_name.upper() + '_' + str(cl) + ' = ((' + datatype_8 + ') (((data) >> '+str(bits_left)+') & ' + "0x%02x" % int(a, 2) + '));'
+                          print('   ' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + sig_name.upper() + '_' + str(cl) + ' = ((' + datatype_8 + ') (((data) >> '+str(bits_left)+') & ' + "0x%02x" % int(a, 2) + '));')
                       else:
                         if mes['Multiplex'] == 'YES':
                           if signals['Mul_order'] != 'root':
-                            print '   ' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + multiplexor_id.lower() + '_data' + '.' + multiplexor_id.lower() + '_' + str(multiplexor_index) + '.' + sig_name.upper() + '_' + str(cl) + ' = ((' + datatype_8 + ') (data & ' + "0x%02x" % int(a, 2) + '));'
+                            print('   ' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + multiplexor_id.lower() + '_data' + '.' + multiplexor_id.lower() + '_' + str(multiplexor_index) + '.' + sig_name.upper() + '_' + str(cl) + ' = ((' + datatype_8 + ') (data & ' + "0x%02x" % int(a, 2) + '));')
                           else:
                             # print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') (data & '+"0x%02x"%int(a,2)+'));'
-                            print '   ' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + sig_name.upper() + '_' + str(cl) + ' = ((' + datatype_8 + ') (data & ' + "0x%02x" % int(a, 2) + '));'
+                            print('   ' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + sig_name.upper() + '_' + str(cl) + ' = ((' + datatype_8 + ') (data & ' + "0x%02x" % int(a, 2) + '));')
                         else:
-                          print '   ' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + sig_name.upper() + '_' + str(cl) + ' = ((' + datatype_8 + ') (data & ' + "0x%02x" % int(a, 2) + '));'
+                          print('   ' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + sig_name.upper() + '_' + str(cl) + ' = ((' + datatype_8 + ') (data & ' + "0x%02x" % int(a, 2) + '));')
                     else:
                       if mes['Multiplex'] == 'YES':
                         if signals['Mul_order'] != 'root':
-                          print '   ' + mes['Msg_name'].upper() + '.' + mes[
-                            'Msg_name'].lower() + '.' + multiplexor_id.lower() + '_data' + '.' + multiplexor_id.lower() + '_' + str(multiplexor_index) + '.' + sig_name.upper() + '_' + str(cl) + ' = ((' + datatype_8 + ') data );'
+                          print('   ' + mes['Msg_name'].upper() + '.' + mes[
+                            'Msg_name'].lower() + '.' + multiplexor_id.lower() + '_data' + '.' + multiplexor_id.lower() + '_' + str(multiplexor_index) + '.' + sig_name.upper() + '_' + str(cl) + ' = ((' + datatype_8 + ') data );')
                         else:
-                          print '   ' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + sig_name.upper() + '_' + str(cl) + ' = ((' + datatype_8 + ') data );'
+                          print('   ' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + sig_name.upper() + '_' + str(cl) + ' = ((' + datatype_8 + ') data );')
 
                       else:
-                        print '   ' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + sig_name.upper() + '_' + str( cl) + ' = ((' + datatype_8 + ') data );'
+                        print('   ' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + sig_name.upper() + '_' + str( cl) + ' = ((' + datatype_8 + ') data );')
                     cl += 1
 
                   # print '   IlLeaveCritical(INST0);\n}\n'
-                  print '   CAN_EXIT_CRITICAL_SECTION(0);'
-                  print '}\n'
+                  print('   CAN_EXIT_CRITICAL_SECTION(0);')
+                  print('}\n')
               else:
                 #print datatype_8+' sigData)'
                 #print '   IlEnterCritical(INST0);'
                 if layout_row_start != layout_row_end:
-                  print 'void ILRxPut_'+sig_name.upper()+'('+datatype_8+' data)'
-                  print '{'
+                  print('void ILRxPut_'+sig_name.upper()+'('+datatype_8+' data)')
+                  print('{')
                   #print '   CAN_CCR     saveCcr;'
-                  print '    CAN_ENTER_CRITICAL_SECTION(0);'
+                  print('    CAN_ENTER_CRITICAL_SECTION(0);')
                   #print'   IlEnterCritical(INST0);'
                   rem=signal_length
-                  start_bit_1=sig_start_bit/8
+                  start_bit_1=sig_start_bit//8
                   cl=0
                   while(rem>0):
                     if cl==0:
@@ -508,27 +510,27 @@ def message_Put_rx():
                     if a!='11111111':
                       if mes['Multiplex'] == 'YES':
                         if signals['Mul_order'] != 'root':
-                          print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') (data & '+"0x%02x"%int(a,2)+'));'
+                          print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') (data & '+"0x%02x"%int(a,2)+'));')
                         else:
                           #print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') (data & '+"0x%02x"%int(a,2)+'));'
-                          print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') (data & '+"0x%02x"%int(a,2)+'));'
+                          print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') (data & '+"0x%02x"%int(a,2)+'));')
                       else:
-                        print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') (data & '+"0x%02x"%int(a,2)+'));'
+                        print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') (data & '+"0x%02x"%int(a,2)+'));')
 
                     else:
                       if mes['Multiplex'] == 'YES':
                         if signals['Mul_order'] != 'root':
-                          print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') data );'
+                          print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') data );')
                         else:
-                          print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') data );'
+                          print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') data );')
 
                       else:
-                        print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') data );'
+                        print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') data );')
                     cl+=1
 
                 #print '   IlLeaveCritical(INST0);\n}\n'
-                  print '   CAN_EXIT_CRITICAL_SECTION(0);'
-                  print '}\n'
+                  print('   CAN_EXIT_CRITICAL_SECTION(0);')
+                  print('}\n')
 
             elif signal_length>8 and signal_length <= 32:
               start_bit=sig_start_bit
@@ -539,16 +541,16 @@ def message_Put_rx():
               byt = 0
               
               if signal_length <=16:
-                print 'void ILRxPut_'+sig_name.upper()+'('+datatype_16+' data)'
-                print '{'
+                print('void ILRxPut_'+sig_name.upper()+'('+datatype_16+' data)')
+                print('{')
                 #print '   CAN_CCR     saveCcr;'
-                print '    CAN_ENTER_CRITICAL_SECTION(0);'
+                print('    CAN_ENTER_CRITICAL_SECTION(0);')
                 #print'   IlEnterCritical(INST0);'
               elif signal_length >16 and signal_length <= 32:
-                print 'void ILRxPut_'+sig_name.upper()+'('+datatype_32+' data)'
-                print '{' 
+                print('void ILRxPut_'+sig_name.upper()+'('+datatype_32+' data)')
+                print('{') 
                 #print '   CAN_CCR     saveCcr;'
-                print '    CAN_ENTER_CRITICAL_SECTION(0);'
+                print('    CAN_ENTER_CRITICAL_SECTION(0);')
               else:
                 pass
                 
@@ -562,12 +564,12 @@ def message_Put_rx():
                   a='1'*bit_to_be_filled
                   if mes['Multiplex'] == 'YES':
                     if signals['Mul_order'] != 'root':
-                      print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((data) & '+"0x%02x"%int(a,2)+');'
+                      print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((data) & '+"0x%02x"%int(a,2)+');')
                     else:
-                      print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((data) & '+"0x%02x"%int(a,2)+');'
+                      print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((data) & '+"0x%02x"%int(a,2)+');')
                     
                   else:
-                    print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((data) & '+"0x%02x"%int(a,2)+');'
+                    print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((data) & '+"0x%02x"%int(a,2)+');')
                   cl+=1
                 else:
                   if path != 0:
@@ -575,24 +577,24 @@ def message_Put_rx():
                       rem=rem-8
                       if mes['Multiplex'] == 'YES':
                         if signals['Mul_order'] != 'root':
-                          print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((data) >> '+str(bit_to_be_filled)+') & 0xff);'
+                          print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((data) >> '+str(bit_to_be_filled)+') & 0xff);')
                         else:
-                          print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((data) >> '+str(bit_to_be_filled)+') & 0xff);'
+                          print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((data) >> '+str(bit_to_be_filled)+') & 0xff);')
                           
                       else:
-                        print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((data) >> '+str(bit_to_be_filled)+') & 0xff);'
+                        print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((data) >> '+str(bit_to_be_filled)+') & 0xff);')
                       bit_to_be_filled+=8
                     elif rem>0 and rem<8:
                       a='1'*rem
                       #((vuint8) ((sigData >> 8) & (vuint8) 0x03u));
                       if mes['Multiplex'] == 'YES':
                         if signals['Mul_order'] != 'root':
-                          print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((data) >> '+str(bit_to_be_filled)+') & '+"0x%02x"%int(a,2)+');'
+                          print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((data) >> '+str(bit_to_be_filled)+') & '+"0x%02x"%int(a,2)+');')
                         else:
-                          print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((data) >> '+str(bit_to_be_filled)+') & '+"0x%02x"%int(a,2)+');'
+                          print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((data) >> '+str(bit_to_be_filled)+') & '+"0x%02x"%int(a,2)+');')
                           
                       else:
-                        print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((data) >> '+str(bit_to_be_filled)+') & '+"0x%02x"%int(a,2)+');'
+                        print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((data) >> '+str(bit_to_be_filled)+') & '+"0x%02x"%int(a,2)+');')
                       rem=0
                     start_bit+=8
                     cl+=1
@@ -601,21 +603,21 @@ def message_Put_rx():
                       if cl == 0:
                         if mes['Multiplex'] == 'YES':
                           if signals['Mul_order'] != 'root':
-                            print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((data) & 0xff);'
+                            print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((data) & 0xff);')
                           else:
-                            print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((data) & 0xff);'
+                            print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((data) & 0xff);')
                         else:
-                          print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((data) & 0xff);'
+                          print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((data) & 0xff);')
                       else:
                         byt+=8
                         if mes['Multiplex'] == 'YES':
                           if signals['Mul_order'] != 'root':
-                            print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((data) >>' +str(byt)+') & 0xff);'
+                            print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((data) >>' +str(byt)+') & 0xff);')
                           else:
-                            print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((data) >>' +str(byt)+') & 0xff);'
+                            print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((data) >>' +str(byt)+') & 0xff);')
                             
                         else:
-                          print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((data) >>' +str(byt)+') & 0xff);'
+                          print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((data) >>' +str(byt)+') & 0xff);')
                         #print 'byte'+str(cl)+'data'+'>>8'
                       rem-=8
                     else:
@@ -623,69 +625,69 @@ def message_Put_rx():
                       a='1'*rem
                       if mes['Multiplex'] == 'YES':
                         if signals['Mul_order'] != 'root':
-                          print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((data) >> 8'+') & '+"0x%02x"%int(a,2)+');'
+                          print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((data) >> 8'+') & '+"0x%02x"%int(a,2)+');')
                         else:
-                          print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((data) >> '+str(byt)+') & '+"0x%02x"%int(a,2)+');'
+                          print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((data) >> '+str(byt)+') & '+"0x%02x"%int(a,2)+');')
                         
                       else:
-                        print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((data) >> '+str(byt)+') & '+"0x%02x"%int(a,2)+');'
+                        print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((data) >> '+str(byt)+') & '+"0x%02x"%int(a,2)+');')
                       #print 'byte'+str(cl)+'data'+'>>8'+"0x%02x"%int(a,2)
                       rem-=rem
                     cl+=1
                     #print '   IlLeaveCritical(INST0);\n}\n'
-              print '   CAN_EXIT_CRITICAL_SECTION(0);'
-              print '}\n'
+              print('   CAN_EXIT_CRITICAL_SECTION(0);')
+              print('}\n')
           
             elif signal_length <=64 and signal_length >32 :
               co = 0
-              print 'void ILRxPut_'+sig_name.upper()+'('+datatype_8+' const * const pData)'
-              print '{\n'
+              print('void ILRxPut_'+sig_name.upper()+'('+datatype_8+' const * const pData)')
+              print('{\n')
               #print '   CAN_CCR     saveCcr;'
-              print '    CAN_ENTER_CRITICAL_SECTION(0);'
+              print('    CAN_ENTER_CRITICAL_SECTION(0);')
               #print '   IlEnterCritical(INST0);'
               #print co,signal_length
-              while (co < signal_length/8):
+              while (co < signal_length//8):
                 if mes['Multiplex'] == 'YES':
                   if signals['Mul_order'] != 'root':
-                    print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(co) +' = pData['+str(co)+'];'
+                    print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(co) +' = pData['+str(co)+'];')
                   else:
-                    print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(co) +' = pData['+str(co)+'];'
+                    print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(co) +' = pData['+str(co)+'];')
                     
                 else:
-                  print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(co) +' = pData['+str(co)+'];'
+                  print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(co) +' = pData['+str(co)+'];')
                 co+=1
                 #print '   IlLeaveCritical(INST0);\n}\n'
-              print '   CAN_EXIT_CRITICAL_SECTION(0);'
-              print '}\n'
+              print('   CAN_EXIT_CRITICAL_SECTION(0);')
+              print('}\n')
 
             else:
-              print 'fail'
+              print('fail')
       
           elif signals['Order'] == 'Motorola':
             if sig_start_bit == 7 and sig_start_bit ==1 :
               start_bit=sig_start_bit
             else:
-              start_bit = (sig_start_bit-7) + 8*((signal_length/8)-1)
+              start_bit = (sig_start_bit-7) + 8*((signal_length//8)-1)
               
               if signal_length>32 and signal_length<=64:
-                print 'void ILRxPut_'+sig_name.upper()+'('+datatype_8+' const * const pData)'
-                print '{\n'
+                print('void ILRxPut_'+sig_name.upper()+'('+datatype_8+' const * const pData)')
+                print('{\n')
                 #print '   CAN_CCR     saveCcr;'
-                print '    CAN_ENTER_CRITICAL_SECTION(0);'
+                print('    CAN_ENTER_CRITICAL_SECTION(0);')
                 #print '   IlEnterCritical(INST0);'
                 co = 0
-                while (co < signal_length/8):
+                while (co < signal_length//8):
                   if mes['Multiplex'] == 'YES':
                     if signals['Mul_order'] != 'root':
-                      print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(co) +' = pData['+str(co)+'];'
+                      print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(co) +' = pData['+str(co)+'];')
                     else:
-                      print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(co) +' = pData['+str(co)+'];'
+                      print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(co) +' = pData['+str(co)+'];')
                       
                   else:
-                    print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(co) +' = pData['+str(co)+'];'
+                    print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(co) +' = pData['+str(co)+'];')
                   co+=1
-                print '   CAN_EXIT_CRITICAL_SECTION(0);'
-                print '}\n'
+                print('   CAN_EXIT_CRITICAL_SECTION(0);')
+                print('}\n')
                 
               elif signal_length>8 and signal_length <= 32:
                   length=signal_length
@@ -694,16 +696,16 @@ def message_Put_rx():
                   path=0
                   byt = 0
                   if signal_length<=16:
-                    print 'void ILRxPut_'+sig_name.upper()+'('+datatype_16+' data)'
-                    print '{'
+                    print('void ILRxPut_'+sig_name.upper()+'('+datatype_16+' data)')
+                    print('{')
                     #print '   CAN_CCR     saveCcr;'
-                    print '    CAN_ENTER_CRITICAL_SECTION(0);'
+                    print('    CAN_ENTER_CRITICAL_SECTION(0);')
                     #print'   IlEnterCritical(INST0);'
                   elif signal_length>16 and signal_length <=32:
-                    print 'void ILRxPut_'+sig_name.upper()+'('+datatype_32+' data)'
-                    print '{' 
+                    print('void ILRxPut_'+sig_name.upper()+'('+datatype_32+' data)')
+                    print('{') 
                     #print '   CAN_CCR     saveCcr;'
-                    print '    CAN_ENTER_CRITICAL_SECTION(0);'
+                    print('    CAN_ENTER_CRITICAL_SECTION(0);')
                   else:
                     pass
                     
@@ -718,12 +720,12 @@ def message_Put_rx():
                       a='1'*bit_to_be_filled
                       if mes['Multiplex'] == 'YES':
                         if signals['Mul_order'] != 'root':
-                          print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((data) & '+"0x%02x"%int(a,2)+');'
+                          print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((data) & '+"0x%02x"%int(a,2)+');')
                         else:
-                          print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((data) & '+"0x%02x"%int(a,2)+');'
+                          print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((data) & '+"0x%02x"%int(a,2)+');')
                           
                       else:
-                        print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((data) & '+"0x%02x"%int(a,2)+');'
+                        print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((data) & '+"0x%02x"%int(a,2)+');')
                       cl+=1
                     else:
                       if path != 0:
@@ -731,24 +733,24 @@ def message_Put_rx():
                           rem=rem-8
                           if mes['Multiplex'] == 'YES':
                             if signals['Mul_order'] != 'root':
-                              print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((data) >> '+str(bit_to_be_filled)+') & 0xff);'
+                              print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((data) >> '+str(bit_to_be_filled)+') & 0xff);')
                             else:
-                              print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((data) >> '+str(bit_to_be_filled)+') & 0xff);'
+                              print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((data) >> '+str(bit_to_be_filled)+') & 0xff);')
                               
                           else:
-                            print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((data) >> '+str(bit_to_be_filled)+') & 0xff);'
+                            print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((data) >> '+str(bit_to_be_filled)+') & 0xff);')
                           bit_to_be_filled+=8
                         elif rem>0 and rem<8:
                           a='1'*rem
                           #((vuint8) ((sigData >> 8) & (vuint8) 0x03u));
                           if mes['Multiplex'] == 'YES':
                             if signals['Mul_order'] != 'root':
-                              print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((data) >> '+str(bit_to_be_filled)+') & '+"0x%02x"%int(a,2)+');'
+                              print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((data) >> '+str(bit_to_be_filled)+') & '+"0x%02x"%int(a,2)+');')
                             else:
-                              print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((data) >> '+str(bit_to_be_filled)+') & '+"0x%02x"%int(a,2)+');'
+                              print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((data) >> '+str(bit_to_be_filled)+') & '+"0x%02x"%int(a,2)+');')
                               
                           else:
-                            print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((data) >> '+str(bit_to_be_filled)+') & '+"0x%02x"%int(a,2)+');'
+                            print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') (((data) >> '+str(bit_to_be_filled)+') & '+"0x%02x"%int(a,2)+');')
                           rem=0
                         start_bit+=8
                         cl+=1
@@ -757,21 +759,21 @@ def message_Put_rx():
                           if cl == 0:
                             if mes['Multiplex'] == 'YES':
                               if signals['Mul_order'] != 'root':
-                                print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((data) & 0xff);'
+                                print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((data) & 0xff);')
                               else:
-                                print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((data) & 0xff);'
+                                print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((data) & 0xff);')
                             else:
-                              print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((data) & 0xff);'
+                              print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = ('+datatype_8+') ((data) & 0xff);')
                           else:
                             byt+=8
                             if mes['Multiplex'] == 'YES':
                               if signals['Mul_order'] != 'root':
-                                print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((data) >>' +str(byt)+') & 0xff);'
+                                print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((data) >>' +str(byt)+') & 0xff);')
                               else:
-                                print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((data) >>' +str(byt)+') & 0xff);'
+                                print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((data) >>' +str(byt)+') & 0xff);')
                                 
                             else:
-                              print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((data) >>' +str(byt)+') & 0xff);'
+                              print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((data) >>' +str(byt)+') & 0xff);')
                             #print 'byte'+str(cl)+'data'+'>>8'
                           rem-=8
                         else:
@@ -779,27 +781,27 @@ def message_Put_rx():
                           a='1'*rem
                           if mes['Multiplex'] == 'YES':
                             if signals['Mul_order'] != 'root':
-                              print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((data) >> 8'+') & '+"0x%02x"%int(a,2)+');'
+                              print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((data) >> 8'+') & '+"0x%02x"%int(a,2)+');')
                             else:
-                              print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((data) >> '+str(byt)+') & '+"0x%02x"%int(a,2)+');'
+                              print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((data) >> '+str(byt)+') & '+"0x%02x"%int(a,2)+');')
                             
                           else:
-                            print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((data) >> '+str(byt)+') & '+"0x%02x"%int(a,2)+');'
+                            print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +' = ('+datatype_8+') (((data) >> '+str(byt)+') & '+"0x%02x"%int(a,2)+');')
                           #print 'byte'+str(cl)+'data'+'>>8'+"0x%02x"%int(a,2)
                           rem-=rem
                         cl+=1
-                  print '   CAN_EXIT_CRITICAL_SECTION(0);'
-                  print '}\n'
+                  print('   CAN_EXIT_CRITICAL_SECTION(0);')
+                  print('}\n')
               elif signal_length <=8 :
-                layout_row_start = start_bit/8
-                layout_row_end = (sig_start_bit/8)
+                layout_row_start = start_bit//8
+                layout_row_end = (sig_start_bit//8)
                 if layout_row_start != layout_row_end: 
-                  print 'void ILRxPut_'+sig_name.upper()+'('+datatype_8+' data)'
-                  print '{'
+                  print('void ILRxPut_'+sig_name.upper()+'('+datatype_8+' data)')
+                  print('{')
                   #print '   CAN_CCR     saveCcr;'
-                  print '    CAN_ENTER_CRITICAL_SECTION(0);'
+                  print('    CAN_ENTER_CRITICAL_SECTION(0);')
                   rem=signal_length
-                  start_bit_1=sig_start_bit/8
+                  start_bit_1=sig_start_bit//8
                   cl=0
                   while(rem>0):
                     if cl==0:
@@ -812,29 +814,29 @@ def message_Put_rx():
                     if a!='11111111':
                       if mes['Multiplex'] == 'YES':
                         if signals['Mul_order'] != 'root':
-                          print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') (data & '+"0x%02x"%int(a,2)+'));'
+                          print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') (data & '+"0x%02x"%int(a,2)+'));')
                         else:
-                          print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') (data & '+"0x%02x"%int(a,2)+'));'
+                          print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') (data & '+"0x%02x"%int(a,2)+'));')
                           
                       else:
-                        print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') (data & '+"0x%02x"%int(a,2)+'));'
+                        print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') (data & '+"0x%02x"%int(a,2)+'));')
                     else:
                       if mes['Multiplex'] == 'YES':
                         if signals['Mul_order'] != 'root':
-                          print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') data );'
+                          print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') data );')
                         else:
-                          print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') data );'
+                          print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') data );')
                       
                       else:
-                        print '   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') data );'
+                        print('   '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+' = (('+datatype_8+') data );')
                     cl+=1
-                  print '   CAN_EXIT_CRITICAL_SECTION(0);'
-                  print '}\n'
+                  print('   CAN_EXIT_CRITICAL_SECTION(0);')
+                  print('}\n')
        
 def message_Get_tx():
   global dbc,datatype_16,datatype_8,datatype_32,il_data_dir,tp_generic_config,nm_generic_config,il_generic_config
   
-  vnim_cfg_file = open(il_data_dir+"CanDbcMsgConfiguration.data",'r')
+  vnim_cfg_file = open(il_data_dir+"CanDbcMsgConfiguration.data",'r',encoding='utf-8')
   vnim_msg_cfg_data = json.loads(vnim_cfg_file.read())
   vnim_cfg_file.close()
   
@@ -851,10 +853,10 @@ def message_Get_tx():
   
   il_sorted_mes_tx = sorted(il_msg_tx,key = lambda x: x['Msg_name'])
   
-  print '''/* ====================================================================================
+  print('''/* ====================================================================================
   Interaction Layer Receive Signal Tx Get Functions
   =====================================================================================*/
-'''
+''')
   for mes in il_sorted_mes_tx:
     if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_tx_enable'] in ['on','On',1,'1','ON']:
       sig_list =[]
@@ -876,15 +878,15 @@ def message_Get_tx():
         for signals in sorted_bit:
           signal_occur=0
           sig_start_bit = int(signals['Endbit'])
-          layout_row_start=int(signals['Endbit'])/8
+          layout_row_start=int(signals['Endbit'])//8
           layout_col_start=int(signals['Endbit'])%8
           signal_length=int(signals['Len'])
           sig_name = signals['Sig_name']
           end_bit=int(signals['Endbit'])+signal_length-1
-          layout_row_end = end_bit/8
+          layout_row_end = end_bit//8
 
           byte_no=0
-          byte_no_1=(signal_length/8)-1 if signal_length%8 == 0 else signal_length/8
+          byte_no_1=(signal_length//8)-1 if signal_length%8 == 0 else signal_length//8
 
     
           if signals['Order'] == 'Intel':  
@@ -892,11 +894,11 @@ def message_Get_tx():
             if signal_length<=8:
 
               if layout_row_start != layout_row_end:
-                print datatype_8+' ILGetTx_'+sig_name.upper()+'(void)'
-                print '{'
+                print(datatype_8+' ILGetTx_'+sig_name.upper()+'(void)')
+                print('{')
                 #print '   CAN_CCR     saveCcr;'
-                print '   '+datatype_8+'  rValue;'
-                print '    CAN_ENTER_CRITICAL_SECTION(0);'
+                print('   '+datatype_8+'  rValue;')
+                print('    CAN_ENTER_CRITICAL_SECTION(0);')
                 bits_left = 8 - (sig_start_bit % 8)
                 if (bits_left < signal_length):
                   rem = signal_length
@@ -905,32 +907,32 @@ def message_Get_tx():
                     if cl == 0:
                       bits_to_be_filled = signal_length-bits_left
                       rem -= bits_to_be_filled
-                      print '   rValue = (' + datatype_8 + ')' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + sig_name.upper() + '_' + str(cl) + ';'
+                      print('   rValue = (' + datatype_8 + ')' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + sig_name.upper() + '_' + str(cl) + ';')
                     else:
                       bits_to_be_filled = rem
                       rem -= bits_to_be_filled
-                      print '   rValue |= (' + datatype_8 + ')(((' + datatype_8 + ')' + mes['Msg_name'].upper() + '.' + \
+                      print('   rValue |= (' + datatype_8 + ')(((' + datatype_8 + ')' + mes['Msg_name'].upper() + '.' + \
                             mes['Msg_name'].lower() + '.' + sig_name.upper() + '_' + str(cl) + ') << ' + str(
-                        bits_to_be_filled) + ');'
+                        bits_to_be_filled) + ');')
                     cl += 1
                 else:
                   rem=signal_length
-                  start_bit_1=sig_start_bit/8
+                  start_bit_1=sig_start_bit//8
                   cl=0
                   while(rem>0):
                     if cl==0:
                       bits_to_be_filled = 8-start_bit_1
                       rem -= bits_to_be_filled
-                      print '   rValue = ('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';'
+                      print('   rValue = ('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';')
                     else:
                       bits_to_be_filled=rem
                       rem -= bits_to_be_filled
-                      print '   rValue |= ('+datatype_8+')((('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bits_to_be_filled)+');'
+                      print('   rValue |= ('+datatype_8+')((('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bits_to_be_filled)+');')
                     cl+=1
 
-                print '   CAN_EXIT_CRITICAL_SECTION(0);'
-                print '   return rValue;'
-                print '}\n'
+                print('   CAN_EXIT_CRITICAL_SECTION(0);')
+                print('   return rValue;')
+                print('}\n')
 
             elif signal_length>8 and signal_length <=32:
               start_bit=sig_start_bit
@@ -940,17 +942,17 @@ def message_Get_tx():
               path=0
               byt = 0
               if length >8 and length<=16:
-                print datatype_16 +' ILGetTx_'+sig_name.upper()+'(void)'
-                print '{'
+                print(datatype_16 +' ILGetTx_'+sig_name.upper()+'(void)')
+                print('{')
                 #print '   CAN_CCR     saveCcr;'
-                print '   '+datatype_16+'  rValue;'
-                print '    CAN_ENTER_CRITICAL_SECTION(0);'
+                print('   '+datatype_16+'  rValue;')
+                print('    CAN_ENTER_CRITICAL_SECTION(0);')
               elif length >16 and length <=32:
-                print datatype_8+' ILGetTx_'+sig_name.upper()+'(void)'
-                print '{'
+                print(datatype_8+' ILGetTx_'+sig_name.upper()+'(void)')
+                print('{')
                 #print '   CAN_CCR     saveCcr;'
-                print'   '+datatype_32+'  rValue;'
-                print '    CAN_ENTER_CRITICAL_SECTION(0);'
+                print('   '+datatype_32+'  rValue;')
+                print('    CAN_ENTER_CRITICAL_SECTION(0);')
 
               while(rem>0):
                 if start_bit%8!=0:
@@ -962,25 +964,25 @@ def message_Get_tx():
                   start_bit=start_bit+bit_to_be_filled
                   a='1'*bit_to_be_filled
                   if length <= 16:
-                    print '   rValue = ('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';'
+                    print('   rValue = ('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';')
                   elif length >16 and length <= 32:
-                    print '   rValue = ('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';'
+                    print('   rValue = ('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';')
                   cl+=1
                 else:
                   if path != 0:
                     if rem >=8:
                       rem=rem-8
                       if length <= 16:
-                        print '   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');'
+                        print('   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');')
                       elif length>16 and length <= 32:
-                        print '   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');'
+                        print('   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');')
                       bit_to_be_filled+=8
                     elif rem>0 and rem<8:
                       a='1'*rem
                       if length <= 16:
-                        print '   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');'
+                        print('   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');')
                       elif length >16 and length<=32 :
-                        print '   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');'
+                        print('   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');')
 
                       rem=0
                     start_bit+=8
@@ -989,73 +991,73 @@ def message_Get_tx():
                     if rem>=8:
                       if cl == 0:
                         if length <=16:
-                          print '   rValue = ('+datatype_16+')(('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+');'
+                          print('   rValue = ('+datatype_16+')(('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+');')
                         elif length <=32:
-                          print '   rValue = ('+datatype_32+')(('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+');'
+                          print('   rValue = ('+datatype_32+')(('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+');')
                       else:
                         byt+=8
                         if length <=16:
-                          print '   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');'
+                          print('   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');')
                         elif length >16 and length <=32:
-                          print '   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');'
+                          print('   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');')
                         #print 'byte'+str(cl)+'data'+'>>8'
                       rem-=8
                     else:
                       a='1'*rem
                       byt+=8
                       if length <= 16:
-                        print '   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << '+str(byt)+');'
+                        print('   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << '+str(byt)+');')
                       elif length <=32 and length >16:
-                        print '   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << '+str(byt)+');'
+                        print('   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << '+str(byt)+');')
                       #print 'byte'+str(cl)+'data'+'>>8'+"0x%02x"%int(a,2)
                       rem-=rem
                     cl+=1
-              print '   CAN_EXIT_CRITICAL_SECTION(0);'
-              print '   return rValue;'
-              print '}\n'
+              print('   CAN_EXIT_CRITICAL_SECTION(0);')
+              print('   return rValue;')
+              print('}\n')
             elif signal_length <=64 and signal_length >32 :
               co = 0
-              print 'void ILGetTx_'+sig_name.upper()+'('+datatype_8+' * pData)\n{\n'
+              print('void ILGetTx_'+sig_name.upper()+'('+datatype_8+' * pData)\n{\n')
               #print '   CAN_CCR     saveCcr;'
-              print '    CAN_ENTER_CRITICAL_SECTION(0);'
-              while (co < signal_length/8):
-                print '    pData['+str(co)+'] = '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(co)+';'
+              print('    CAN_ENTER_CRITICAL_SECTION(0);')
+              while (co < signal_length//8):
+                print('    pData['+str(co)+'] = '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(co)+';')
                 co+=1
-              print '   CAN_EXIT_CRITICAL_SECTION(0);'
-              print '}\n'
+              print('   CAN_EXIT_CRITICAL_SECTION(0);')
+              print('}\n')
           
           elif signals['Order'] == 'Motorola':
             if sig_start_bit== 7 and sig_start_bit ==1 :
               start_bit=sig_start_bit
             else:
-              start_bit = (sig_start_bit-7) + 8*((signal_length/8)-1)
+              start_bit = (sig_start_bit-7) + 8*((signal_length//8)-1)
                      
             if signal_length <=64 and signal_length >32 :
               co = 0
-              print 'void ILGetTx_'+sig_name.upper()+'('+datatype_8+' * pData)\n{\n'
+              print('void ILGetTx_'+sig_name.upper()+'('+datatype_8+' * pData)\n{\n')
               #print '   CAN_CCR     saveCcr;'
-              print '    CAN_ENTER_CRITICAL_SECTION(0);'
-              while (co < signal_length/8):
-                print '   pData['+str(co)+'] = '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_byte'+str(co)+';'
+              print('    CAN_ENTER_CRITICAL_SECTION(0);')
+              while (co < signal_length//8):
+                print('   pData['+str(co)+'] = '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_byte'+str(co)+';')
                 co+=1
-              print '   CAN_EXIT_CRITICAL_SECTION(0);'
-              print '}\n'
+              print('   CAN_EXIT_CRITICAL_SECTION(0);')
+              print('}\n')
               
             elif signal_length>8 and signal_length <=32:
               rem = signal_length
               length = signal_length
               if signal_length<=16:
-                print datatype_16 +' ILGetTx_'+sig_name.upper()+'(void)'
-                print '{'
+                print(datatype_16 +' ILGetTx_'+sig_name.upper()+'(void)')
+                print('{')
                 #print '   CAN_CCR     saveCcr;'
-                print '   '+datatype_16+'  rValue;'
-                print '    CAN_ENTER_CRITICAL_SECTION(0);'
+                print('   '+datatype_16+'  rValue;')
+                print('    CAN_ENTER_CRITICAL_SECTION(0);')
               elif signal_length>16 and signal_length<=32:
-                print datatype_8+' ILGetTx_'+sig_name.upper()+'(void)'
-                print '{'
+                print(datatype_8+' ILGetTx_'+sig_name.upper()+'(void)')
+                print('{')
                 #print '   CAN_CCR     saveCcr;'
-                print'   '+datatype_32+'  rValue;'
-                print '    CAN_ENTER_CRITICAL_SECTION(0);'
+                print('   '+datatype_32+'  rValue;')
+                print('    CAN_ENTER_CRITICAL_SECTION(0);')
               path = 0
               cl = 0
               byt = 0
@@ -1069,25 +1071,25 @@ def message_Get_tx():
                     start_bit=start_bit+bit_to_be_filled
                     a='1'*bit_to_be_filled
                     if length <= 16:
-                      print '   rValue = ('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';'
+                      print('   rValue = ('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';')
                     elif length >16 and length <= 32:
-                      print '   rValue = ('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';'
+                      print('   rValue = ('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';')
                     cl+=1
                   else:
                     if path != 0:
                       if rem >=8:
                         rem=rem-8
                         if length <= 16:
-                          print '   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');'
+                          print('   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');')
                         elif length>16 and length <= 32:
-                          print '   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');'
+                          print('   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');')
                         bit_to_be_filled+=8
                       elif rem>0 and rem<8:
                         a='1'*rem
                         if length <= 16:
-                          print '   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');'
+                          print('   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');')
                         elif length >16 and length<=32 :
-                          print '   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');'
+                          print('   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');')
 
                         rem=0
                       start_bit+=8
@@ -1096,58 +1098,58 @@ def message_Get_tx():
                       if rem>=8:
                         if cl == 0:
                           if length <=16:
-                            print '   rValue = ('+datatype_16+')(('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+');'
+                            print('   rValue = ('+datatype_16+')(('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+');')
                           elif length <=32:
-                            print '   rValue = ('+datatype_32+')(('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+');'
+                            print('   rValue = ('+datatype_32+')(('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+');')
                         else:
                           byt+=8
                           if length <=16:
-                            print '   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');'
+                            print('   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');')
                           elif length >16 and length <=32:
-                            print '   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');'
+                            print('   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');')
                           #print 'byte'+str(cl)+'data'+'>>8'
                         rem-=8
                       else:
                         a='1'*rem
                         byt+=8
                         if length <= 16:
-                          print '   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << '+str(byt)+');'
+                          print('   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << '+str(byt)+');')
                         elif length <=32 and length >16:
-                          print '   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << '++str(byt)+');'
+                          print('   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << '++str(byt)+');')
                         #print 'byte'+str(cl)+'data'+'>>8'+"0x%02x"%int(a,2)
                         rem-=rem
                       cl+=1
-              print '   CAN_EXIT_CRITICAL_SECTION(0);'
-              print '   return rValue;'
-              print '}\n'
+              print('   CAN_EXIT_CRITICAL_SECTION(0);')
+              print('   return rValue;')
+              print('}\n')
                 
             elif signal_length<=8:
               if layout_row_start != layout_row_end:
-                layout_row_start = start_bit/8
-                layout_row_end = sig_start_bit/8
-                print datatype_8+' ILGetTx_'+sig_name.upper()+'(void)'
-                print '{'
+                layout_row_start = start_bit//8
+                layout_row_end = sig_start_bit//8
+                print(datatype_8+' ILGetTx_'+sig_name.upper()+'(void)')
+                print('{')
                 #print '   CAN_CCR     saveCcr;'
-                print '   '+datatype_8+'  rValue;'
-                print '    CAN_ENTER_CRITICAL_SECTION(0);'
+                print('   '+datatype_8+'  rValue;')
+                print('    CAN_ENTER_CRITICAL_SECTION(0);')
                     
                 rem=signal_length
-                start_bit_1=start_bit/8
+                start_bit_1=start_bit//8
                 cl=0
                 while(rem>0):
                   if cl==0:
                     bits_to_be_filled = 8-start_bit_1
                     rem -= bits_to_be_filled
-                    print '   rValue = ('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';'
+                    print('   rValue = ('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';')
                   else:
                     bits_to_be_filled=rem
                     rem -= bits_to_be_filled
-                    print '   rValue |= ('+datatype_8+')((('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bits_to_be_filled)+');'
+                    print('   rValue |= ('+datatype_8+')((('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bits_to_be_filled)+');')
                   cl+=1
 
-                print '   CAN_EXIT_CRITICAL_SECTION(0);'
-                print '   return rValue;'
-                print '}\n'
+                print('   CAN_EXIT_CRITICAL_SECTION(0);')
+                print('   return rValue;')
+                print('}\n')
 
 
   
@@ -1155,7 +1157,7 @@ def message_Get_tx():
 def message_Get_rx():
   global dbc,datatype_16,datatype_8,datatype_32,il_data_dir,tp_generic_config,nm_generic_config,il_generic_config
   
-  vnim_cfg_file = open(il_data_dir+"CanDbcMsgConfiguration.data",'r')
+  vnim_cfg_file = open(il_data_dir+"CanDbcMsgConfiguration.data",'r',encoding='utf-8')
   vnim_msg_cfg_data = json.loads(vnim_cfg_file.read())
   vnim_cfg_file.close()
 
@@ -1207,10 +1209,10 @@ def message_Get_rx():
       if mes['Msg_name'] == order_msg:
         il_sorted_mes_rx_ordered.append(mes)
   
-  print '''/* ====================================================================================
+  print('''/* ====================================================================================
   Interaction Layer Receive Signal Rx Get Functions
   =====================================================================================*/
-'''
+''')
   for mes in il_sorted_mes_rx_ordered:
     if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON']:
       if mes['Multiplex'] == 'YES':
@@ -1240,15 +1242,15 @@ def message_Get_rx():
                 multiplexor_index=mul_msg['Multiplex_group'].index(sig_list)
           signal_occur=0
           sig_start_bit = int(signals['Endbit'])
-          layout_row_start=int(signals['Endbit'])/8
+          layout_row_start=int(signals['Endbit'])//8
           layout_col_start=int(signals['Endbit'])%8
           signal_length=int(signals['Len'])
           sig_name = signals['Sig_name']
           end_bit=int(signals['Endbit'])+signal_length-1
-          layout_row_end = end_bit/8
+          layout_row_end = end_bit//8
 
           byte_no=0
-          byte_no_1=(signal_length/8)-1 if signal_length%8 == 0 else signal_length/8
+          byte_no_1=(signal_length//8)-1 if signal_length%8 == 0 else signal_length//8
 
     
           if signals['Order'] == 'Intel':  #signal format is  intel
@@ -1257,13 +1259,13 @@ def message_Get_rx():
               bits_left = 8 - (sig_start_bit % 8)
               if (bits_left < signal_length):
                 if layout_row_start != layout_row_end:  # if signal is in different byte position seperate function is used to get the value otherwise a macro is generated in par_h py file
-                  print datatype_8 + ' IlRxGet' + sig_name.upper() + '(void)'
-                  print '{'
+                  print(datatype_8 + ' IlRxGet' + sig_name.upper() + '(void)')
+                  print('{')
                   # print '   CAN_CCR     saveCcr;'
-                  print '   ' + datatype_8 + '  rValue;'
-                  print '    CAN_ENTER_CRITICAL_SECTION(0);'
+                  print('   ' + datatype_8 + '  rValue;')
+                  print('    CAN_ENTER_CRITICAL_SECTION(0);')
                   rem = signal_length
-                  start_bit_1 = sig_start_bit / 8
+                  start_bit_1 = sig_start_bit // 8
                   cl = 0
                   while (rem > 0):
                     if cl == 0:
@@ -1271,37 +1273,37 @@ def message_Get_rx():
                       rem -= bits_to_be_filled
                       if mes['Multiplex'] == 'YES':
                         if signals['Mul_order'] != 'root':
-                          print '   rValue = (' + datatype_8 + ')' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + multiplexor_id.lower() + '_data' + '.' + multiplexor_id.lower() + '_' + str(multiplexor_index) + '.' + sig_name.upper() + '_' + str(cl) + ';'
+                          print('   rValue = (' + datatype_8 + ')' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + multiplexor_id.lower() + '_data' + '.' + multiplexor_id.lower() + '_' + str(multiplexor_index) + '.' + sig_name.upper() + '_' + str(cl) + ';')
                         else:
-                          print '   rValue = (' + datatype_8 + ')' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + sig_name.upper() + '_' + str(cl) + ';'
+                          print('   rValue = (' + datatype_8 + ')' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + sig_name.upper() + '_' + str(cl) + ';')
                       else:
-                        print '   rValue = (' + datatype_8 + ')' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + sig_name.upper() + '_' + str(cl) + ';'
+                        print('   rValue = (' + datatype_8 + ')' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + sig_name.upper() + '_' + str(cl) + ';')
                     else:
                       bits_to_be_filled = rem
                       rem -= bits_to_be_filled
                       if mes['Multiplex'] == 'YES':
                         if signals['Mul_order'] != 'root':
-                          print '   rValue |= (' + datatype_8 + ')(((' + datatype_8 + ')' + mes[
+                          print('   rValue |= (' + datatype_8 + ')(((' + datatype_8 + ')' + mes[
                             'Msg_name'].upper() + '.' + mes[
-                                  'Msg_name'].lower() + '.' + multiplexor_id.lower() + '_data' + '.' + multiplexor_id.lower() + '_' + str(multiplexor_index) + '.' + sig_name.upper() + '_' + str(cl) + ') << ' + str(bits_to_be_filled) + ');'
+                                  'Msg_name'].lower() + '.' + multiplexor_id.lower() + '_data' + '.' + multiplexor_id.lower() + '_' + str(multiplexor_index) + '.' + sig_name.upper() + '_' + str(cl) + ') << ' + str(bits_to_be_filled) + ');')
                         else:
-                          print '   rValue |= (' + datatype_8 + ')(((' + datatype_8 + ')' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + sig_name.upper() + '_' + str(cl) + ') << ' + str(bits_to_be_filled) + ');'
+                          print('   rValue |= (' + datatype_8 + ')(((' + datatype_8 + ')' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + sig_name.upper() + '_' + str(cl) + ') << ' + str(bits_to_be_filled) + ');')
                       else:
-                        print '   rValue |= (' + datatype_8 + ')(((' + datatype_8 + ')' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + sig_name.upper() + '_' + str(cl) + ') << ' + str(bits_to_be_filled) + ');'
+                        print('   rValue |= (' + datatype_8 + ')(((' + datatype_8 + ')' + mes['Msg_name'].upper() + '.' + mes['Msg_name'].lower() + '.' + sig_name.upper() + '_' + str(cl) + ') << ' + str(bits_to_be_filled) + ');')
                     cl += 1
 
-                  print '   CAN_EXIT_CRITICAL_SECTION(0);'
-                  print '   return rValue;'
-                  print '}\n'
+                  print('   CAN_EXIT_CRITICAL_SECTION(0);')
+                  print('   return rValue;')
+                  print('}\n')
               else:
                 if layout_row_start != layout_row_end:#if signal is in different byte position seperate function is used to get the value otherwise a macro is generated in par_h py file
-                  print datatype_8+' IlRxGet'+sig_name.upper()+'(void)'
-                  print '{'
+                  print(datatype_8+' IlRxGet'+sig_name.upper()+'(void)')
+                  print('{')
                   #print '   CAN_CCR     saveCcr;'
-                  print '   '+datatype_8+'  rValue;'
-                  print '    CAN_ENTER_CRITICAL_SECTION(0);'
+                  print('   '+datatype_8+'  rValue;')
+                  print('    CAN_ENTER_CRITICAL_SECTION(0);')
                   rem=signal_length
-                  start_bit_1=sig_start_bit/8
+                  start_bit_1=sig_start_bit//8
                   cl=0
                   while(rem>0):
                     if cl==0:
@@ -1309,26 +1311,26 @@ def message_Get_rx():
                       rem -= bits_to_be_filled
                       if mes['Multiplex'] == 'YES':
                         if signals['Mul_order'] != 'root':
-                          print '   rValue = ('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+';'
+                          print('   rValue = ('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+';')
                         else:
-                          print '   rValue = ('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';'
+                          print('   rValue = ('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';')
                       else:
-                        print '   rValue = ('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';'
+                        print('   rValue = ('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';')
                     else:
                       bits_to_be_filled=rem
                       rem -= bits_to_be_filled
                       if mes['Multiplex'] == 'YES':
                         if signals['Mul_order'] != 'root':
-                          print '   rValue |= ('+datatype_8+')((('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bits_to_be_filled)+');'
+                          print('   rValue |= ('+datatype_8+')((('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bits_to_be_filled)+');')
                         else:
-                          print '   rValue |= ('+datatype_8+')((('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bits_to_be_filled)+');'
+                          print('   rValue |= ('+datatype_8+')((('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bits_to_be_filled)+');')
                       else:
-                        print '   rValue |= ('+datatype_8+')((('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bits_to_be_filled)+');'
+                        print('   rValue |= ('+datatype_8+')((('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bits_to_be_filled)+');')
                     cl+=1
 
-                  print '   CAN_EXIT_CRITICAL_SECTION(0);'
-                  print '   return rValue;'
-                  print '}\n'
+                  print('   CAN_EXIT_CRITICAL_SECTION(0);')
+                  print('   return rValue;')
+                  print('}\n')
 
             elif signal_length>8 and signal_length <=32:#if signal length is greater than 8 and less than 32 bytes #for 32bit controller
               start_bit=sig_start_bit #start bit of the signal
@@ -1338,17 +1340,17 @@ def message_Get_rx():
               path=0#used to diffrentiate whether the start bit exactly starts at begining of the byte layout
               byt = 0
               if length >8 and length<=16:# signal length between 8 to 16
-                print datatype_16 +' IlRxGet'+sig_name.upper()+'(void)'
-                print '{'
+                print(datatype_16 +' IlRxGet'+sig_name.upper()+'(void)')
+                print('{')
                 #print '   CAN_CCR     saveCcr;'
-                print '   '+datatype_16+'  rValue;'
-                print '    CAN_ENTER_CRITICAL_SECTION(0);'
+                print('   '+datatype_16+'  rValue;')
+                print('    CAN_ENTER_CRITICAL_SECTION(0);')
               elif length >16 and length <=32:# signal length between 8 to 16
-                print datatype_32+' IlRxGet'+sig_name.upper()+'(void)'
-                print '{'
+                print(datatype_32+' IlRxGet'+sig_name.upper()+'(void)')
+                print('{')
                 #print '   CAN_CCR     saveCcr;'
-                print'   '+datatype_32+'  rValue;'
-                print '    CAN_ENTER_CRITICAL_SECTION(0);'
+                print('   '+datatype_32+'  rValue;')
+                print('    CAN_ENTER_CRITICAL_SECTION(0);')
 
               while(rem>0):#remaining length greater than zero
                 if start_bit%8!=0:#if start bit is not in the begining of the byte
@@ -1362,20 +1364,20 @@ def message_Get_rx():
                   if length <= 16:
                     if mes['Multiplex'] == 'YES':
                       if signals['Mul_order'] != 'root':
-                        print '   rValue = ('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+';'
+                        print('   rValue = ('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+';')
                       else:
-                        print '   rValue = ('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';'
+                        print('   rValue = ('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';')
                     else:    
-                      print '   rValue = ('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';'
+                      print('   rValue = ('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';')
                         
                   elif length >16 and length <= 32:
                     if mes['Multiplex'] == 'YES':
                       if signals['Mul_order'] != 'root':
-                        print '   rValue = ('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+';'
+                        print('   rValue = ('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+';')
                       else:
-                        print '   rValue = ('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';'
+                        print('   rValue = ('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';')
                     else:
-                      print '   rValue = ('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';'
+                      print('   rValue = ('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';')
                       
                       
                   cl+=1
@@ -1386,19 +1388,19 @@ def message_Get_rx():
                       if length <= 16:#if signal length is less than equql to 16
                         if mes['Multiplex'] == 'YES':
                           if signals['Mul_order'] != 'root':
-                            print '   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');'
+                            print('   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');')
                           else:
-                            print '   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');'
+                            print('   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');')
                         else:
-                          print '   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');'
+                          print('   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');')
                       elif length>16 and length <= 32:#if signal length is greater than 16 and is less than equql to 32
                         if mes['Multiplex'] == 'YES':
                           if signals['Mul_order'] != 'root':
-                            print '   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');'
+                            print('   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');')
                           else:
-                            print '   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');'
+                            print('   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');')
                         else:
-                          print '   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');'
+                          print('   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');')
                       else:#if signal length is greater than 32 
                         pass
                       bit_to_be_filled+=8
@@ -1407,19 +1409,19 @@ def message_Get_rx():
                       if length <= 16:#if signal length is less than equql to 16
                         if mes['Multiplex'] == 'YES':
                           if signals['Mul_order'] != 'root':
-                            print '   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');'
+                            print('   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');')
                           else:
-                            print '   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');'
+                            print('   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');')
                         else:
-                            print '   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');'
+                            print('   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');')
                       elif length >16 and length<=32 :#if signal length is greater than 16 and is less than equql to 32
                         if mes['Multiplex'] == 'YES':
                           if signals['Mul_order'] != 'root':
-                            print '   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');'
+                            print('   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');')
                           else:
-                            print '   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');'
+                            print('   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');')
                         else:
-                          print '   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');'
+                          print('   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');')
                       else:#if signal length is greater than 32 
                         pass    
                       rem=0
@@ -1431,41 +1433,41 @@ def message_Get_rx():
                         if length <=16:
                           if mes['Multiplex'] == 'YES':
                             if signals['Mul_order'] != 'root':
-                              print '   rValue = ('+datatype_16+')(('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+');'
+                              print('   rValue = ('+datatype_16+')(('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+');')
                             else:
-                              print '   rValue = ('+datatype_16+')(('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+');'
+                              print('   rValue = ('+datatype_16+')(('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+');')
                           else:
-                            print '   rValue = ('+datatype_16+')(('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+');'
+                            print('   rValue = ('+datatype_16+')(('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+');')
                             
                         elif length <=32:
                           if mes['Multiplex'] == 'YES':
                             if signals['Mul_order'] != 'root':
-                              print '   rValue = ('+datatype_32+')(('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+');'
+                              print('   rValue = ('+datatype_32+')(('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+');')
                             else:
-                              print '   rValue = ('+datatype_32+')(('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+');'
+                              print('   rValue = ('+datatype_32+')(('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+');')
                           else:
-                            print '   rValue = ('+datatype_32+')(('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+');'
+                            print('   rValue = ('+datatype_32+')(('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+');')
                             
                       else:
                         byt+=8
                         if length <=16:
                           if mes['Multiplex'] == 'YES':
                             if signals['Mul_order'] != 'root':
-                              print '   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');'
+                              print('   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');')
                             else:
-                              print '   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');'
+                              print('   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');')
                           else:
-                            print '   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');'
+                            print('   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');')
                             
                             
                         elif length >16 and length <=32:
                           if mes['Multiplex'] == 'YES':
                             if signals['Mul_order'] != 'root':
-                              print '   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');'
+                              print('   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');')
                             else:
-                              print '   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');'
+                              print('   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');')
                           else:
-                            print '   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');'
+                            print('   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');')
                         #print 'byte'+str(cl)+'data'+'>>8'
                       rem-=8
                     else:#remainder length less than 8
@@ -1474,84 +1476,84 @@ def message_Get_rx():
                       if length <= 16:
                         if mes['Multiplex'] == 'YES':
                           if signals['Mul_order'] != 'root':
-                            print '   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl) +') << 8'+');'
+                            print('   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl) +') << 8'+');')
                           else:
-                            print '   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << '+str(byt)+');'
+                            print('   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << '+str(byt)+');')
                         else:
-                          print '   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << '+str(byt)+');'
+                          print('   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << '+str(byt)+');')
                           
                       elif length <=32 and length >16:
                         if mes['Multiplex'] == 'YES':
                           if signals['Mul_order'] != 'root':
-                            print '   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl) +') << 8'+');'
+                            print('   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl) +') << 8'+');')
                           else:
-                            print '   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << '+str(byt)+');'
+                            print('   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << '+str(byt)+');')
                         else:
-                          print '   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << '+str(byt)+');'
+                          print('   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << '+str(byt)+');')
                           
                       #print 'byte'+str(cl)+'data'+'>>8'+"0x%02x"%int(a,2)
                       rem-=rem
                     cl+=1
-              print '   CAN_EXIT_CRITICAL_SECTION(0);'
-              print '   return rValue;'
-              print '}\n'
+              print('   CAN_EXIT_CRITICAL_SECTION(0);')
+              print('   return rValue;')
+              print('}\n')
             elif signal_length <=64 and signal_length >32 :
               co = 0
-              print 'void IlRxGet'+sig_name.upper()+'('+datatype_8+' * pData)\n{\n'
+              print('void IlRxGet'+sig_name.upper()+'('+datatype_8+' * pData)\n{\n')
               #print '   CAN_CCR     saveCcr;'
-              print '    CAN_ENTER_CRITICAL_SECTION(0);'
-              while (co < signal_length/8):
+              print('    CAN_ENTER_CRITICAL_SECTION(0);')
+              while (co < signal_length//8):
                 if mes['Multiplex'] == 'YES':
                   if signals['Mul_order'] != 'root':
-                    print '    pData['+str(co)+'] = '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(co)+';'
+                    print('    pData['+str(co)+'] = '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(co)+';')
                   else:
-                    print '    pData['+str(co)+'] = '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(co)+';'
+                    print('    pData['+str(co)+'] = '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(co)+';')
                 else:
-                  print '    pData['+str(co)+'] = '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(co)+';'
+                  print('    pData['+str(co)+'] = '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(co)+';')
                   
                 co+=1
-              print '   CAN_EXIT_CRITICAL_SECTION(0);'
-              print '}\n'
+              print('   CAN_EXIT_CRITICAL_SECTION(0);')
+              print('}\n')
           
           elif signals['Order'] == 'Motorola':
             if sig_start_bit== 7 and sig_start_bit ==1 :
               start_bit=sig_start_bit
             else:
-              start_bit = (sig_start_bit-7) + 8*((signal_length/8)-1)
+              start_bit = (sig_start_bit-7) + 8*((signal_length//8)-1)
                      
             if signal_length <=64 and signal_length >32 :
               co = 0
-              print 'void IlRxGet'+sig_name.upper()+'('+datatype_8+' * pData)\n{\n'
+              print('void IlRxGet'+sig_name.upper()+'('+datatype_8+' * pData)\n{\n')
               #print '   CAN_CCR     saveCcr;'
-              print '    CAN_ENTER_CRITICAL_SECTION(0);'
-              while (co < signal_length/8):
+              print('    CAN_ENTER_CRITICAL_SECTION(0);')
+              while (co < signal_length//8):
                 if mes['Multiplex'] == 'YES':
                   if signals['Mul_order'] != 'root':
-                    print '   pData['+str(co)+'] = '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_byte'+str(co)+';'
+                    print('   pData['+str(co)+'] = '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_byte'+str(co)+';')
                   else:
-                    print '   pData['+str(co)+'] = '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_byte'+str(co)+';'
+                    print('   pData['+str(co)+'] = '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_byte'+str(co)+';')
                 else:
-                  print '   pData['+str(co)+'] = '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_byte'+str(co)+';'
+                  print('   pData['+str(co)+'] = '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_byte'+str(co)+';')
                   
                 co+=1
-              print '   CAN_EXIT_CRITICAL_SECTION(0);'
-              print '}\n'
+              print('   CAN_EXIT_CRITICAL_SECTION(0);')
+              print('}\n')
               
             elif signal_length>8 and signal_length <=32:
               rem = signal_length
               length = signal_length
               if signal_length<=16:
-                print datatype_16 +' IlRxGet'+sig_name.upper()+'(void)'
-                print '{'
+                print(datatype_16 +' IlRxGet'+sig_name.upper()+'(void)')
+                print('{')
                 #print '   CAN_CCR     saveCcr;'
-                print '   '+datatype_16+'  rValue;'
-                print '    CAN_ENTER_CRITICAL_SECTION(0);'
+                print('   '+datatype_16+'  rValue;')
+                print('    CAN_ENTER_CRITICAL_SECTION(0);')
               elif signal_length>16 and signal_length<=32:
-                print datatype_32+' IlRxGet'+sig_name.upper()+'(void)'
-                print '{'
+                print(datatype_32+' IlRxGet'+sig_name.upper()+'(void)')
+                print('{')
                 #print '   CAN_CCR     saveCcr;'
-                print'   '+datatype_32+'  rValue;'
-                print '    CAN_ENTER_CRITICAL_SECTION(0);'
+                print('   '+datatype_32+'  rValue;')
+                print('    CAN_ENTER_CRITICAL_SECTION(0);')
               path = 0
               cl = 0
               byt = 0
@@ -1567,20 +1569,20 @@ def message_Get_rx():
                     if length <= 16:
                       if mes['Multiplex'] == 'YES':
                         if signals['Mul_order'] != 'root':
-                          print '   rValue = ('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+';'
+                          print('   rValue = ('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+';')
                         else:
-                          print '   rValue = ('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';'
+                          print('   rValue = ('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';')
                       else:
-                        print '   rValue = ('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';'
+                        print('   rValue = ('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';')
                         
                     elif length >16 and length <= 32:
                       if mes['Multiplex'] == 'YES':
                         if signals['Mul_order'] != 'root':
-                          print '   rValue = ('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+';'
+                          print('   rValue = ('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+';')
                         else:
-                          print '   rValue = ('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';'
+                          print('   rValue = ('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';')
                       else:
-                        print '   rValue = ('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';'                        
+                        print('   rValue = ('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';')                        
                         
                     cl+=1
                   else:
@@ -1590,20 +1592,20 @@ def message_Get_rx():
                         if length <= 16:
                           if mes['Multiplex'] == 'YES':
                             if signals['Mul_order'] != 'root':
-                              print '   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');'
+                              print('   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');')
                             else:
-                              print '   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');'
+                              print('   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');')
                           else:
-                              print '   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');'
+                              print('   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');')
                           
                         elif length>16 and length <= 32:
                           if mes['Multiplex'] == 'YES':
                             if signals['Mul_order'] != 'root':
-                              print '   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');'
+                              print('   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');')
                             else:
-                              print '   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');'
+                              print('   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');')
                           else:
-                            print '   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');'
+                            print('   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');')
                           
                         bit_to_be_filled+=8
                       elif rem>0 and rem<8:
@@ -1611,19 +1613,19 @@ def message_Get_rx():
                         if length <= 16:
                           if mes['Multiplex'] == 'YES':
                             if signals['Mul_order'] != 'root':
-                              print '   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');'
+                              print('   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');')
                             else:
-                              print '   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');'
+                              print('   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');')
                           else:
-                            print '   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');'                            
+                            print('   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');')                            
                         elif length >16 and length<=32 :
                           if mes['Multiplex'] == 'YES':
                             if signals['Mul_order'] != 'root':
-                              print '   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');'
+                              print('   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');')
                             else:
-                              print '   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');'
+                              print('   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');')
                           else:
-                            print '   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');'
+                            print('   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') <<'+str(bit_to_be_filled)+');')
                             
                         rem=0
                       start_bit+=8
@@ -1634,37 +1636,37 @@ def message_Get_rx():
                           if length <=16:
                             if mes['Multiplex'] == 'YES':
                               if signals['Mul_order'] != 'root':
-                                print '   rValue = ('+datatype_16+')(('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+');'
+                                print('   rValue = ('+datatype_16+')(('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+');')
                               else:
-                                print '   rValue = ('+datatype_16+')(('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+');'
+                                print('   rValue = ('+datatype_16+')(('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+');')
                             else:
-                              print '   rValue = ('+datatype_16+')(('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+');'
+                              print('   rValue = ('+datatype_16+')(('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+');')
                           elif length <=32:
                             if mes['Multiplex'] == 'YES':
                               if signals['Mul_order'] != 'root':
-                                print '   rValue = ('+datatype_32+')(('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+');'
+                                print('   rValue = ('+datatype_32+')(('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+');')
                               else:
-                                print '   rValue = ('+datatype_32+')(('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+');'
+                                print('   rValue = ('+datatype_32+')(('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+');')
                             else:
-                              print '   rValue = ('+datatype_32+')(('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+');'
+                              print('   rValue = ('+datatype_32+')(('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+');')
                         else:
                           byt+=8
                           if length <=16:
                             if mes['Multiplex'] == 'YES':
                               if signals['Mul_order'] != 'root':
-                                print '   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');'
+                                print('   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');')
                               else:
-                                print '   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');'
+                                print('   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');')
                             else:
-                              print '   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');'
+                              print('   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');')
                           elif length >16 and length <=32:
                             if mes['Multiplex'] == 'YES':
                               if signals['Mul_order'] != 'root':
-                                print '   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');'
+                                print('   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');')
                               else:
-                                print '   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');'
+                                print('   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');')
                             else:
-                              print '   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');'
+                              print('   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << ' +str(byt)+');')
                           #print 'byte'+str(cl)+'data'+'>>8'
                         rem-=8
                       else:
@@ -1673,38 +1675,38 @@ def message_Get_rx():
                         if length <= 16:
                           if mes['Multiplex'] == 'YES':
                             if signals['Mul_order'] != 'root':
-                              print '   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl) +') << 8'+');'
+                              print('   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl) +') << 8'+');')
                             else:
-                              print '   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << 8'+');'
+                              print('   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << 8'+');')
                           else:
-                            print '   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << 8'+');'
+                            print('   rValue |= ('+datatype_16+')((('+datatype_16+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << 8'+');')
                         elif length <=32 and length >16:
                           if mes['Multiplex'] == 'YES':
                             if signals['Mul_order'] != 'root':
-                              print '   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl) +') << 8'+');'
+                              print('   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl) +') << 8'+');')
                             else:
-                              print '   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << '+str(byt)+');'
+                              print('   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << '+str(byt)+');')
                           else:  
-                            print '   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << '+str(byt)+');'
+                            print('   rValue |= ('+datatype_32+')((('+datatype_32+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl) +') << '+str(byt)+');')
                         #print 'byte'+str(cl)+'data'+'>>8'+"0x%02x"%int(a,2)
                         rem-=rem
                       cl+=1
-              print '   CAN_EXIT_CRITICAL_SECTION(0);'
-              print '   return rValue;'
-              print '}\n'
+              print('   CAN_EXIT_CRITICAL_SECTION(0);')
+              print('   return rValue;')
+              print('}\n')
                 
             elif signal_length<=8:
               if layout_row_start != layout_row_end:
-                layout_row_start = start_bit/8
-                layout_row_end = sig_start_bit/8
-                print datatype_8+' IlRxGet'+sig_name.upper()+'(void)'
-                print '{'
+                layout_row_start = start_bit//8
+                layout_row_end = sig_start_bit//8
+                print(datatype_8+' IlRxGet'+sig_name.upper()+'(void)')
+                print('{')
                 #print '   CAN_CCR     saveCcr;'
-                print '   '+datatype_8+'  rValue;'
-                print '    CAN_ENTER_CRITICAL_SECTION(0);'
+                print('   '+datatype_8+'  rValue;')
+                print('    CAN_ENTER_CRITICAL_SECTION(0);')
                     
                 rem=signal_length
-                start_bit_1=start_bit/8
+                start_bit_1=start_bit//8
                 cl=0
                 while(rem>0):
                   if cl==0:
@@ -1712,32 +1714,32 @@ def message_Get_rx():
                     rem -= bits_to_be_filled
                     if mes['Multiplex'] == 'YES':
                       if signals['Mul_order'] != 'root':
-                        print '   rValue = ('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+';'
+                        print('   rValue = ('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+';')
                       else:
-                        print '   rValue = ('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';'
+                        print('   rValue = ('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';')
                     else:
-                      print '   rValue = ('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';'
+                      print('   rValue = ('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+';')
                   else:
                     bits_to_be_filled=rem
                     rem -= bits_to_be_filled
                     if mes['Multiplex'] == 'YES':
                       if signals['Mul_order'] != 'root':
-                        print '   rValue |= ('+datatype_8+')((('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bits_to_be_filled)+');'
+                        print('   rValue |= ('+datatype_8+')((('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+multiplexor_id.lower()+'_data'+'.'+multiplexor_id.lower()+'_'+str(multiplexor_index)+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bits_to_be_filled)+');')
                       else:
-                        print '   rValue |= ('+datatype_8+')((('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bits_to_be_filled)+');'
+                        print('   rValue |= ('+datatype_8+')((('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bits_to_be_filled)+');')
                     else:
-                      print '   rValue |= ('+datatype_8+')((('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bits_to_be_filled)+');'
+                      print('   rValue |= ('+datatype_8+')((('+datatype_8+')'+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bits_to_be_filled)+');')
                   cl+=1
 
-                print '   CAN_EXIT_CRITICAL_SECTION(0);'
-                print '   return rValue;'
-                print '}\n'
+                print('   CAN_EXIT_CRITICAL_SECTION(0);')
+                print('   return rValue;')
+                print('}\n')
 
               
 def message_precopy():
   global dbc,datatype_16,datatype_8,datatype_32,il_data_dir,tp_generic_config,nm_generic_config,il_generic_config
   
-  vnim_cfg_file = open(il_data_dir+"CanDbcMsgConfiguration.data",'r')
+  vnim_cfg_file = open(il_data_dir+"CanDbcMsgConfiguration.data",'r',encoding='utf-8')
   vnim_msg_cfg_data = json.loads(vnim_cfg_file.read())
   vnim_cfg_file.close()
 
@@ -1789,10 +1791,10 @@ def message_precopy():
       if mes['Msg_name'] == order_msg:
         il_sorted_mes_rx_ordered.append(mes)
   
-  print '''/* ====================================================================================
+  print('''/* ====================================================================================
    Interaction Layer Receive Message Precopy Functions
    ==================================================================================*/
-'''
+''')
 
   for mes in il_sorted_mes_rx:
     if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON']:
@@ -1814,10 +1816,10 @@ def message_precopy():
       moto_max=[]   #list contains the startbit of each signla in a message for Motorola byte order
       #logic for implementing the layout with signal and unused bit
 
-      print 'void '+mes['Msg_name']+'_PreCopy (void)'
-      print '{'
-      print '   if (0 == (il_status & ('+datatype_8+') IL_STATUS_SUSPEND))'
-      print '   {'
+      print('void '+mes['Msg_name']+'_PreCopy (void)')
+      print('{')
+      print('   if (0 == (il_status & ('+datatype_8+') IL_STATUS_SUSPEND))')
+      print('   {')
       if sorted_bit:
         for signals in sorted_bit:
           if mes['Multiplex'] == 'YES':
@@ -1828,15 +1830,15 @@ def message_precopy():
           precopy = []
           signal_occur=0
           sig_start_bit = int(signals['Endbit'])
-          layout_row_start=int(signals['Endbit'])/8
+          layout_row_start=int(signals['Endbit'])//8
           layout_col_start=int(signals['Endbit'])%8
           signal_length=int(signals['Len'])
           sig_name = signals['Sig_name']
           end_bit=int(signals['Endbit'])+signal_length-1
-          layout_row_end = end_bit/8
+          layout_row_end = end_bit//8
 
           byte_no=0
-          byte_no_1=(signal_length/8)-1 if signal_length%8 == 0 else signal_length/8
+          byte_no_1=(signal_length//8)-1 if signal_length%8 == 0 else signal_length//8
 
     
           if signals['Order'] == 'Intel':  
@@ -1845,7 +1847,7 @@ def message_precopy():
 
               if layout_row_start != layout_row_end:
                 rem=signal_length
-                start_bit_1=sig_start_bit/8
+                start_bit_1=sig_start_bit//8
                 cl=0
                 while(rem>0):
                   if cl==0:
@@ -1899,7 +1901,7 @@ def message_precopy():
                         #print '   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');'
                         precopy.append(sig_name.upper()+'_'+str(cl))
                       elif length>16 and length <= 32:
-                        print '   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');'
+                        print('   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');')
                         precopy.append(sig_name.upper()+'_'+str(cl))
                       bit_to_be_filled+=8
                     elif rem>0 and rem<8:
@@ -1948,7 +1950,7 @@ def message_precopy():
             elif signal_length <=64 and signal_length >32 :
               co = 0
               
-              while (co < signal_length/8):
+              while (co < signal_length//8):
                 #print '    pData['+str(co)+'] = '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(co)+';'
                 precopy.append(sig_name.upper()+'_'+str(co))
                 co+=1
@@ -1972,18 +1974,18 @@ def message_precopy():
             temp_str+='         ILSet_'+sig_name.upper()+'_DataChanged();\n'
             temp_str+='     }\n'
               
-            print temp_str
+            print(temp_str)
             
           elif signals['Order'] == 'Motorola':
             if sig_start_bit== 7 and sig_start_bit ==1 :
               start_bit=sig_start_bit
             else:
-              start_bit = (sig_start_bit-7) + 8*((signal_length/8)-1)
+              start_bit = (sig_start_bit-7) + 8*((signal_length//8)-1)
             no_print = 1        
             if signal_length <=64 and signal_length >32 :
               co = 0
               
-              while (co < signal_length/8):
+              while (co < signal_length//8):
                 #print '   pData['+str(co)+'] = '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_byte'+str(co)+';'
                 precopy.append(sig_name.upper()+'_'+str(co))
                 co+=1
@@ -2067,17 +2069,17 @@ def message_precopy():
                         #print 'byte'+str(cl)+'data'+'>>8'+"0x%02x"%int(a,2)
                         rem-=rem
                       cl+=1
-              print '   CAN_EXIT_CRITICAL_SECTION(0);'
-              print '   return rValue;'
-              print '}\n'
+              print('   CAN_EXIT_CRITICAL_SECTION(0);')
+              print('   return rValue;')
+              print('}\n')
                 
             elif signal_length<=8:
-              layout_row_start = start_bit/8
-              layout_row_end = sig_start_bit/8
+              layout_row_start = start_bit//8
+              layout_row_end = sig_start_bit//8
               if layout_row_start != layout_row_end:
                                   
                 rem=signal_length
-                start_bit_1=start_bit/8
+                start_bit_1=start_bit//8
                 cl=0
                 while(rem>0):
                   if cl==0:
@@ -2116,16 +2118,16 @@ def message_precopy():
               temp_str+='         ILSet_'+sig_name.upper()+'_DataChanged();\n'
               temp_str+='     }\n'
                 
-              print temp_str
+              print(temp_str)
           
           
-    print '   }'
-    print '}\n'
+    print('   }')
+    print('}\n')
     
 def buffer_obj():
   global dbc,datatype_16,datatype_8,datatype_32,il_data_dir,tp_generic_config,nm_generic_config,il_generic_config
   
-  vnim_cfg_file = open(il_data_dir+"CanDbcMsgConfiguration.data",'r')
+  vnim_cfg_file = open(il_data_dir+"CanDbcMsgConfiguration.data",'r',encoding='utf-8')
   vnim_msg_cfg_data = json.loads(vnim_cfg_file.read())
   vnim_cfg_file.close()
   
@@ -2185,7 +2187,7 @@ def buffer_obj():
       if mes['Msg_name'] == order_msg:
         il_sorted_mes_rx_ordered.append(mes)
   
-  print '''/* ===========================================================================
+  print('''/* ===========================================================================
 //  M E M O R Y   A L L O C A T I O N
 // =========================================================================*/
 CAN_UINT8 il_Rx_DataChanged_Flag[ IL_NUM_OF_RX_DATA_CHANGED_FLAG ];
@@ -2195,17 +2197,17 @@ CAN_UINT8 il_Rx_DataChanged_Flag[ IL_NUM_OF_RX_DATA_CHANGED_FLAG ];
 /  ========================================================================*/
 /*Tx_Msg_buf             Tx_buffer;*/
 Rx_Msg_buf  Rx_buffer;
-'''
+''')
 
-  print "/* Tx buffer objects */\n"
+  print("/* Tx buffer objects */\n")
   for mes in il_sorted_mes_tx:
     if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_tx_enable'] in ['on','On',1,'1','ON']:
-      print mes['Msg_name'].upper()+'_buf '+mes['Msg_name'].upper()+';'
-  print "/* Rx buffer objects */\n"
+      print(mes['Msg_name'].upper()+'_buf '+mes['Msg_name'].upper()+';')
+  print("/* Rx buffer objects */\n")
   
   for mes in il_sorted_mes_rx_ordered:
     if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON']:
-      print mes['Msg_name'].upper()+'_buf '+mes['Msg_name'].upper()+';'  
+      print(mes['Msg_name'].upper()+'_buf '+mes['Msg_name'].upper()+';')  
 
 
 #f=open('nm_il_msg.h','w')
@@ -2215,12 +2217,11 @@ def il_par_c_gen_function():
 
   if not os.path.exists(il_code_gen_dir):
       os.mkdir(il_code_gen_dir)
-  f=open('./CODE_GEN/nw_il_par.c','w')
-
-  sys.stdout = f
+  f=open_output("nw_il_par.c")
 
 
-  print '''/* ===========================================================================
+
+  print('''/* ===========================================================================
 
                        CONFIDENTIAL VISTEON CORPORATION
 
@@ -2252,13 +2253,13 @@ def il_par_c_gen_function():
 
   /* ===========================================================================
     P U B L I C   T Y P E   D E F I N I T I O N S
-   ========================================================================*/\n\n'''
+   ========================================================================*/\n\n''')
 
-  print '#include "can_type.h"'
-  print '#include "can_defs.h"'
-  print '#include "can_csec.h"'
-  print '#include "nw_il.h"'
-  print '#include "nw_il_par.h"'
+  print('#include "can_type.h"')
+  print('#include "can_defs.h"')
+  print('#include "can_csec.h"')
+  print('#include "nw_il.h"')
+  print('#include "nw_il_par.h"')
 
   
 
@@ -2271,8 +2272,8 @@ def il_par_c_gen_function():
   message_Get_rx()
   message_precopy()
   
-  print footer
-  f.close()
+  print(footer)
+  close_output(f)
 
 
 if __name__ == '__main__':

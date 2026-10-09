@@ -1,5 +1,6 @@
 import pickle
 import sys,re 
+from py2compat import Py2Dict
 
 #note - class  dbc_parser not completed 
 class dbc_parser:
@@ -7,14 +8,14 @@ class dbc_parser:
     def __init__(self,dbc=None,node=None):
         self.dbc=dbc
         self.node=node
-        self.__message={} #message is a dictionary which has message id(in decimal) as key and the value will also be a dictionary which contains its attributes and signal list.
-        self.__multiplex_message={} #multiplex message is a dictionary which has message id(in decimal) as key and the value will also be a dictionary which contains its attributes and signal list.
+        self.__message=Py2Dict() #message is a dictionary which has message id(in decimal) as key and the value will also be a dictionary which contains its attributes and signal list.
+        self.__multiplex_message=Py2Dict() #multiplex message is a dictionary which has message id(in decimal) as key and the value will also be a dictionary which contains its attributes and signal list.
         self.__nodes=[]#contains the nodes in the database 
         self.__message_type=[]#
         self.__message_parameters=[]#list contains what are the properties of messages defined in the database
         self.__signal_parameters=[]#list contains what are the properties of signals defined in the database
-        self.__default_values={}
-        self.__enum_values={}
+        self.__default_values=Py2Dict()
+        self.__enum_values=Py2Dict()
 
     def __parse_messages__(self):
         '''Function uesd to extract messages,signals,message properties and signal properites
@@ -25,7 +26,7 @@ class dbc_parser:
         '''
         
         if self.dbc != None:
-            temp_file=open(self.dbc,'r')
+            temp_file=open(self.dbc,'r',encoding='latin-1')
             for line in temp_file:#iterate over every line in dbc file
                 line=line.rstrip(' ;\n')#remove ;\n symbol on the right end line
                 line=line.split(" ")#split the line into items seprated by spaces
@@ -124,12 +125,12 @@ class dbc_parser:
                     if "BO_" in line and self.node in line and 'CM_' not in line:
                         #Getting Tx message of node by checking if B0_ and Our node name in the line list 
                         if line[1] not in self.__message:#adding new key in message dictionary with id as key  
-                            self.__message[line[1]]={"Multiplex":"NO","Msg_name":line[2].rstrip(':'),"DLC":line[3],"DIR":'tx'}
+                            self.__message[line[1]]=Py2Dict([("Multiplex","NO"),("Msg_name",line[2].rstrip(':')),("DLC",line[3]),("DIR",'tx')])
                         
                         #Below logic used for Tx signal extracting
                         signal_end=1#variable used to check the end of the signals under the paricular message
-                        sig = temp_file.next()#dbc.next() will give the next line 
-                        sig_list={}#variable used to store the signal parameter list 
+                        sig = next(temp_file)#dbc.next() will give the next line 
+                        sig_list=Py2Dict()#variable used to store the signal parameter list 
                         
                         while signal_end!=0:#checking for line with SG_
                             if "BO_" in sig:#if BO_ has occured then next message definition has occured. Hence we need to stop extracting signals
@@ -157,16 +158,16 @@ class dbc_parser:
                                     
                                     temp_end_bit=temp_sig[0].split("|")[0]
                                     #sig_list.append({'name':sig[1],'len':temp_sig_len,'order':temp_byte_order,'endbit':temp_end_bit})
-                                    sig_list[(sig[1].rstrip(':')).upper()]={'Len':temp_sig_len,'Order':temp_byte_order,'Endbit':temp_end_bit}
+                                    sig_list[(sig[1].rstrip(':')).upper()]=Py2Dict([('Len',temp_sig_len),('Order',temp_byte_order),('Endbit',temp_end_bit)])
                                     #print temp_byte_order
-                                sig = temp_file.next() 
+                                sig = next(temp_file) 
                                 
                                 #print temp_byte_order
                             else:#empty lines 
                                 signal_end=0
                                 
                         if line[1] not in self.__message:#adding signal list parameters to the signal
-                            self.__message[line[1]]={'Sig_List':sig_list}
+                            self.__message[line[1]]=Py2Dict([('Sig_List',sig_list)])
                         else:
                             self.__message[line[1]]['Sig_List']=sig_list
                         
@@ -177,13 +178,13 @@ class dbc_parser:
                     if "BO_" == line[0] and self.node not in line:#checking for BO_ and other node value
                         #print line    
                         signal_end=1
-                        sig = temp_file.next()
+                        sig = next(temp_file)
                         
                         rx_message=0#used to indicate rx message .If any signal has receiver node as our node then that message will be considered as receive message
                         multiplex_message = 0
-                        sig_list={}
+                        sig_list=Py2Dict()
                         multiplex_rx=[]
-                        multiplex_msg={}
+                        multiplex_msg=Py2Dict()
                             
                         while signal_end!=0:
                             #print sig ,'SG_' in sig
@@ -215,12 +216,12 @@ class dbc_parser:
                                     
                                     temp_end_bit=temp_sig[0].split("|")[0]
                                     if re.match('m*[0-9]',sig[2]) is not None:	
-                                      sig_list[sig[1].rstrip(':').upper()]={'Mul_order':sig[2].lstrip('m'),'Len':temp_sig_len,'Order':temp_byte_order,'Endbit':temp_end_bit}
+                                      sig_list[sig[1].rstrip(':').upper()]=Py2Dict([('Mul_order',sig[2].lstrip('m')),('Len',temp_sig_len),('Order',temp_byte_order),('Endbit',temp_end_bit)])
                                     elif sig[2] == 'M':
-                                      sig_list[sig[1].rstrip(':').upper()]={'Mul_order':"root",'Len':temp_sig_len,'Order':temp_byte_order,'Endbit':temp_end_bit}
+                                      sig_list[sig[1].rstrip(':').upper()]=Py2Dict([('Mul_order',"root"),('Len',temp_sig_len),('Order',temp_byte_order),('Endbit',temp_end_bit)])
                                     else:
-                                      sig_list[sig[1].rstrip(':').upper()]={'Len':temp_sig_len,'Order':temp_byte_order,'Endbit':temp_end_bit}
-                                sig = temp_file.next()
+                                      sig_list[sig[1].rstrip(':').upper()]=Py2Dict([('Len',temp_sig_len),('Order',temp_byte_order),('Endbit',temp_end_bit)])
+                                sig = next(temp_file)
                             elif "BO_" in sig:
                                 #print '1.exit'
                                 signal_end=0
@@ -233,12 +234,12 @@ class dbc_parser:
                         if(rx_message==1):
                             if multiplex_message == 1:
                               if line[1] not in self.__multiplex_message:
-                                self.__multiplex_message[line[1]]={"Msg_name":line[2].rstrip(':'),"Multiplex":"YES","DLC":line[3],"DIR":'rx',"Sig_List":sig_list}
+                                self.__multiplex_message[line[1]]=Py2Dict([("Msg_name",line[2].rstrip(':')),("Multiplex","YES"),("DLC",line[3]),("DIR",'rx'),("Sig_List",sig_list)])
                             if line[1] not in self.__message:
                               if multiplex_message == 1:
-                                self.__message[line[1]]={"Msg_name":line[2].rstrip(':'),"DLC":line[3],"Multiplex":"YES","DIR":'rx',"Sig_List":sig_list}
+                                self.__message[line[1]]=Py2Dict([("Msg_name",line[2].rstrip(':')),("DLC",line[3]),("Multiplex","YES"),("DIR",'rx'),("Sig_List",sig_list)])
                               else:
-                                self.__message[line[1]]={"Msg_name":line[2].rstrip(':'),"DLC":line[3],"Multiplex":"NO","DIR":'rx',"Sig_List":sig_list}     
+                                self.__message[line[1]]=Py2Dict([("Msg_name",line[2].rstrip(':')),("DLC",line[3]),("Multiplex","NO"),("DIR",'rx'),("Sig_List",sig_list)])     
 
         #print self.__message    
         temp_file.close()
@@ -247,7 +248,7 @@ class dbc_parser:
       '''This function will returnt the multiplex signal details 
         input : msgid'''
       if msg_id in self.__multiplex_message:
-        multiplex_data={'Multiplexor':None,'Multiplex_group':None,'Multiplex_maxval':0,'Multiplex_group_Name':None}
+        multiplex_data=Py2Dict([('Multiplexor',None),('Multiplex_group',None),('Multiplex_maxval',0),('Multiplex_group_Name',None)])
         mes=self.__multiplex_message[msg_id]
         #mul_group={'Group_Name':None,'Group_list':None}
         multiplex_list=[]
@@ -284,7 +285,7 @@ class dbc_parser:
     def __message_par__(self):
         ''' Funtion used to extract the parameters of the each message '''
         if self.dbc != None:
-            temp_file=open(self.dbc,'r')
+            temp_file=open(self.dbc,'r',encoding='latin-1')
             for line in temp_file:  
                 line=line.rstrip(';\n')
                 line=line.split(" ")
@@ -304,7 +305,7 @@ class dbc_parser:
     def __sig_par__(self):
         '''Funtion used to extract the parameters of the each signals'''
         if self.dbc != None:
-            temp_file=open(self.dbc,'r')
+            temp_file=open(self.dbc,'r',encoding='latin-1')
             for line in temp_file:  
                     line=line.rstrip(';\n')
                     line=line.split(" ")
@@ -353,7 +354,7 @@ class dbc_parser:
                     if self.__message[mes]['SystemMessageLongSymbol'] != '':
                         self.__message[mes]['Msg_name'] = self.__message[mes]['SystemMessageLongSymbol']
                 item_to_remove=[]
-                items_to_add={}
+                items_to_add=Py2Dict()
                 for sig in self.__message[mes]['Sig_List']:
                     #print sig print 'adf'
                     #print self.__message[mes]['Sig_List'][sig]
@@ -383,7 +384,7 @@ class dbc_parser:
         self.__add_default_message_parameters()
         self.__add_default_signal_parameters()
         self.__replace_signal_name_32_bit_wide()
-        t_messages={}
+        t_messages=Py2Dict()
         
            
         for keys in self.__message:
@@ -578,6 +579,11 @@ class dbc_parser:
         else:
             return None
     
+    def get_nodes(self):
+        '''returns the node names defined in the BU_ line of the database'''
+        self.__parse_messages__()
+        return list(self.__nodes)
+
     def check__node(self):
         
         try:

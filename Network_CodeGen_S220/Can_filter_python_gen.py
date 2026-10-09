@@ -50,7 +50,7 @@ def html(file_name,node):
     </head>
     <body onload="load()" class="w3-container w3-grey">"""
 
-    file1=open(html_dir+'Tool_Index_Page.html','r')
+    file1=open(html_dir+'Tool_Index_Page.html','r',encoding='latin-1')
     start=0
     for line in file1.readlines():
         if '<!--copy_start-->' == line.rstrip('\n'):
@@ -187,11 +187,11 @@ def html(file_name,node):
     """
 
     #print html_css_content
-    html= open(html_dir+'CanFilterconfiguration.html', 'w')
+    html= open(html_dir+'CanFilterconfiguration.html', 'w',encoding='latin-1')
     html.write(html_css_content)
     html.close()
     #print js
-    jscript = open(java_dir+'CanFilterconfiguration.js', 'w')
+    jscript = open(java_dir+'CanFilterconfiguration.js', 'w',encoding='latin-1')
    
     jscript.write(js)
     
