@@ -19,6 +19,18 @@ def _describe(exc):
     return "%s: %s" % (type(exc).__name__, exc)
 
 
+def _set_aside_fifo_config(archive_names):
+    """Archives saved before the FIFO configuration existed do not contain it; the current file belongs
+    to another project, so it is renamed instead of silently applied. Returns a note for the user."""
+    import cogent_fifo
+    current = os.path.join('.', 'data', cogent_fifo.CONFIG_FILE)
+    if 'data/' + cogent_fifo.CONFIG_FILE in archive_names or not os.path.isfile(current):
+        return ""
+    os.replace(current, current + '.previous')
+    return ("This archive has no FIFO configuration: data\\%s was renamed to %s.previous and the platform "
+            "defaults apply.\n" % (cogent_fifo.CONFIG_FILE, cogent_fifo.CONFIG_FILE))
+
+
 def _open_data_or_empty(path):
     """Saved page settings, or an empty configuration when the page was never saved."""
     if not os.path.exists(path):
@@ -120,6 +132,7 @@ class BackEnd(htmlPy.Object):
                     raise CogentError(op, "%s is a zip archive but not a CoGeNT configuration archive (data/dbc_details.data is missing)" % file_val,
                                       item=item, hint=hint)
                 dbc_details = json.loads(zip1.read('data/dbc_details.data').decode('utf-8'))
+                fifo_note = _set_aside_fifo_config(zip1.namelist())
                 zip1.extractall()
         except CogentError as err:
             self._fail(op, err)
@@ -139,7 +152,8 @@ class BackEnd(htmlPy.Object):
         if dbc_details.get("ch0_node_name", '') !='':
             self.__node=dbc_details["ch0_node_name"]
         self.default_page()
-        self._alert("Configuration loaded successfully\n%s\nPress 'Load DBC' before opening the configuration pages or running code gen." % file_val)
+        self._alert("Configuration loaded successfully\n%s\n%sPress 'Load DBC' before opening the configuration pages or running code gen."
+                    % (file_val, fifo_note))
 
 
 
@@ -241,15 +255,20 @@ class BackEnd(htmlPy.Object):
             import datetime
             time_print = datetime.datetime.now()
             try:
-                files = cogent_generate.run_code_generation(self.__dbc, self.__node, time_print.strftime("%Y-%m-%d %H:%M"))
+                result = cogent_generate.run_code_generation(self.__dbc, self.__node, time_print.strftime("%Y-%m-%d %H:%M"))
             except CogentError as err:
                 self._alert(err.user_message())
             except Exception as exc:  # outside the generators (those are explained in cogent_generate)
                 self._fail(op, exc, item="preparing the code generation",
                            hint="Please send logs\\cogent.log to the tool maintainer.")
             else:
-                self._alert("Code Generated in CODE_GEN folder\n%d files written to %s"
-                            % (len(files), os.path.abspath(cogent_generate.OUTPUT_DIR)))
+                text = ("Code Generated in CODE_GEN folder\n%d files written to %s\nCAN receive rules: %d of %d (FIFO 0/1/2: %s)"
+                        % (len(result.files), os.path.abspath(cogent_generate.OUTPUT_DIR), sum(result.fifo_counts),
+                           result.max_rx_rules, "/".join(str(c) for c in result.fifo_counts)))
+                if result.manual_actions:
+                    text += ("\nManual action required: %d item(s), see CODE_GEN\\%s"
+                             % (result.manual_actions, cogent_generate.MANUAL_ACTIONS))
+                self._alert(text)
         self.default_page()
 
 

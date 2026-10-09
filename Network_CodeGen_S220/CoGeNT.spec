@@ -6,7 +6,7 @@ datas = [("html", "html"), ("js", "js"), ("style", "style"), ("data", "data"),
          ("batman.ico", "."), ("cogent_gui/bridge.js", "cogent_gui")]
 hidden = ["Dbc_Parser", "Can_dbc_gen", "Can_filter_python_gen", "can_rx_filt_gen", "msg",
           "il_par_h_generation", "il_par_c_generation", "vnim_app_signals_par", "cogent_io", "py2compat",
-          "cogent_errors", "cogent_generate"]
+          "cogent_errors", "cogent_generate", "cogent_fifo"]
 
 a = Analysis(["CoGeNT.pyw"], pathex=["."], datas=datas, hiddenimports=hidden,
              excludes=["tkinter", "PySide6.Qt3DCore", "PySide6.QtQuick3D", "PySide6.QtMultimedia"])

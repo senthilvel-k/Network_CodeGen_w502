@@ -11,6 +11,9 @@ sys.path.insert(0, str(ROOT))
 
 FIXTURE = "s2xx_40024"          # real _Edited DBC + config from CODE_GEN/DBC_40024_2
 TIME = "2000-01-01 00:00"
+# The legacy runs of this fixture use 209 receive rules (81 in FIFO 2). With limits that allow this the
+# output must stay identical to the legacy tool; the 192-rule platform limit is tested in test_fifo_pipeline.
+LEGACY_LIMITS = {"max_rx_rules": 256, "max_rules_per_fifo": 128}
 
 
 @pytest.fixture
@@ -18,6 +21,7 @@ def home(tmp_path, monkeypatch):
     """A working folder like the app folder (generators use ./data and ./CODE_GEN)."""
     h = tmp_path / "CoGeNT home with spaces"
     shutil.copytree(load_fixture(FIXTURE).data_dir, h / "data")
+    (h / "data" / "CanFifoConfiguration.data").write_text(json.dumps(LEGACY_LIMITS), encoding="utf-8")
     monkeypatch.chdir(h)
     monkeypatch.setenv("LOGNAME", "cogent-test")
     return h
@@ -56,7 +60,8 @@ def test_generation_writes_all_files_identical_to_legacy_run(home):
     (home / "CODE_GEN").mkdir()
     (home / "CODE_GEN" / "errorlog.txt").write_text("old failure", encoding="utf-8")
     written = _generate()
-    assert sorted(written) == sorted(CODE_FILES)
+    assert sorted(written.files) == sorted(CODE_FILES)
+    assert written.fifo_counts == (64, 64, 81) and written.manual_actions == 0
     legacy = LEGACY_REFS[FIXTURE][0]
     for f in CODE_FILES:
         assert normalize_header((home / "CODE_GEN" / f).read_bytes()) == normalize_header((legacy / f).read_bytes()), f

@@ -1,0 +1,7 @@
+{
+ "merge_blocks": [
+  {"base": "0x3D0", "mask": "0x7F0"},
+  {"base": "0x4F0", "mask": "0x7F0"}
+ ],
+ "additional_rx_messages": ["BMS19_100", "BMS20_100"]
+}

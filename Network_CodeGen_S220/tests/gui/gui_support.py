@@ -9,9 +9,9 @@ from support import ROOT, load_fixture
 
 APP_ITEMS = ["CoGeNT.pyw", "back_end.py", "Dbc_Parser.py", "Can_dbc_gen.py", "Can_filter_python_gen.py",
              "can_rx_filt_gen.py", "msg.py", "il_par_h_generation.py", "il_par_c_generation.py",
-             "vnim_app_signals_par.py", "cogent_io.py", "cogent_errors.py", "cogent_generate.py",
+             "vnim_app_signals_par.py", "cogent_io.py", "cogent_errors.py", "cogent_generate.py", "cogent_fifo.py",
              "py2compat.py", "batman.ico", "cogent_gui", "html", "js", "style"]
-APP_MODULES = ("back_end", "Dbc_Parser", "py2compat", "cogent_io", "cogent_errors", "cogent_generate",
+APP_MODULES = ("back_end", "Dbc_Parser", "py2compat", "cogent_io", "cogent_errors", "cogent_generate", "cogent_fifo",
                "Can_dbc_gen", "Can_filter_python_gen", "can_rx_filt_gen", "msg", "il_par_h_generation",
                "il_par_c_generation", "vnim_app_signals_par")
 

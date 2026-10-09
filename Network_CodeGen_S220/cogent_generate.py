@@ -3,13 +3,20 @@
 Runs the generators in the legacy order into CODE_GEN/.staging and replaces the files in
 CODE_GEN only when every generator succeeded, so a failed run never leaves a mix of new and
 old files. Failures are raised as CogentError with a user-facing explanation; the traceback
-goes to CODE_GEN/errorlog.txt and logs/cogent.log."""
+goes to CODE_GEN/errorlog.txt and logs/cogent.log.
+
+The CAN receive rules are planned and checked against the controller limits (cogent_fifo,
+data/CanFifoConfiguration.data) before any generator runs, and the generated can_rxrule.cfg and
+nw_can_dll.h are checked against that plan before they are published. Every run also writes
+CODE_GEN/fifo_plan.json and CODE_GEN/MANUAL_ACTIONS.md."""
 import importlib
 import json
 import os
 import shutil
 import sys
+from dataclasses import dataclass
 
+import cogent_fifo
 import cogent_io
 from cogent_errors import (MSG_DATA_FILE, MSG_PAGE, SIG_DATA_FILE, SIG_PAGE, CogentError, log_failure,
                            missing_config_entry)
@@ -32,15 +39,30 @@ PLAN = [
                               ("nm_par_gen", ["nw_nm_par.h"])]),
 ]
 GENERATED_FILES = [f for _, funcs in PLAN for _, files in funcs for f in files]
+FIFO_PLAN = "fifo_plan.json"
+MANUAL_ACTIONS = "MANUAL_ACTIONS.md"
+REPORT_FILES = [FIFO_PLAN, MANUAL_ACTIONS]
+
+
+@dataclass
+class GenerationResult:
+    files: list            # generated source files now in CODE_GEN
+    reports: list          # REPORT_FILES
+    manual_actions: int    # entries of MANUAL_ACTIONS.md that need the user
+    fifo_counts: tuple     # receive rules per FIFO
+    max_rx_rules: int
 
 
 def run_code_generation(dbc, node, time_str):
-    """Generate all files for `dbc`/`node` into ./CODE_GEN. Returns the generated file names."""
+    """Generate all files for `dbc`/`node` into ./CODE_GEN. Returns a GenerationResult."""
     context = {"DBC file": dbc, "Node": node, "Working folder": os.getcwd()}
     try:
         msg_cfg = _check_inputs(dbc, node)
         _check_multiplex(dbc, node, msg_cfg)
+        plan, fifo_config = _check_fifo(dbc, node, msg_cfg)
         _run_generators(dbc, node, time_str)
+        _check_generated_rules(plan)
+        manual = _write_reports(plan, fifo_config, dbc, node, msg_cfg)
         _publish()
     except CogentError as err:
         err.log_path = log_failure("Code generation", err, context, extra_file=ERROR_LOG)
@@ -49,7 +71,8 @@ def run_code_generation(dbc, node, time_str):
         shutil.rmtree(STAGING_DIR, ignore_errors=True)
     if os.path.exists(ERROR_LOG):
         os.remove(ERROR_LOG)  # the last run succeeded; an old failure log would mislead
-    return list(GENERATED_FILES)
+    return GenerationResult(list(GENERATED_FILES), list(REPORT_FILES), manual, plan.fifo_counts(),
+                            fifo_config.max_rx_rules)
 
 
 def _check_inputs(dbc, node):
@@ -94,6 +117,64 @@ def _check_multiplex(dbc, node, msg_cfg):
         raise multiplex_error(*found)
 
 
+def _check_fifo(dbc, node, msg_cfg):
+    """Plan the CAN receive rules and check them against the controller before any file is written."""
+    import can_rx_filt_gen
+    from Dbc_Parser import dbc_parser
+    op, item = "Code generation", "planning the CAN receive rules (can_rxrule.cfg, nw_can_dll.h)"
+    try:
+        config = cogent_fifo.load_config(DATA_DIR)
+    except cogent_fifo.FifoConfigError as exc:
+        raise CogentError(op, str(exc), item="reading the FIFO configuration",
+                          hint="No file was changed. Correct data\\%s (see FIFO_MULTIPLEXING.md) or delete it to "
+                               "use the platform defaults, then run code gen again." % cogent_fifo.CONFIG_FILE) from exc
+    try:
+        plan = can_rx_filt_gen.plan_rx_rules(dbc_parser(dbc, node), msg_cfg, config)
+    except cogent_fifo.FifoPlanError as exc:
+        raise CogentError(op, "; ".join(exc.problems), item=item,
+                          hint="No file was changed. Correct merge_blocks / additional_rx_messages in data\\%s or the "
+                               "Rx settings on '%s', then run code gen again." % (cogent_fifo.CONFIG_FILE, MSG_PAGE)) from exc
+    except KeyError as exc:
+        err = missing_config_entry(exc.args[0], "can_rxrule.cfg / nw_can_dll.h") if exc.args and isinstance(exc.args[0], str) else None
+        if err is None:
+            raise
+        raise err from exc
+    problems = cogent_fifo.check_limits(plan, config)
+    if problems:
+        raise CogentError(op, "; ".join(problems), item=item, hint=cogent_fifo.overflow_hint(plan, config))
+    return plan, config
+
+
+def _check_generated_rules(plan):
+    """The staged can_rxrule.cfg and nw_can_dll.h must contain exactly the planned rules."""
+    def staged(name):
+        with open(os.path.join(STAGING_DIR, name), encoding='latin-1') as fh:
+            return fh.read()
+    want = [(r.can_id, r.mask, r.ptr1) for r in plan.rules()]
+    got = cogent_fifo.read_rule_table(staged("can_rxrule.cfg"))
+    vectors = cogent_fifo.read_dispatch_counts(staged("nw_can_dll.h"))
+    if got != want or vectors != plan.fifo_counts():
+        raise CogentError("Code generation", "the generated receive rules do not match the receive-rule plan "
+                          "(can_rxrule.cfg: %d rules, planned %d; nw_can_dll.h dispatch entries %s, planned %s)"
+                          % (len(got), len(want), vectors, plan.fifo_counts()),
+                          item="checking can_rxrule.cfg and nw_can_dll.h",
+                          hint="No file was changed. This is a problem in the generator; please send "
+                               "CODE_GEN\\errorlog.txt to the tool maintainer.")
+
+
+def _write_reports(plan, config, dbc, node, msg_cfg):
+    """CODE_GEN/fifo_plan.json and CODE_GEN/MANUAL_ACTIONS.md (staged with the generated files)."""
+    disabled = [n for n in config.additional_rx_messages
+                if msg_cfg.get(n.upper() + '_rx_enable') not in ('on', 'ON', 'On', 1, '1')]
+    text, entries = cogent_fifo.manual_actions(plan, config, os.path.basename(dbc), node, disabled)
+    with open(os.path.join(STAGING_DIR, MANUAL_ACTIONS), 'w', encoding='utf-8') as fh:
+        fh.write(text)
+    with open(os.path.join(STAGING_DIR, FIFO_PLAN), 'w', encoding='utf-8') as fh:
+        json.dump(cogent_fifo.plan_summary(plan, config), fh, indent=1)
+        fh.write("\n")
+    return entries
+
+
 def _run_generators(dbc, node, time_str):
     shutil.rmtree(STAGING_DIR, ignore_errors=True)
     os.makedirs(STAGING_DIR)
@@ -127,6 +208,10 @@ def _explain(exc, output):
     import msg
     if isinstance(exc, msg.UnsupportedMultiplexLayout):
         return multiplex_error(exc.msg_name, exc.multiplexor, exc.problem)
+    if isinstance(exc, (cogent_fifo.FifoConfigError, cogent_fifo.FifoPlanError)):
+        return CogentError("Code generation", str(exc), item="generating " + output,
+                           hint="Correct data\\%s or the Rx settings on '%s', then run code gen again."
+                                % (cogent_fifo.CONFIG_FILE, MSG_PAGE))
     if isinstance(exc, KeyError) and exc.args and isinstance(exc.args[0], str):
         err = missing_config_entry(exc.args[0], output)
         if err is not None:
@@ -146,7 +231,7 @@ def _explain(exc, output):
 def _publish():
     """Move the staged files into CODE_GEN."""
     replaced = []
-    for name in GENERATED_FILES:
+    for name in GENERATED_FILES + REPORT_FILES:
         target = os.path.join(OUTPUT_DIR, name)
         try:
             os.replace(os.path.join(STAGING_DIR, name), target)
