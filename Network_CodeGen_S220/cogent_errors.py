@@ -24,13 +24,14 @@ SIGNAL_FIELDS = ('os_notify_no_of_events', 'signal_fault_id', 'signal_content', 
 class CogentError(Exception):
     """An operation failed for a reason the user can act on (or an internal error, explained)."""
 
-    def __init__(self, operation, reason, item=None, hint=None, log_path=None):
+    def __init__(self, operation, reason, item=None, hint=None, log_path=None, details=None):
         super().__init__(reason)
         self.operation = operation
         self.reason = reason
         self.item = item
         self.hint = hint
         self.log_path = log_path
+        self.details = details      # long explanation for the log only (keeps the popup short)
 
     def user_message(self):
         head = self.operation + " failed" + (" while " + self.item if self.item else "") + "."
@@ -55,6 +56,9 @@ def log_failure(operation, exc, context=None, extra_file=None):
     if isinstance(exc, CogentError):
         lines.append("Message shown to the user:")
         lines.append(exc.user_message())
+        if exc.details:
+            lines.append("Details:")
+            lines.append(exc.details)
         cause = exc.__cause__ or exc.__context__
         if cause is not None:
             lines.append("".join(traceback.format_exception(type(cause), cause, cause.__traceback__)))

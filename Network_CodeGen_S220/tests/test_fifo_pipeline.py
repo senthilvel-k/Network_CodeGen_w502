@@ -54,20 +54,20 @@ def _rules(home):
 
 
 # ---- overflow is detected before any file is written ------------------------------------------------
-def test_overflow_with_platform_defaults_names_counts_messages_and_candidates(home):
+def test_overflow_popup_is_short_and_the_log_names_messages_and_candidates(home):
     from cogent_errors import CogentError
     _previous_outputs(home)
     with pytest.raises(CogentError) as exc:
         _generate()
     text = exc.value.user_message()
-    assert "Traceback" not in text
-    assert "209 receive rules are needed but the controller accepts at most 192" in text
-    assert "FIFO 2 (PTR1 0x400) has 81 receive rules, limit 64" in text
-    assert "these do not fit: CCM_ACTIVE (0x3AC)" in text and "VCU_WAKEUP (0x09F)" in text   # NM rules at the end of FIFO 2
-    assert "0x4F0-0x4FF: 16 messages" in text and "0x3D0-0x3DF: 13 messages" in text
-    assert "merge_blocks" in text and "CanFifoConfiguration.data" in text and "No file was changed" in text
+    assert "Traceback" not in text and len(text) < 500
+    assert "209 CAN receive rules are needed, but the controller accepts 192 (FIFO 0/1/2: 64/64/81)" in text
+    assert "Receive FIFO" in text and "Apply" in text and "Nothing was changed" in text
     _assert_previous_outputs_untouched(home)
-    assert "209 receive rules" in (home / "CODE_GEN" / "errorlog.txt").read_text(encoding="utf-8")
+    log = (home / "CODE_GEN" / "errorlog.txt").read_text(encoding="utf-8")
+    assert "FIFO 2 (PTR1 0x400) has 81 receive rules, limit 64" in log
+    assert "these do not fit: CCM_ACTIVE (0x3AC)" in log and "VCU_WAKEUP (0x09F)" in log   # NM rules at the end of FIFO 2
+    assert "0x4F0-0x4FF: 16 messages" in log and "0x3D0-0x3DF: 13 messages" in log
 
 
 @pytest.mark.parametrize("limit, fits", [(184, True), (183, False)])
@@ -79,7 +79,7 @@ def test_total_limit_boundary_on_real_configuration(home, limit, fits):
     else:
         with pytest.raises(CogentError) as exc:
             _generate()
-        assert "184 receive rules are needed but the controller accepts at most 183" in str(exc.value)
+        assert "184 CAN receive rules are needed, but the controller accepts 183" in str(exc.value)
 
 
 def test_invalid_fifo_configuration_is_named_and_nothing_is_written(home):
@@ -90,6 +90,7 @@ def test_invalid_fifo_configuration_is_named_and_nothing_is_written(home):
         _generate()
     text = exc.value.user_message()
     assert "CanFifoConfiguration.data" in text and "0x3D1" in text and "not aligned" in text
+    assert "Receive FIFO" in text
     _assert_previous_outputs_untouched(home)
 
 
@@ -164,17 +165,16 @@ def test_without_merging_or_overflow_the_report_says_no_action(home):
 
 
 # ---- configuration archives ------------------------------------------------------------------------
-def test_loading_an_archive_without_fifo_configuration_sets_the_current_one_aside(home):
+def test_loading_an_archive_without_fifo_settings_keeps_the_current_ones(home):
     import back_end
     _fifo_config(home, REFERENCE_CONFIG)
-    note = back_end._set_aside_fifo_config(["data/dbc_details.data", "data/CanDbcMsgConfiguration.data"])
-    assert "renamed" in note
-    assert not (home / "data" / "CanFifoConfiguration.data").exists()
-    assert json.loads((home / "data" / "CanFifoConfiguration.data.previous").read_text(encoding="utf-8")) == REFERENCE_CONFIG
+    note = back_end._fifo_note(["data/dbc_details.data", "data/CanDbcMsgConfiguration.data"])
+    assert "were kept" in note
+    assert json.loads((home / "data" / "CanFifoConfiguration.data").read_text(encoding="utf-8")) == REFERENCE_CONFIG
+    assert not (home / "data" / "CanFifoConfiguration.data.previous").exists()
 
 
-def test_loading_an_archive_with_fifo_configuration_keeps_the_file_for_extraction(home):
+def test_loading_an_archive_with_fifo_settings_needs_no_note(home):
     import back_end
     _fifo_config(home, REFERENCE_CONFIG)
-    assert back_end._set_aside_fifo_config(["data/dbc_details.data", "data/CanFifoConfiguration.data"]) == ""
-    assert (home / "data" / "CanFifoConfiguration.data").exists()
+    assert back_end._fifo_note(["data/dbc_details.data", "data/CanFifoConfiguration.data"]) == ""

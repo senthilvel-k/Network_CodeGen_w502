@@ -125,15 +125,15 @@ def _check_fifo(dbc, node, msg_cfg):
     try:
         config = cogent_fifo.load_config(DATA_DIR)
     except cogent_fifo.FifoConfigError as exc:
-        raise CogentError(op, str(exc), item="reading the FIFO configuration",
-                          hint="No file was changed. Correct data\\%s (see FIFO_MULTIPLEXING.md) or delete it to "
-                               "use the platform defaults, then run code gen again." % cogent_fifo.CONFIG_FILE) from exc
+        raise CogentError(op, str(exc), item="reading the Receive FIFO settings",
+                          hint="Nothing was changed. Open 'Receive FIFO' (left menu) and press Apply to save the "
+                               "settings again, then Generate code.") from exc
     try:
         plan = can_rx_filt_gen.plan_rx_rules(dbc_parser(dbc, node), msg_cfg, config)
     except cogent_fifo.FifoPlanError as exc:
         raise CogentError(op, "; ".join(exc.problems), item=item,
-                          hint="No file was changed. Correct merge_blocks / additional_rx_messages in data\\%s or the "
-                               "Rx settings on '%s', then run code gen again." % (cogent_fifo.CONFIG_FILE, MSG_PAGE)) from exc
+                          hint="Nothing was changed. Open 'Receive FIFO' (left menu), remove or change the flagged "
+                               "block or receive-only message, press Apply, then Generate code again.") from exc
     except KeyError as exc:
         err = missing_config_entry(exc.args[0], "can_rxrule.cfg / nw_can_dll.h") if exc.args and isinstance(exc.args[0], str) else None
         if err is None:
@@ -141,7 +141,12 @@ def _check_fifo(dbc, node, msg_cfg):
         raise err from exc
     problems = cogent_fifo.check_limits(plan, config)
     if problems:
-        raise CogentError(op, "; ".join(problems), item=item, hint=cogent_fifo.overflow_hint(plan, config))
+        counts = plan.fifo_counts()
+        raise CogentError(op, "%d CAN receive rules are needed, but the controller accepts %d (FIFO 0/1/2: %s)"
+                          % (sum(counts), config.max_rx_rules, "/".join(str(c) for c in counts)),
+                          hint="Nothing was changed. Open 'Receive FIFO' (left menu, or the card on the home page): "
+                               "the ID blocks to combine are already selected. Press Apply, then Generate code again.",
+                          details="\n".join(problems) + "\n" + cogent_fifo.overflow_hint(plan, config))
     return plan, config
 
 

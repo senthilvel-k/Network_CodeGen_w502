@@ -1,107 +1,95 @@
 <!DOCTYPE html>
 <html>
-<title>W3.CSS</title>
+<head>
+<meta charset="utf-8">
+<title>CoGeNT - Home</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="{{'cogent.css'|staticfile }}">
+</head>
+<body onload="load()">
+<div class="cg-app">
+{% set active = 'home' %}
+{% include '_sidebar.html' %}
+<main class="cg-main">
+  <h1>Home</h1>
 
-<link rel="stylesheet" href="{{'styl.css'|staticfile }}">
-<!--link rel="stylesheet" href="styl.css"-->
+  {% if new and (new.messages or new.signals) %}
+  <div class="cg-banner cg-banner-warn" id="new-banner">
+    <strong>New in this DBC:</strong>
+    {% if new.messages %}{{ new.messages|length }} message{{ 's' if new.messages|length != 1 }}
+      ({{ new.messages[:6]|map(attribute='name')|join(', ') }}{{ ', ...' if new.messages|length > 6 }}){% endif %}{% if new.messages and new.signals %} and {% endif %}{% if new.signals %}{{ new.signals|length }} signal{{ 's' if new.signals|length != 1 }}{% endif %}
+    without saved settings. They are highlighted green on the pages.
+    {% if new.messages %}<a href="BackEnd.Can_dbc0_msg" data-bind="true">Review messages</a>{% endif %}
+    {% if new.signals %}<a href="BackEnd.Can_dbc0_sig" data-bind="true">Review signals</a>{% endif %}
+  </div>
+  {% endif %}
+
+  <section class="cg-card">
+    <h2>CAN database</h2>
+    <form action="BackEnd.upload_dbc" id="form" data-bind="true" class="cg-form">
+      <label for="file_path">DBC file</label>
+      <input class="cg-input" name="ch0_file" id="file_path" type="text" placeholder="D:/networkgen/DBC/.../project.dbc">
+      <input type="button" class="cg-btn" value="Browse" name="ch0_dbc_file" id="ch0_dbc_file" onclick="BackEnd.file_browse()">
+      <label for="ch0_node_name">Node name</label>
+      <input class="cg-input" id="ch0_node_name" name="ch0_node_name" type="text" placeholder="SMART_CORE">
+      <input type="submit" class="cg-btn cg-btn-primary" value="Load DBC" id="form_submit">
+    </form>
+  </section>
+
+  <section class="cg-card" id="fifo-card">
+    {% if fifo_error %}
+    <div class="cg-head"><h2>CAN receive rules</h2></div>
+    <p class="cg-over">{{ fifo_error }}</p>
+    <a class="cg-link" href="BackEnd.fifo_page" data-bind="true">Open Receive FIFO</a>
+    {% elif fifo %}
+    <div class="cg-head"><h2>CAN receive rules</h2>
+      <span class="cg-big" id="fifo-total">{{ fifo.total }}</span><span class="cg-muted">of {{ fifo.max_rx_rules }}</span></div>
+    <div class="cg-bars">
+      {% for n in fifo.fifo_counts %}
+      <div><div class="cg-bar-label"><span>FIFO {{ loop.index0 }}</span><span>{{ n }} / {{ fifo.max_rules_per_fifo }}</span></div>
+        <div class="cg-bar{{ ' over' if n > fifo.max_rules_per_fifo }}"><div style="width:{{ [100, (n * 100 // fifo.max_rules_per_fifo)]|min }}%"></div></div></div>
+      {% endfor %}
+    </div>
+    {% if fifo.fits %}
+    <p><span class="cg-ok">Fits.</span>
+      {{ fifo.merged|selectattr('applied')|list|length }} ID block{{ 's' if fifo.merged|selectattr('applied')|list|length != 1 }} combined,
+      {{ fifo.receive_only|length }} receive-only message{{ 's' if fifo.receive_only|length != 1 }}.
+      <a class="cg-link" href="BackEnd.fifo_page" data-bind="true">Manage Receive FIFO</a></p>
+    {% else %}
+    <p><span class="cg-over">{% if fifo.total > fifo.max_rx_rules %}{{ fifo.total - fifo.max_rx_rules }} rules over the limit.{% else %}A FIFO has more than {{ fifo.max_rules_per_fifo }} rules.{% endif %}</span>
+      {% if fifo.preselect_fits %}CoGeNT has selected the ID blocks to combine; open Receive FIFO and press Apply.{% else %}Open Receive FIFO to see the options.{% endif %}
+      <a class="cg-link" href="BackEnd.fifo_page" data-bind="true">Open Receive FIFO</a></p>
+    {% endif %}
+    {% for m in fifo.merged if not m.applied %}
+    <p class="cg-problem">Block {{ m.label }} is not applied: {{ m.problems|join('; ') }}. Remove or change it on the Receive FIFO page.</p>
+    {% endfor %}
+    {% for r in fifo.receive_only if r.problem %}
+    <p class="cg-problem">Receive-only message {{ r.name }}: {{ r.problem }}.</p>
+    {% endfor %}
+    {% if fifo.unconfigured %}
+    <p class="cg-muted cg-small">{{ fifo.unconfigured|length }} message{{ 's have' if fifo.unconfigured|length != 1 else ' has' }} no saved settings and
+      {{ 'are' if fifo.unconfigured|length != 1 else 'is' }} counted as not received until you save the message page.</p>
+    {% endif %}
+    {% else %}
+    <div class="cg-head"><h2>CAN receive rules</h2></div>
+    <p class="cg-muted">Load a DBC to see how many CAN receive rules it needs (the controller accepts 192).</p>
+    {% endif %}
+  </section>
+
+  <section class="cg-card">
+    <h2>Generate and configurations</h2>
+    <div class="cg-actions">
+      <input type="button" class="cg-btn cg-btn-primary" value="Generate code" name="code_generate" onclick="BackEnd.code_gen()">
+      <input type="button" class="cg-btn" value="Save configuration" name="save_cofiguration" onclick="BackEnd.save_cfg()">
+      <input type="button" class="cg-btn" value="Load configuration" name="load_cofiguration" onclick="BackEnd.load_cfg()">
+    </div>
+    <p class="cg-muted cg-small">Generate code writes the files to CODE_GEN. Save configuration stores the page settings and the
+      Receive FIFO settings in the Config folder; Load configuration restores them.</p>
+  </section>
+</main>
+</div>
 <script>
-function myFunction() {
-    var x = document.getElementById("demo");
-    if (x.className.indexOf("w3-show") == -1) {
-        x.className += " w3-show";
-    } else { 
-        x.className = x.className.replace(" w3-show", "");
-    }
-}
+function load() { BackEnd.onpageload(); }
 </script>
-
-
-<body  onload="load()" class="w3-container w3-grey" >
-
- <!-- <div class="w3-accordion w3-grey "style="width:30%" >
-  <button onclick="myFunction('Demo1')" class="w3-btn-block w3-left-align w3-round-large w3-xlarge w3-justify">&#9776; Menu </button>
-  <div id="Demo1" class="w3-accordion-content w3-animate-left "style="width:100%">
-  <BR>
-    -->
-<!--copy_start-->
-<div  class=" w3-dark-grey" style ="width:100%;height:100%;position:fixed">
-
-<div class="w3-sidenav w3-dark-grey" style ="width:15%;height:100%;float:left;overflow:auto">
-
-<div class="w3-card-4 w3-light-grey" style="width:100%;height:100%">
-    <header class="w3-container w3-light-green">
-        <h3>CAN Database </h3>
-    </header>
-    
-    <Br>
-            
-    <div class="w3-container ">
-        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_dbc0_msg" id="DRV" data-bind="true">+ TX/RX Message Configurations </a>
-    </div>
-  
-    <div class="w3-container ">
-        <a class="w3-hover-blue" style="text-decoration:none;" href="BackEnd.Can_dbc0_sig" id="DRV" data-bind="true">+ TX/Rx signal Configurations </a>
-    </div>
-    <Br>
-   
-</div>
-
-</div>
- 
-<div class=" w3-dark-grey w3-padding-medium" style ="width:85%;height:100%;float:right;overflow:auto">
-<!--copy_end-->
-
-
-<form action="BackEnd.upload_dbc" id="form" data-bind="true">
-<br>
-<br>
-<br>
-<br>
-
-<table class ="w3-table  w3-bordered  w3-border  w3-hoverable w3-hoverable">
-<tr style="width:100%"> 
-<td style="width:20%">DBC File</td>
-<td style="width:60%">
-<input class="w3-input w3-border" style="width:100%" name ="ch0_file" id= "file_path" name="ch0_node_name" type="textbox"/></td>
-<td style="width:20%" ><input type="button"  value=" Browse .." name="ch0_dbc_file" id="ch0_dbc_file" onclick="BackEnd.file_browse()"  /></td>
-
-</tr>
-<br>
-<tr style="width:100%">
-<td style="width:20%">
-<label>Node Name</label>
-</td>
-<td style="width:80%" >
-<input class="w3-input w3-border" id= "ch0_node_name"name="ch0_node_name" type="textbox">
-</td>
-</tr>
-</table>
-<br>
-<br>
-<input type="submit" value="  Load DBC  " style="width:18%" id="form_submit" />
-<br>
-<br>
-</form>
-<input type="button" value ="  code gen "  style="width:18%" name="code_generate" onclick="BackEnd.code_gen()"/>
-<br>
-<br>
-<input type="button" value =" save_cofiguration "  style="width:18%" name="save_cofiguration" onclick="BackEnd.save_cfg()"/>
-<br>
-<br>
-<input type="button" value =" load_cofiguration "  style="width:18%" name="load_cofiguration" onclick="BackEnd.load_cfg()"/>
-
-</div>
-
-
-
-</div>
 </body>
 </html>
-<script>
-function load(){
-BackEnd.onpageload();
-}
-</script>
-
-

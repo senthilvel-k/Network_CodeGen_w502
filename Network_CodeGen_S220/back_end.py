@@ -4,7 +4,9 @@ import io
 import json
 import os
 from PySide6 import QtGui, QtWidgets
+import cogent_fifo
 import cogent_generate
+import cogent_project
 from cogent_errors import CogentError, MSG_PAGE, SIG_PAGE, log_failure
 
 ''' This the Backend HTML application controlling the GUI portion '''
@@ -19,16 +21,21 @@ def _describe(exc):
     return "%s: %s" % (type(exc).__name__, exc)
 
 
-def _set_aside_fifo_config(archive_names):
-    """Archives saved before the FIFO configuration existed do not contain it; the current file belongs
-    to another project, so it is renamed instead of silently applied. Returns a note for the user."""
-    import cogent_fifo
+def _fifo_note(archive_names):
+    """Archives saved before the Receive FIFO settings existed do not contain them: the current settings
+    are kept (they belong to the project, not to a DBC version). Returns a note for the user."""
     current = os.path.join('.', 'data', cogent_fifo.CONFIG_FILE)
     if 'data/' + cogent_fifo.CONFIG_FILE in archive_names or not os.path.isfile(current):
         return ""
-    os.replace(current, current + '.previous')
-    return ("This archive has no FIFO configuration: data\\%s was renamed to %s.previous and the platform "
-            "defaults apply.\n" % (cogent_fifo.CONFIG_FILE, cogent_fifo.CONFIG_FILE))
+    return "This archive has no Receive FIFO settings; your current Receive FIFO settings were kept.\n"
+
+
+def _read_json(path):
+    """Saved page settings as a dict ({} when the page was never saved)."""
+    if not os.path.exists(path):
+        return {}
+    with open(path, encoding='utf-8') as fh:
+        return json.load(fh)
 
 
 def _open_data_or_empty(path):
@@ -132,7 +139,7 @@ class BackEnd(htmlPy.Object):
                     raise CogentError(op, "%s is a zip archive but not a CoGeNT configuration archive (data/dbc_details.data is missing)" % file_val,
                                       item=item, hint=hint)
                 dbc_details = json.loads(zip1.read('data/dbc_details.data').decode('utf-8'))
-                fifo_note = _set_aside_fifo_config(zip1.namelist())
+                fifo_note = _fifo_note(zip1.namelist())
                 zip1.extractall()
         except CogentError as err:
             self._fail(op, err)
@@ -183,11 +190,39 @@ class BackEnd(htmlPy.Object):
             return  # dialog cancelled: keep the current path
         app.evaluate_javascript("document.getElementById('file_path').value=%s;" % json.dumps(file_val))
     
+    def _project(self):
+        """(cached DBC, message settings, signal settings) of the loaded DBC."""
+        return (cogent_project.cached_dbc(self.__dbc, self.__node),
+                _read_json(self.__data_dir + 'CanDbcMsgConfiguration.data'),
+                _read_json(self.__data_dir + 'CanDbcSigConfiguration.data'))
+
+    def _context(self, active):
+        """Template context for the pages with the sidebar: FIFO view and new items of the loaded DBC."""
+        ctx = {"active": active, "dbc_name": os.path.basename(self.__dbc or ''), "fifo": None, "fifo_error": None,
+               "new": None, "config_error": None}
+        if self.__load != 0:
+            return ctx
+        try:
+            dbc, msg_cfg, sig_cfg = self._project()
+            ctx["new"] = cogent_project.new_items(dbc, msg_cfg, sig_cfg)
+            try:
+                config = cogent_fifo.load_config(self.__data_dir)
+            except cogent_fifo.FifoConfigError as exc:
+                ctx["config_error"] = ("The saved Receive FIFO settings could not be read (%s). Apply saves new "
+                                       "settings." % exc)
+                ctx["fifo_error"] = ctx["config_error"]
+                config = cogent_fifo.FifoConfig()
+            ctx["fifo"] = cogent_project.fifo_view(dbc, msg_cfg, config)
+            ctx["fifo_config"] = config
+        except Exception as exc:
+            path = log_failure("Computing the receive-rule usage", exc, {"DBC file": self.__dbc, "Node": self.__node})
+            ctx["fifo_error"] = "The receive-rule usage could not be computed (%s). Details: %s" % (_describe(exc), path)
+        return ctx
+
     #for default display
     @htmlPy.Slot()
     def default_page(self):
-        #print 'asdfa'
-        app.template = ("Tool_Index_Page.html", {})
+        app.template = ("Tool_Index_Page.html", self._context("home"))
         #print self.__dbc ,self.__node,'-------------------------'
         
         if self.__dbc or self.__node:
@@ -235,7 +270,51 @@ class BackEnd(htmlPy.Object):
         self.__node = node
         self.__path = dbc
         self.__load = 0
+        self.default_page()
         self._alert("Database loaded successfully")
+
+    @htmlPy.Slot()
+    def fifo_page(self):
+        if self.__load != 0:
+            self._not_loaded("Opening the Receive FIFO page")
+            return
+        ctx = self._context("fifo")
+        if ctx["fifo"] is None:
+            self._alert(CogentError("Opening the Receive FIFO page", ctx["fifo_error"] or "no data").user_message())
+            return
+        ctx["view_json"] = json.dumps(ctx["fifo"])
+        ctx["saved_json"] = json.dumps(cogent_fifo.config_to_dict(ctx["fifo_config"]))
+        app.template = ("Fifo.html", ctx)
+
+    @htmlPy.Slot(str, result=str)
+    def fifo_preview(self, json_data):
+        """Receive-rule view for the selection on the Receive FIFO page (nothing is saved)."""
+        try:
+            config = cogent_fifo.config_from_dict(json.loads(json_data), "Receive FIFO page")
+            dbc, msg_cfg, _ = self._project()
+            return json.dumps(cogent_project.fifo_view(dbc, msg_cfg, config))
+        except cogent_fifo.FifoConfigError as exc:
+            return json.dumps({"error": str(exc).replace("Receive FIFO page: ", "")})
+        except Exception as exc:
+            path = log_failure("Previewing the receive rules", exc, {"DBC file": self.__dbc, "Selection": json_data})
+            return json.dumps({"error": "The preview failed (%s). Details: %s" % (_describe(exc), path)})
+
+    @htmlPy.Slot(str, result=str)
+    def fifo_apply(self, json_data):
+        op = "Saving the Receive FIFO settings"
+        try:
+            config = cogent_fifo.config_from_dict(json.loads(json_data), "Receive FIFO page")
+            cogent_fifo.save_config(self.__data_dir, config)
+        except cogent_fifo.FifoConfigError as exc:
+            self._alert(CogentError(op, str(exc).replace("Receive FIFO page: ", ""),
+                                    hint="Correct the selection on the Receive FIFO page and press Apply again.").user_message())
+            return ""
+        except OSError as exc:
+            self._fail(op, exc, item="writing data\\" + cogent_fifo.CONFIG_FILE,
+                       hint="Check that the data folder of the tool is writable, then press Apply again.")
+            return ""
+        self.default_page()
+        return ""
 
 
     #code generate button callback

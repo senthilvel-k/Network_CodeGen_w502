@@ -182,9 +182,9 @@ def test_code_gen_overflow_popup_names_rules_messages_and_candidates(qtbot, app)
     settle(qtbot, gui)
     assert len(gui.alerts) == 1, gui.alerts
     text = gui.alerts[0]
-    assert text.startswith("Code generation failed while planning the CAN receive rules")
-    assert "209 receive rules are needed but the controller accepts at most 192" in text
-    assert "0x4F0-0x4FF: 16 messages" in text and "merge_blocks" in text and "Traceback" not in text
+    assert text.startswith("Code generation failed.") and len(text) < 500
+    assert "209 CAN receive rules are needed, but the controller accepts 192" in text
+    assert "Receive FIFO" in text and "Traceback" not in text
     assert {n: (home / "CODE_GEN" / n).read_bytes() for n in CODE_FILES} == before
     gui.alerts.clear()
 
@@ -254,7 +254,7 @@ def test_load_configuration_rejects_a_non_archive_with_reason(qtbot, app, monkey
     gui.alerts.clear()
 
 
-def test_load_archive_without_fifo_configuration_sets_the_current_one_aside(qtbot, app, monkeypatch):
+def test_load_archive_without_fifo_settings_keeps_the_current_ones(qtbot, app, monkeypatch):
     back_end, home, fx, dbc = app
     gui = back_end.app
     old = home / "older project.cfg"
@@ -264,11 +264,9 @@ def test_load_archive_without_fifo_configuration_sets_the_current_one_aside(qtbo
     monkeypatch.setattr(back_end.QtWidgets.QFileDialog, "getOpenFileName", staticmethod(lambda *a, **k: (str(old), "")))
     js(qtbot, gui, "document.querySelector('input[name=load_cofiguration]').click(); 1")
     text = wait_alert(qtbot, gui, "Configuration loaded successfully")
-    assert "renamed to CanFifoConfiguration.data.previous" in text
-    assert not (home / "data" / FIFO_FILE).exists()
-    aside = home / "data" / (FIFO_FILE + ".previous")
-    assert json.loads(aside.read_text(encoding="utf-8")) == REFERENCE_CONFIG
-    aside.replace(home / "data" / FIFO_FILE)
+    assert "your current Receive FIFO settings were kept" in text
+    assert json.loads((home / "data" / FIFO_FILE).read_text(encoding="utf-8")) == REFERENCE_CONFIG
+    assert not (home / "data" / (FIFO_FILE + ".previous")).exists()
     settle(qtbot, gui)
     gui.alerts.clear()
 
