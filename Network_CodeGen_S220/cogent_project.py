@@ -130,13 +130,17 @@ def fifo_view(dbc, msg_cfg, config):
 
 
 def new_items(dbc, msg_cfg, sig_cfg):
-    """Messages and signals of the DBC without saved settings: the rows the pages highlight green."""
+    """Messages and signals of the DBC without saved settings: the rows the pages highlight green.
+    The signal page lists the signals of enabled application (Appl) messages only (Can_dbc_gen.html_sig)."""
     messages, signals = [], []
     for direction in ('tx', 'rx'):
         for m in sorted(dbc.get_msg_type('ALL', direction), key=lambda m: m['Msg_name']):
             name = m['Msg_name'].upper()
             if name + '_%s_enable' % direction not in msg_cfg:
                 messages.append({"name": m['Msg_name'], "direction": direction})
+            if (msg_cfg.get(name + '_%s_enable' % direction) not in ENABLED
+                    or msg_cfg.get(name + '_msg_type_no_of_events') != 'Appl'):
+                continue
             for s in m['Sig_List']:
                 if s.upper() + '_%s_init_value' % direction not in sig_cfg:
                     signals.append({"name": s, "message": m['Msg_name'], "direction": direction})

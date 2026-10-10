@@ -85,9 +85,8 @@ def test_new_items_lists_messages_and_signals_without_saved_settings(project):
     base = new_items(dbc, msg_cfg, sig_cfg)
     msg2 = {k: v for k, v in msg_cfg.items() if k != "BMS4_100_rx_enable"}
     sig2 = {k: v for k, v in sig_cfg.items() if k != "BMS_BATTERYPACKSOH_rx_init_value"}
-    new = new_items(dbc, msg2, sig2)
-    added_msgs = [m for m in new["messages"] if m not in base["messages"]]
-    added_sigs = [s for s in new["signals"] if s not in base["signals"]]
+    added_msgs = [m for m in new_items(dbc, msg2, sig_cfg)["messages"] if m not in base["messages"]]
+    added_sigs = [s for s in new_items(dbc, msg_cfg, sig2)["signals"] if s not in base["signals"]]
     assert added_msgs == [{"name": "BMS4_100", "direction": "rx"}]
     assert added_sigs == [{"name": "BMS_BATTERYPACKSOH", "message": "BMS4_100", "direction": "rx"}]
 
@@ -97,3 +96,13 @@ def test_cached_dbc_returns_independent_copies(project):
     first = dbc.get_msg_type("ALL", "rx")
     first[0]["Msg_name"] = "CHANGED"
     assert dbc.get_msg_type("ALL", "rx")[0]["Msg_name"] != "CHANGED"
+
+
+def test_new_signals_are_only_those_the_signal_page_shows(project):
+    """The signal page lists the signals of enabled application (Appl) messages only."""
+    from cogent_project import new_items
+    dbc, msg_cfg, sig_cfg = project
+    assert new_items(dbc, msg_cfg, sig_cfg)["signals"] == []
+    disabled = dict(msg_cfg, BMS4_100_rx_enable="")
+    sig2 = {k: v for k, v in sig_cfg.items() if k != "BMS_BATTERYPACKSOH_rx_init_value"}
+    assert new_items(dbc, disabled, sig2)["signals"] == []

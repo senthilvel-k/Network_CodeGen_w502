@@ -30,6 +30,15 @@ def _fifo_note(archive_names):
     return "This archive has no Receive FIFO settings; your current Receive FIFO settings were kept.\n"
 
 
+STYL_LINK = """<link rel="stylesheet" href="{{'styl.css'|staticfile }}">"""
+
+
+def _themed(page):
+    """Configuration pages built from Can_dbc_gen output get the CoGeNT theme and the new-row banner script."""
+    return page.replace(STYL_LINK, STYL_LINK + """<link rel="stylesheet" href="{{'cogent.css'|staticfile }}">"""
+                        """<script src="{{'cogent_pages.js'|staticfile }}"></script>""", 1)
+
+
 def _read_json(path):
     """Saved page settings as a dict ({} when the page was never saved)."""
     if not os.path.exists(path):
@@ -539,6 +548,7 @@ class BackEnd(htmlPy.Object):
             {
                 elem_obj=getClosest((document.getElementById(tx_row[i].id+"_tx_enable")),"tr");
                 elem_obj.style.backgroundColor="#3bb87e";
+                elem_obj.classList.add("cogent-new");
             }
          }
          for ( i = 2, len = (rx_row.length); i < len; i++)
@@ -547,12 +557,13 @@ class BackEnd(htmlPy.Object):
             {
                 elem_obj=getClosest((document.getElementById(rx_row[i].id+"_rx_enable")),"tr");
                 elem_obj.style.backgroundColor="#3bb87e";
+                elem_obj.classList.add("cogent-new");
             }
          }
-         
+         cogentMarkNew("messages");
 };</script>"""
                 new_file= open(self.__html_dir+'CAN_DBC_msg.html','w',encoding='latin-1')
-                new_file.write(final_data)
+                new_file.write(_themed(final_data))
                 new_file.close()
                 html_file.close()
                 jscript_file.close()
@@ -673,6 +684,7 @@ class BackEnd(htmlPy.Object):
             {
                 elem_obj=getClosest((document.getElementById(tx_row[i].id+"_tx_init_value")),"tr");
                 elem_obj.style.backgroundColor="#3bb87e";
+                elem_obj.classList.add("cogent-new");
             }
          }
          for ( i = 2, len = (rx_row.length); i < len; i++)
@@ -681,9 +693,10 @@ class BackEnd(htmlPy.Object):
             {
                 elem_obj=getClosest((document.getElementById(rx_row[i].id+"_rx_init_value")),"tr");
                 elem_obj.style.backgroundColor="#3bb87e";
+                elem_obj.classList.add("cogent-new");
             }
          }
-         
+         cogentMarkNew("signals");
         };'''
 
                 else:
@@ -691,7 +704,7 @@ class BackEnd(htmlPy.Object):
 
                 final_data+='''\n</script>'''
                 new_file= open(self.__html_dir+'CAN_DBC_sig.html','w',encoding='latin-1')
-                new_file.write(final_data)
+                new_file.write(_themed(final_data))
                 new_file.close()
                 html_file.close()
                 jscript_file.close()
@@ -786,7 +799,7 @@ class BackEnd(htmlPy.Object):
                 final_data+='''};\n</script>'''
                 
                 new_file= open(self.__html_dir+'Can_filter.html','w',encoding='latin-1')
-                new_file.write(final_data)
+                new_file.write(_themed(final_data))
                 new_file.close()
                 html_file.close()
                 jscript_file.close()
