@@ -14,6 +14,14 @@ function cogentMarkNew(kind) {
       ' <button type="button" id="cogent-next-new" class="cg-btn cg-btn-small">Next new</button>' +
       ' <button type="button" id="cogent-only-new" class="cg-btn cg-btn-small">Only new</button>';
   }
+  var save = document.createElement("button");
+  save.type = "button";
+  save.id = "cogent-save";
+  save.className = "cg-btn cg-btn-small cg-btn-primary";
+  save.textContent = "Save and Back";
+  save.style.marginLeft = "auto";
+  save.onclick = function () { document.getElementById("form_submit").click(); };
+  bar.appendChild(save);
   var form = document.getElementById("form");
   form.parentNode.insertBefore(bar, form);
   if (!rows.length) { return; }

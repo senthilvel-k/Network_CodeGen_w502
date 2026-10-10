@@ -77,3 +77,11 @@ def test_saving_clears_the_announcement(qtbot, app):
     assert js(qtbot, gui, "document.getElementById('new-banner') === null")
     navigate(qtbot, gui, MSG_LINK)
     assert "No new messages" in js(qtbot, gui, BANNER)
+
+
+def test_banner_save_button_saves_the_page(qtbot, app):
+    back_end, home, fx, dbc = app
+    gui = back_end.app
+    navigate(qtbot, gui, MSG_LINK)
+    navigate(qtbot, gui, "document.getElementById('cogent-save').click()")
+    assert gui.template[0] == "Tool_Index_Page.html"            # Save and Back returns to the home page

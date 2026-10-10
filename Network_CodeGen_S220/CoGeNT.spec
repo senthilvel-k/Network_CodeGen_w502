@@ -3,10 +3,11 @@
 # Build:  .venv\Scripts\pyinstaller --noconfirm --clean CoGeNT.spec --distpath dist_py3 --workpath build_py3
 block_cipher = None
 datas = [("html", "html"), ("js", "js"), ("style", "style"), ("data", "data"),
-         ("batman.ico", "."), ("cogent_gui/bridge.js", "cogent_gui")]
+         ("batman.ico", "."), ("cogent_gui/bridge.js", "cogent_gui"), ("USER_GUIDE.md", ".")]
 hidden = ["Dbc_Parser", "Can_dbc_gen", "Can_filter_python_gen", "can_rx_filt_gen", "msg",
           "il_par_h_generation", "il_par_c_generation", "vnim_app_signals_par", "cogent_io", "py2compat",
-          "cogent_errors", "cogent_generate", "cogent_fifo"]
+          "cogent_errors", "cogent_generate", "cogent_fifo",
+          "cogent_project", "cogent_carry", "cogent_help"]
 
 a = Analysis(["CoGeNT.pyw"], pathex=["."], datas=datas, hiddenimports=hidden,
              excludes=["tkinter", "PySide6.Qt3DCore", "PySide6.QtQuick3D", "PySide6.QtMultimedia"])

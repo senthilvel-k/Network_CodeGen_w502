@@ -367,7 +367,7 @@ def overflow_hint(plan, config):
                         "; ".join("%s: %d messages (%s), saves %d rules" % (
                             g.block.label(), len(g.members), ", ".join(m['Msg_name'] for m in g.members[:4])
                             + (", ..." if len(g.members) > 4 else ""), len(g.members) - 1) for g in candidates[:5])))
-    lines.append("- Or untick Rx enable for messages this ECU does not need in '+ TX/RX Message Configurations'.")
+    lines.append("- Or untick Rx enable for messages this ECU does not need in 'TX/RX messages'.")
     lines.append("- If your controller accepts more rules, set max_rx_rules / max_rules_per_fifo in data\\%s." % CONFIG_FILE)
     return "\n".join(lines)
 
@@ -462,7 +462,7 @@ def manual_actions(plan, config, dbc_name, node, disabled_additional=()):
             "nw_il_msg.h (%s_msgType), nw_il_par.h / nw_il_par.c (receive frame table, IL_RX_NUM_*), "
             "nw_vnim_app_signals_par.h / .c (VNIM_%s_MSGID and signal handling), vnim.msg.resource, "
             "vnim.txrx.resource, nw_host_mgr_txrx.resource" % (name, name.upper()),
-            ("CoGeNT generated no code for %s because its Rx enable is off on '+ TX/RX Message Configurations'"
+            ("CoGeNT generated no code for %s because its Rx enable is off on 'TX/RX messages'"
              % name) if disabled else ("%s is enabled on the page, so CoGeNT generated its code" % name),
             ["add your hand-written code for %s to the files above (CoGeNT generates only its receive rule and "
              "dispatch entry)." % name],

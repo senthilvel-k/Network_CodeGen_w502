@@ -14,7 +14,7 @@ html, body { margin: 0; height: 100%; background: var(--cg-bg); color: var(--cg-
 .cg-nav a { display: flex; align-items: center; gap: 8px; padding: 9px 20px; color: var(--cg-side-text); text-decoration: none; }
 .cg-nav a:hover { background: rgba(255,255,255,.07); color: #fff; }
 .cg-nav a.active { background: rgba(255,255,255,.12); color: #fff; border-left: 3px solid #60a5fa; padding-left: 17px; }
-.cg-side-foot { margin-top: auto; padding: 12px 20px; font-size: 11px; color: #94a3b8; }
+.cg-side-foot { margin-top: auto; padding: 12px 20px; font-size: 11px; color: #94a3b8; overflow-wrap: anywhere; }
 .cg-badge { margin-left: auto; background: #f59e0b; color: #1f2933; border-radius: 999px; padding: 0 8px; font-size: 11px; font-weight: 600; }
 .cg-main { flex: 1; overflow: auto; padding: 24px 32px 40px; }
 .cg-main h1 { font-size: 22px; font-weight: 600; margin: 0 0 16px; }
@@ -74,3 +74,18 @@ details > summary { cursor: pointer; color: var(--cg-muted); }
   background: var(--cg-warn-bg); border-bottom: 1px solid var(--cg-warn-border); color: var(--cg-warn); padding: 8px 16px; }
 .cg-page-bar.none { background: var(--cg-ok-bg); border-color: #a7dcbc; color: var(--cg-ok); }
 tr.cogent-current { outline: 3px solid #f59e0b; outline-offset: -3px; }
+/* legacy configuration pages (message, signal, filter) inside the CoGeNT layout */
+body.w3-grey, body.w3-container { background: var(--cg-bg) !important; color: var(--cg-text) !important; padding: 0 !important; margin: 0 !important; }
+.cg-config { background: var(--cg-bg); color: var(--cg-text); }
+.cg-config label.w3-text-light-grey, .cg-config .w3-text-light-grey { color: var(--cg-text) !important; }
+.cg-config h1 { font-size: 18px; font-weight: 600; margin: 18px 0 8px; }
+.cg-config table.w3-table { background: var(--cg-surface); border: 1px solid var(--cg-border) !important; border-collapse: collapse; font-size: 12.5px; width: 100%; }
+.cg-config table.w3-table th { background: #eef2f7; color: var(--cg-text); font-weight: 600; position: sticky; top: 0; z-index: 1;
+  border: 1px solid var(--cg-border) !important; padding: 5px 6px !important; }
+.cg-config table.w3-table td { border: 1px solid var(--cg-border) !important; padding: 3px 6px !important; color: var(--cg-text); }
+.cg-config table.w3-table tr:hover td { background: rgba(37, 99, 235, .05); }
+.cg-config input[type=text], .cg-config input:not([type]), .cg-config select, .cg-config .w3-input {
+  border: 1px solid var(--cg-border) !important; border-radius: 4px; padding: 2px 5px; font: inherit; background: #fff; }
+.cg-config input[type=submit], .cg-config #form_submit { padding: 7px 16px; border: 1px solid var(--cg-accent); border-radius: 6px;
+  background: var(--cg-accent); color: #fff; font: inherit; cursor: pointer; }
+.cg-config input[type=submit]:hover { background: var(--cg-accent-dark); }

@@ -52,7 +52,7 @@ def test_message_page_before_load_dbc_asks_to_load_first(qtbot, app):
     js(qtbot, gui, MSG_LINK + "; 1")
     settle(qtbot, gui)
     assert len(gui.alerts) == 1, gui.alerts
-    assert "Load DBC" in gui.alerts[0] and "TX/RX Message Configurations" in gui.alerts[0]
+    assert "Load DBC" in gui.alerts[0] and "TX/RX messages" in gui.alerts[0]
     assert gui.template[0] == "Tool_Index_Page.html"
     gui.alerts.clear()
 
@@ -107,7 +107,7 @@ def test_code_gen_before_saving_pages_names_the_pages(qtbot, app):
     navigate(qtbot, gui, CODE_GEN_BTN)
     settle(qtbot, gui)
     assert len(gui.alerts) == 1, gui.alerts
-    assert "TX/RX Message Configurations" in gui.alerts[0] and "TX/Rx signal Configurations" in gui.alerts[0]
+    assert "TX/RX messages" in gui.alerts[0] and "TX/RX signals" in gui.alerts[0]
     gui.alerts.clear()
 
 

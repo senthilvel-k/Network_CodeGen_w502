@@ -11,8 +11,8 @@ LOG_FILE = os.path.join('.', 'logs', 'cogent.log')
 
 MSG_DATA_FILE = 'CanDbcMsgConfiguration.data'
 SIG_DATA_FILE = 'CanDbcSigConfiguration.data'
-MSG_PAGE = "+ TX/RX Message Configurations"
-SIG_PAGE = "+ TX/Rx signal Configurations"
+MSG_PAGE = "TX/RX messages"
+SIG_PAGE = "TX/RX signals"
 
 # Field suffixes of the keys in the saved .data files (see the generated configuration pages).
 MESSAGE_FIELDS = ('msg_type_no_of_events', 'rx_key_msg', 'rx_ign_off', 'node_absent', 'msg_timeout',
@@ -102,5 +102,5 @@ def missing_config_entry(key, output_file):
         "the saved %s configuration (data\\%s) has no '%s' setting for %s %s" % (kind, data_file, field, kind, name),
         item="generating " + output_file,
         hint="The configuration was probably saved for a different DBC, or the page was not saved after "
-             "loading this DBC. Open '%s', check %s and press 'Save and Back', then run code gen again."
+             "loading this DBC. Open '%s', check %s and press 'Save and Back', then press Generate code again."
              % (page, name))

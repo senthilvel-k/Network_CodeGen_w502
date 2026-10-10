@@ -78,14 +78,14 @@ def run_code_generation(dbc, node, time_str):
 def _check_inputs(dbc, node):
     if not os.path.isfile(dbc):
         raise CogentError("Code generation", "DBC file not found: %s" % dbc, item="reading the DBC file",
-                          hint="Select the DBC with 'Browse ..', press 'Load DBC', then run code gen again.")
+                          hint="Select the DBC with 'Browse', press 'Load DBC', then press Generate code again.")
     loaded = {}
     for name, page in ((MSG_DATA_FILE, MSG_PAGE), (SIG_DATA_FILE, SIG_PAGE)):
         path = os.path.join(DATA_DIR, name)
         if not os.path.isfile(path):
             raise CogentError("Code generation", "data\\%s does not exist (the page has not been saved yet)" % name,
                               item="reading the saved configuration",
-                              hint="Open '%s' and press 'Save and Back', then run code gen again." % page)
+                              hint="Open '%s' and press 'Save and Back', then press Generate code again." % page)
         try:
             with open(path, encoding='utf-8') as fh:
                 loaded[name] = json.load(fh)
@@ -93,7 +93,7 @@ def _check_inputs(dbc, node):
             raise CogentError("Code generation", "data\\%s is damaged (%s)" % (name, exc),
                               item="reading the saved configuration",
                               hint="Open '%s' and press 'Save and Back' to write it again, or use "
-                                   "'load_cofiguration' to load a saved configuration." % page) from exc
+                                   "'Load configuration' to load a saved configuration." % page) from exc
     return loaded[MSG_DATA_FILE]
 
 
@@ -104,7 +104,7 @@ def multiplex_error(msg_name, multiplexor, problem):
         "laid out like VCU5_500: every multiplexed signal starts at bit 0 and the multiplexor is in byte 7"
         % (msg_name, multiplexor, problem),
         item="generating nw_il_msg.h",
-        hint="Untick the Rx enable box of %s in '%s' and press 'Save and Back', then run code gen again. "
+        hint="Untick the Rx enable box of %s in '%s' and press 'Save and Back', then press Generate code again. "
              "Generating this multiplex layout needs a generator extension (contact the tool maintainer)."
              % (msg_name, MSG_PAGE))
 
@@ -215,7 +215,7 @@ def _explain(exc, output):
         return multiplex_error(exc.msg_name, exc.multiplexor, exc.problem)
     if isinstance(exc, (cogent_fifo.FifoConfigError, cogent_fifo.FifoPlanError)):
         return CogentError("Code generation", str(exc), item="generating " + output,
-                           hint="Correct data\\%s or the Rx settings on '%s', then run code gen again."
+                           hint="Correct data\\%s or the Rx settings on '%s', then press Generate code again."
                                 % (cogent_fifo.CONFIG_FILE, MSG_PAGE))
     if isinstance(exc, KeyError) and exc.args and isinstance(exc.args[0], str):
         err = missing_config_entry(exc.args[0], output)
@@ -245,5 +245,5 @@ def _publish():
             raise CogentError("Code generation", "CODE_GEN\\%s could not be replaced (%s)" % (name, exc.strerror),
                               item="saving the generated files",
                               hint="Close CODE_GEN\\%s in any program that has it open (editor, compare tool) and "
-                                   "run code gen again.%s" % (name, done)) from exc
+                                   "press Generate code again.%s" % (name, done)) from exc
         replaced.append(name)

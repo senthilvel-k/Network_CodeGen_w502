@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>CoGeNT - Help</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="{{'cogent.css'|staticfile }}">
+</head>
+<body>
+<div class="cg-app">
+{% set active = 'help' %}
+{% include '_sidebar.html' %}
+<main class="cg-main">
+  <section class="cg-card" id="help-toc">
+    <h2>Contents</h2>
+    <div class="cg-actions">
+      {% for anchor, title in toc %}<button type="button" class="cg-btn cg-btn-small" onclick="document.getElementById('{{ anchor }}').scrollIntoView()">{{ title }}</button>{% endfor %}
+    </div>
+  </section>
+  <article class="cg-card cg-doc" id="help-text">
+{{ help_html }}
+  </article>
+</main>
+</div>
+</body>
+</html>

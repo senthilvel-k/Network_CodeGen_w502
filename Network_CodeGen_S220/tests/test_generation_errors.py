@@ -87,7 +87,7 @@ def test_unsupported_multiplex_layout_is_explained_before_any_file_is_written(ho
     _assert_user_friendly(text)
     assert "BMS19_100" in text and "multiplex" in text.lower()
     assert "BMS_CELLTEMP" in text and "bit 16" in text
-    assert "TX/RX Message Configurations" in text
+    assert "TX/RX messages" in text
     _assert_previous_outputs_untouched(home)
 
 
@@ -102,7 +102,7 @@ def test_missing_signal_setting_names_signal_field_file_and_page(home):
     _assert_user_friendly(text)
     assert "nw_vnim_app_signals_par.c" in text
     assert "os_notify_no_of_events" in text and "signal" in text
-    assert "CanDbcSigConfiguration.data" in text and "TX/Rx signal Configurations" in text
+    assert "CanDbcSigConfiguration.data" in text and "TX/RX signals" in text
     _assert_previous_outputs_untouched(home)
     log = (home / "CODE_GEN" / "errorlog.txt").read_text(encoding="utf-8")
     assert "Traceback" in log and "KeyError" in log and "SMART_CORE" in log
@@ -117,7 +117,7 @@ def test_missing_message_setting_names_message_and_page(home):
     text = exc.value.user_message()
     _assert_user_friendly(text)
     assert "VCU5_500" in text and "rx_enable" in text
-    assert "CanDbcMsgConfiguration.data" in text and "TX/RX Message Configurations" in text
+    assert "CanDbcMsgConfiguration.data" in text and "TX/RX messages" in text
 
 
 def test_damaged_configuration_file_is_named(home):
@@ -136,7 +136,7 @@ def test_unsaved_signal_configuration_is_named(home):
     with pytest.raises(CogentError) as exc:
         _generate()
     text = exc.value.user_message()
-    assert "CanDbcSigConfiguration.data" in text and "TX/Rx signal Configurations" in text
+    assert "CanDbcSigConfiguration.data" in text and "TX/RX signals" in text
 
 
 def test_missing_dbc_file_is_named(home):

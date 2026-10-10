@@ -9,6 +9,7 @@ from PySide6 import QtGui, QtWidgets
 import cogent_carry
 import cogent_fifo
 import cogent_generate
+import cogent_help
 import cogent_project
 from cogent_errors import CogentError, MSG_PAGE, SIG_PAGE, log_failure
 
@@ -36,10 +37,29 @@ def _fifo_note(archive_names):
 STYL_LINK = """<link rel="stylesheet" href="{{'styl.css'|staticfile }}">"""
 
 
+NEW_SHELL = """<div class="cg-app">\n{% include '_sidebar.html' %}\n<div class="cg-main cg-config">\n"""
+
+
+def _legacy_shell():
+    """The layout Can_dbc_gen / Can_filter_python_gen copy into the pages (as they copy it)."""
+    text, copying = "", False
+    with open('./html/_page_shell.html', encoding='latin-1') as fh:
+        for line in fh:
+            if line.rstrip('\n') == '<!--copy_start-->':
+                copying = True
+            elif line.rstrip('\n') == '<!--copy_end-->':
+                copying = False
+            if copying:
+                text += line
+    return text
+
+
 def _themed(page):
-    """Configuration pages built from Can_dbc_gen output get the CoGeNT theme and the new-row banner script."""
-    return page.replace(STYL_LINK, STYL_LINK + """<link rel="stylesheet" href="{{'cogent.css'|staticfile }}">"""
+    """Configuration pages built from the generator output get the CoGeNT layout and theme, and the
+    new-row banner script."""
+    page = page.replace(STYL_LINK, STYL_LINK + """<link rel="stylesheet" href="{{'cogent.css'|staticfile }}">"""
                         """<script src="{{'cogent_pages.js'|staticfile }}"></script>""", 1)
+    return page.replace(_legacy_shell(), NEW_SHELL, 1)
 
 
 def _read_json(path):
@@ -143,7 +163,7 @@ class BackEnd(htmlPy.Object):
             return  # dialog cancelled
         op = "Loading the configuration"
         item = "reading " + os.path.basename(file_val)
-        hint = "Choose a .cfg archive created with 'save_cofiguration' (they are kept in the Config folder)."
+        hint = "Choose a .cfg archive created with 'Save configuration' (they are kept in the Config folder)."
         try:
             # Check the archive before extracting, so a bad file cannot overwrite the current settings.
             with zipfile.ZipFile(file_val) as zip1:
@@ -171,7 +191,7 @@ class BackEnd(htmlPy.Object):
         if dbc_details.get("ch0_node_name", '') !='':
             self.__node=dbc_details["ch0_node_name"]
         self.default_page()
-        self._alert("Configuration loaded successfully\n%s\n%sPress 'Load DBC' before opening the configuration pages or running code gen."
+        self._alert("Configuration loaded successfully\n%s\n%sPress 'Load DBC' before opening the configuration pages or generating code."
                     % (file_val, fifo_note))
 
 
@@ -255,11 +275,11 @@ class BackEnd(htmlPy.Object):
         missing = [label for label, value in (("DBC File", dbc), ("Node Name", node)) if not value]
         if missing:
             self._alert(CogentError(op, "no %s was entered" % " and no ".join(missing),
-                                    hint="Enter the DBC file (or use 'Browse ..') and the node name, then press 'Load DBC'.").user_message())
+                                    hint="Enter the DBC file (or use 'Browse') and the node name, then press 'Load DBC'.").user_message())
             return
         if not os.path.isfile(dbc):
             self._alert(CogentError(op, "DBC file not found: %s" % dbc,
-                                    hint="Check the path or select the file with 'Browse ..', then press 'Load DBC' again.").user_message())
+                                    hint="Check the path or select the file with 'Browse', then press 'Load DBC' again.").user_message())
             return
         try:
             from Dbc_Parser import dbc_parser
@@ -379,6 +399,18 @@ class BackEnd(htmlPy.Object):
                     "generation." % os.path.abspath(target))
 
     @htmlPy.Slot()
+    def help_page(self):
+        ctx = self._context("help")
+        guide = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'USER_GUIDE.md')
+        try:
+            ctx["help_html"], ctx["toc"] = cogent_help.render_guide(guide)
+        except OSError as exc:
+            self._fail("Opening Help", exc, item="reading " + guide,
+                       hint="USER_GUIDE.md belongs next to the program; reinstall CoGeNT or open the file from the source folder.")
+            return
+        app.template = ("Help.html", ctx)
+
+    @htmlPy.Slot()
     def fifo_page(self):
         if self.__load != 0:
             self._not_loaded("Opening the Receive FIFO page")
@@ -429,12 +461,12 @@ class BackEnd(htmlPy.Object):
         if self.__load != 0:
             self._alert(CogentError(op, "no DBC is loaded",
                                     hint="Select the DBC file and the node name and press 'Load DBC', then open and save "
-                                         "the configuration pages before running code gen.").user_message())
+                                         "the configuration pages before generating code.").user_message())
         elif self.__msg_saved != 0 or self.__sig_saved != 0:
             pages = [page for page, flag in ((MSG_PAGE, self.__msg_saved), (SIG_PAGE, self.__sig_saved)) if flag != 0]
             self._alert(CogentError(op, "the configuration of the loaded DBC has not been saved in this session: %s"
                                     % " and ".join("'%s'" % page for page in pages),
-                                    hint="Open each page listed, check the settings and press 'Save and Back', then run code gen again.").user_message())
+                                    hint="Open each page listed, check the settings and press 'Save and Back', then press Generate code again.").user_message())
         else:
             import datetime
             time_print = datetime.datetime.now()
@@ -609,7 +641,7 @@ class BackEnd(htmlPy.Object):
              if(document.getElementById(key[i]))
              {
                 elem2=getClosest(elem,"tr");
-                elem2.style.backgroundColor="#616161";
+                elem2.style.backgroundColor="#ffffff";   // rows with saved settings (new rows turn green below)
                 if (document.getElementById(key[i]).type == "text")
                 {
                   
@@ -666,7 +698,7 @@ class BackEnd(htmlPy.Object):
                 if data_file !=' ':
                     data_file.close()
                 
-                app.template = ("CAN_DBC_msg.html", {})
+                app.template = ("CAN_DBC_msg.html", self._context("messages"))
             except Exception as exc:
                 self._fail("Opening '%s'" % MSG_PAGE, exc, item="building the page from " + os.path.basename(str(self.__dbc)),
                            hint="Check that the DBC file is still available and that the html, js and data folders of the tool are complete, then try again.")
@@ -807,7 +839,7 @@ class BackEnd(htmlPy.Object):
                 if data_file !=' ':
                     data_file.close()
                 
-                app.template = ("CAN_DBC_sig.html", {})
+                app.template = ("CAN_DBC_sig.html", self._context("signals"))
             except Exception as exc:
                 self._fail("Opening '%s'" % SIG_PAGE, exc, item="building the page from " + os.path.basename(str(self.__dbc)),
                            hint="Check that the DBC file is still available and that the html, js and data folders of the tool are complete, then try again.")
@@ -900,7 +932,7 @@ class BackEnd(htmlPy.Object):
                 html_file.close()
                 jscript_file.close()
                 data_file.close()
-                app.template = ("Can_filter.html", {})
+                app.template = ("Can_filter.html", self._context("filter"))
             except Exception as exc:
                 self._fail("Opening the filter configuration page", exc, item="building the page from " + os.path.basename(str(self.__dbc)),
                            hint="Check that the DBC file is still available and that the html, js and data folders of the tool are complete, then try again.")
@@ -922,7 +954,7 @@ class BackEnd(htmlPy.Object):
     @htmlPy.Slot(str, result=str)
     def BackButton(self,json_data):
         #print "BackButton callback"     
-        app.template = ("Tool_Index_Page.html", {})
+        self.default_page()
 
     @htmlPy.Slot()        
     def pythonfn(self):

@@ -2,10 +2,11 @@
   <div class="cg-brand">CoGeNT<small>CAN network code generator</small></div>
   <div class="cg-nav">
     <a href="BackEnd.default_page" data-bind="true" class="{{ 'active' if active == 'home' }}">Home</a>
-    <a href="BackEnd.Can_dbc0_msg" data-bind="true" id="nav-messages">TX/RX messages{% if new and new.messages %}<span class="cg-badge" title="Messages without saved settings">{{ new.messages|length }} new</span>{% endif %}</a>
-    <a href="BackEnd.Can_dbc0_sig" data-bind="true" id="nav-signals">TX/RX signals{% if new and new.signals %}<span class="cg-badge" title="Signals without saved settings">{{ new.signals|length }} new</span>{% endif %}</a>
+    <a href="BackEnd.Can_dbc0_msg" data-bind="true" id="nav-messages" class="{{ 'active' if active == 'messages' }}">TX/RX messages{% if new and new.messages %}<span class="cg-badge" title="Messages without saved settings">{{ new.messages|length }} new</span>{% endif %}</a>
+    <a href="BackEnd.Can_dbc0_sig" data-bind="true" id="nav-signals" class="{{ 'active' if active == 'signals' }}">TX/RX signals{% if new and new.signals %}<span class="cg-badge" title="Signals without saved settings">{{ new.signals|length }} new</span>{% endif %}</a>
     <a href="BackEnd.fifo_page" data-bind="true" class="{{ 'active' if active == 'fifo' }}" id="nav-fifo">Receive FIFO{% if fifo and not fifo.fits %}<span class="cg-badge" title="Over the receive-rule limit">over</span>{% endif %}</a>
     <a href="BackEnd.reapply_page" data-bind="true" class="{{ 'active' if active == 'reapply' }}" id="nav-reapply">Re-apply edits</a>
+    <a href="BackEnd.help_page" data-bind="true" class="{{ 'active' if active == 'help' }}" id="nav-help">Help</a>
   </div>
   <div class="cg-side-foot">{{ dbc_name or 'No DBC loaded' }}</div>
 </nav>

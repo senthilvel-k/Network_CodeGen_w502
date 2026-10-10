@@ -13,7 +13,7 @@ def html_mes(file_name,node):
     <!DOCTYPE html>
     <html>
     <head>
-    <title>Filter</title>
+    <title>CoGeNT - TX/RX messages</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script type="text/javascript" src="data.json"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -202,7 +202,7 @@ def html_mes(file_name,node):
     </head>
     <body onload="load()" class="w3-container w3-grey">"""
 
-    file1=open(html_dir+'Tool_Index_Page.html','r',encoding='latin-1')
+    file1=open(html_dir+'_page_shell.html','r',encoding='latin-1')
     start=0
     for line in file1.readlines():
         if '<!--copy_start-->' == line.rstrip('\n'):
@@ -371,7 +371,7 @@ def html_mes(file_name,node):
     <th>Node Name</th>
     <th>Key Message</th>
     <th>Node Absent ID</th>
-    <th>Message Timout ID</th>
+    <th>Message Timeout ID</th>
     <th>Message Content DLC ID</th>
     <th>Notification during IGN OFF</th>
     <!--
@@ -432,7 +432,7 @@ def html_sig(file_name,node):
     <!DOCTYPE html>
     <html>
     <head>
-    <title>Filter</title>
+    <title>CoGeNT - TX/RX signals</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script type="text/javascript" src="data.json"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -477,7 +477,7 @@ def html_sig(file_name,node):
     </head>
     <body onload="load()" class="w3-container w3-grey">"""
 
-    file1=open(html_dir+'Tool_Index_Page.html','r',encoding='latin-1')
+    file1=open(html_dir+'_page_shell.html','r',encoding='latin-1')
     start=0
     for line in file1.readlines():
         if '<!--copy_start-->' == line.rstrip('\n'):
@@ -504,7 +504,7 @@ def html_sig(file_name,node):
     <tr>
     <th>Message Name</th>
     <th>Length</th>
-    <th>byte_order</th>
+    <th>Byte order</th>
     <th>Init Value</th>
     <th>Signal Debounce</th>
     </tr>
@@ -652,7 +652,7 @@ def html_sig(file_name,node):
     <tr>
     <th>Message Name</th>
     <th>Length</th>
-    <th>Byte_order</th>
+    <th>Byte order</th>
     
     <th>Init Value</th>
     <th>Green Drive enable</th>
