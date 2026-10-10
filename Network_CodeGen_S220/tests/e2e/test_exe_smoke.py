@@ -159,3 +159,46 @@ def test_exe_generates_code_like_legacy(tmp_path, fixture_name):
             cdp.close()
         app.kill()
         os.environ.pop("QTWEBENGINE_REMOTE_DEBUGGING", None)
+
+
+def test_exe_new_pages_open(tmp_path):
+    """Packaged exe: Help (USER_GUIDE.md beside the exe), Receive FIFO and Re-apply edits pages open."""
+    if not (EXE_DIR / "CoGeNT.exe").exists():
+        pytest.skip("build first: pyinstaller CoGeNT.spec --distpath dist_py3 --workpath build_py3")
+    home = tmp_path / "CoGeNT exe copy"
+    shutil.copytree(EXE_DIR, home)
+    fx = load_fixture("s2xx_40024")
+    shutil.rmtree(home / "data")
+    shutil.copytree(fx.data_dir, home / "data")
+    port = _free_port()
+    os.environ["QTWEBENGINE_REMOTE_DEBUGGING"] = f"127.0.0.1:{port}"
+    os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--disable-gpu"
+    app = Application(backend="uia").start(f'"{home / "CoGeNT.exe"}"', work_dir=str(home), timeout=60)
+    cdp = None
+    try:
+        win = app.window(title="CoGeNT")
+        win.wait("visible ready", timeout=120)
+        cdp = Cdp(port)
+        _on_page(cdp, "Tool_Index_Page.html")
+        cdp.eval("document.querySelector('a[href=\"BackEnd.help_page\"]').click(); true")
+        _on_page(cdp, "Help.html")
+        assert "CoGeNT user guide" in cdp.eval("document.getElementById('help-text').innerText")
+        cdp.eval("document.querySelector('a[href=\"BackEnd.default_page\"]').click(); true")
+        _on_page(cdp, "Tool_Index_Page.html")
+        cdp.eval(f"document.getElementById('file_path').value={json.dumps(fx.dbc.as_posix())};"
+                 f"document.getElementById('ch0_node_name').value={json.dumps(fx.node)};"
+                 "document.getElementById('form_submit').click(); true")
+        _dismiss_alert(win, "Database loaded successfully")
+        _on_page(cdp, "Tool_Index_Page.html")
+        assert cdp.eval("document.getElementById('fifo-total').innerText") == "209"
+        cdp.eval("document.querySelector('a[href=\"BackEnd.fifo_page\"]').click(); true")
+        _on_page(cdp, "Fifo.html")
+        cdp.wait("document.getElementById('fifo-total').innerText === '182'")
+        cdp.eval("document.querySelector('a[href=\"BackEnd.reapply_page\"]').click(); true")
+        _on_page(cdp, "Reapply.html")
+        assert cdp.eval("document.getElementById('reapply-new').value").endswith("CODE_GEN")
+    finally:
+        if cdp:
+            cdp.close()
+        app.kill()
+        os.environ.pop("QTWEBENGINE_REMOTE_DEBUGGING", None)
