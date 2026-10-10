@@ -66,6 +66,10 @@ Key modules (all under `Network_CodeGen_S220/`):
 | `back_end.py` | GUI controller: slots `upload_dbc`, `code_gen`, `Can_dbc0_msg`, `Can_dbc0_sig`, `Can_Filter`, `*_SaveButton`, `save_cfg`, `load_cfg`, `file_browse`, `default_page`, `onpageload`, `unlock`, `pythonfn` (test hook). Session state is held in name-mangled attributes (`__dbc`, `__node`, `__load`, `__msg_saved`, `__sig_saved`). |
 | `cogent_gui/webgui.py`, `cogent_gui/bridge.js` | Replacement for htmlPy on PySide6 (template rendering, JS bridge, alerts, `evaluate_javascript` queued until a page has loaded). |
 | `cogent_generate.py` | Code-generation pipeline used by `code_gen` (staging, checks, error translation, FIFO pre/post checks, reports). Returns `GenerationResult`. |
+| `cogent_project.py` | GUI view logic without Qt: cached DBC lists, tolerant planning, `fifo_view` (card / Receive FIFO page), `new_items`. |
+| `cogent_carry.py` | Re-apply engine (git merge-file + derived-value rules + checks) for the Re-apply edits page and `tools/carry_forward.py`. |
+| `cogent_help.py` | Renders `USER_GUIDE.md` for the Help page. |
+| `html/Tool_Index_Page.html`, `Fifo.html`, `Reapply.html`, `Help.html`, `_sidebar.html` | New pages (Jinja); `html/_page_shell.html` is the legacy layout the page generators copy (keep it unchanged, the page golden tests compare it); `back_end._themed` swaps it for the new layout when showing a page. |
 | `cogent_fifo.py` | Receive-rule planning: `CanFifoConfiguration.data` (limits, `merge_blocks`, `additional_rx_messages`), merged ID blocks ("FIFO multiplexing"), `check_limits`, `suggest_merge_blocks`, `dispatch_snippet`, `fifo_plan.json`, `MANUAL_ACTIONS.md`. User guide: `FIFO_MULTIPLEXING.md`. |
 | `cogent_errors.py` | `CogentError` (operation / reason / item / hint / log path), `log_failure`, `missing_config_entry`. |
 | `cogent_io.py` | `open_output`, `close_output`, `abort_output`; tracks `current_output` for messages. |
@@ -161,6 +165,22 @@ Done on branch `fifo-multiplexing` (2026-10-09):
 - `CODE_GEN/MANUAL_ACTIONS.md` (Manual Action Required report) and `CODE_GEN/fifo_plan.json`.
 - `tools/carry_forward.py` re-applies the remaining hand edits; `tools/compare_reference.py` verifies.
 
+Done on branch `fifo-multiplexing` (2026-10-10, GUI work; spec
+`docs/superpowers/specs/2026-10-10-gui-fifo-redesign-design.md`, plan `docs/superpowers/plans/2026-10-10-gui-fifo-redesign.md`):
+- New layout on every page (sidebar Home / TX/RX messages / TX/RX signals / Receive FIFO / Re-apply edits /
+  Help, light theme `style/cogent.css`), corrected labels and page titles.
+- Home: "New in this DBC" banner, sidebar badges, receive-rule card (total of 192, bar per FIFO).
+- Receive FIFO page: saved blocks, pre-selected suggestions, live preview, add block by ID, receive-only
+  messages, limits; Apply writes `data/CanFifoConfiguration.data` (no hand-edited files).
+- Message/signal pages: banner with the count of new rows, "Next new", "Only new", Save and Back.
+- Re-apply edits page (`cogent_carry`): three-way merge of the workspace edits into a new generation with
+  derived values recomputed (receive counts, multiplex flag offset, handle numbers, per-message arrays) and
+  checks (lost/doubled definitions, table sizes, order). 40024 edits re-apply to 41490 with no conflict.
+- Short code-gen errors that name the page to fix things on; details in the log.
+- Loading an archive without Receive FIFO settings keeps the current ones (the earlier "set aside" caused the
+  41490 overflow error on 2026-10-10).
+- `USER_GUIDE.md` (whole tool) shown on the Help page.
+
 Remaining (see section 8 for the ordered list): multiplex layouts beyond VCU5_500, the Python 2.7 oracle
 comparison, the optional workflow fixes (load configuration also loads the DBC; working-directory
 independence), a non-blocking UI during code gen, and repository hygiene/cleanup items.
@@ -252,6 +272,13 @@ the e2e test needs the built exe.
 | `tests/test_fifo_pipeline.py` | 11 | pipeline: overflow explained before writing, 184/183 boundary on real data, invalid config, unknown message, generated rules checked against the plan, reports, repeat run identical incl. reports, archive handling |
 | `tests/test_carry_forward.py` | 9 | three-way merge: separate edits kept, conflicts reported with location and all versions, white-space and header-stamp resolution, origin warning, missing files, CRLF, inputs never written, idempotence, exit codes |
 | `tests/test_reference_workspace.py` | 6 | needs `D:\networkgen\dc.app.scl.vehiclecomm` (or `COGENT_REFERENCE_WS`), skipped otherwise: rules and dispatch identical to the workspace, normalized text identical, workspace `nw_can_dll.c` maps every merged ID, generation + carry-forward = workspace except the header stamp (workspace hashes unchanged) |
+| `tests/test_project.py` | 10 | FIFO view (reference config, pre-selection, invalid kept block, unknown receive-only message, unsaved messages), new messages/signals, cached DBC copies |
+| `tests/test_carry_rules.py` | 9 | receive-rule files from the new generation, receive counts + safe multiplex offset, handle numbering incl. Diag/NM, per-message arrays, checks (duplicates, missing definitions, table sizes, flag overlap) |
+| `tests/test_help.py` | 6 | Markdown subset, escaping, the real guide renders without leftovers |
+| `tests/gui/test_gui_fifo.py` | 11 | home card states, Receive FIFO pre-selection, live preview, invalid block by ID, Apply, generate, short overflow / invalid-block errors, receive-only add/remove |
+| `tests/gui/test_gui_new_items.py` | 5 | home banner and badges, message/signal page banners, Next new, Only new, banner Save |
+| `tests/gui/test_gui_reapply.py` | 6 | Re-apply page: defaults, run, results, conflicts with file and line, unsafe output refused, open folder, keep a copy |
+| `tests/gui/test_gui_labels.py` | 8 | titles and labels of every page, no legacy spellings, CoGeNT layout on the configuration pages, Help page |
 | `tests/e2e/test_exe_smoke.py` | 2 | packaged exe (36144_2 and 40024): Load DBC, both pages with real Save and Back, code gen, outputs = legacy. Web content driven via Chrome DevTools Protocol (`QTWEBENGINE_REMOTE_DEBUGGING`, 127.0.0.1), native alert dialogs via UI Automation. |
 
 Fixtures (`tests/fixtures/<name>/`, rebuilt by `tools/build_fixtures.py`): `s2xx_40024`
@@ -268,7 +295,8 @@ Latest results (2026-10-08, code = `ad5fbd0`, identical to current `main`):
 | `.venv/Scripts/python.exe -m pytest tests/e2e` (after a PyInstaller build) | **2 passed**, 1 min 58 s |
 | `python -W error -m py_compile` on all 15 runtime modules (2026-10-09) | no errors or warnings |
 
-Results on branch `fifo-multiplexing` (2026-10-09, after the FIFO work):
+Results on branch `fifo-multiplexing` (2026-10-10, after the GUI work) are in the PR description; the
+2026-10-09 results after the FIFO work were:
 
 | Command | Result |
 |---|---|
@@ -297,7 +325,7 @@ Test notes:
    uncommitted `local_reports/reference_workspace_analysis.md`). Choose one layout with the user, then extend `msg.msg_struct_gen_multiplex` and
    `msg.multiplex_layout_problem`, check how `il_par_h/c` and `vnim_app_signals_par` handle multiplexed Rx
    messages, and add a fixture with BMS19 enabled. Until then they are received via
-   `additional_rx_messages` and their code is carried forward with `tools/carry_forward.py`.
+   receive-only messages (Receive FIFO page) and their code is re-applied with the Re-apply edits page.
 2. **Python 2.7 oracle** (issue 2), if allowed: install 2.7.18, run `tools/make_expected.py`, commit
    `tests/expected/`, re-run the suite (the 144 skipped tests then run).
 3. **Working-directory independence** (issue 4): add `os.chdir(os.path.dirname(os.path.abspath(__file__)))`

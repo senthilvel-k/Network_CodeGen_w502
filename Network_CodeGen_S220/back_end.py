@@ -62,6 +62,11 @@ def _themed(page):
     return page.replace(_legacy_shell(), NEW_SHELL, 1)
 
 
+def script_json(value):
+    """JSON for embedding in a <script> element: '</' is escaped so data can never close the script."""
+    return json.dumps(value).replace("</", "<\\/")
+
+
 def _read_json(path):
     """Saved page settings as a dict ({} when the page was never saved)."""
     if not os.path.exists(path):
@@ -419,8 +424,8 @@ class BackEnd(htmlPy.Object):
         if ctx["fifo"] is None:
             self._alert(CogentError("Opening the Receive FIFO page", ctx["fifo_error"] or "no data").user_message())
             return
-        ctx["view_json"] = json.dumps(ctx["fifo"])
-        ctx["saved_json"] = json.dumps(cogent_fifo.config_to_dict(ctx["fifo_config"]))
+        ctx["view_json"] = script_json(ctx["fifo"])
+        ctx["saved_json"] = script_json(cogent_fifo.config_to_dict(ctx["fifo_config"]))
         app.template = ("Fifo.html", ctx)
 
     @htmlPy.Slot(str, result=str)
