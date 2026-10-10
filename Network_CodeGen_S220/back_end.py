@@ -1,9 +1,12 @@
                    
 from cogent_gui import webgui as htmlPy
+import datetime
 import io
 import json
 import os
+import shutil
 from PySide6 import QtGui, QtWidgets
+import cogent_carry
 import cogent_fifo
 import cogent_generate
 import cogent_project
@@ -281,6 +284,99 @@ class BackEnd(htmlPy.Object):
         self.__load = 0
         self.default_page()
         self._alert("Database loaded successfully")
+
+    # ---- Re-apply edits ----------------------------------------------------------------------------
+    REAPPLY_FILE = 'ReapplyEdits.data'
+
+    def _reapply_paths(self):
+        saved = {}
+        try:
+            saved = _read_json(self.__data_dir + self.REAPPLY_FILE)
+        except ValueError:
+            pass                                       # damaged: start from the defaults
+        stem = os.path.splitext(os.path.basename(self.__dbc or 'CODE_GEN'))[0]
+        stamp = datetime.datetime.now().strftime('%Y-%m-%d_%H%M')
+        return {"base": saved.get("base", ""), "edited": saved.get("edited", ""),
+                "new": saved.get("new") or os.path.abspath(cogent_generate.OUTPUT_DIR),
+                "out": os.path.join(os.path.abspath('MERGED'), "%s_%s" % (stem, stamp))}
+
+    def _reapply_render(self, paths, error=None, results=None, out=None):
+        ctx = self._context("reapply")
+        attention = []
+        for r in results or []:
+            attention += ["%s: check failed: %s" % (r["file"], c) for c in r["checks"]]
+            if r["origin"]:
+                attention.append("%s: your file was generated from %s (previous generation: %s); review the re-applied "
+                                 "differences" % (r["file"], r["origin"][0], r["origin"][1]))
+            if r["status"] in ("new file taken", "skipped") and not r["conflicts"]:
+                attention.append("%s: %s (%s)" % (r["file"], r["status"], r["detail"]))
+            attention += ["%s line %d: the new generation changed lines you edited" % (r["file"], c[0]) for c in r["conflicts"]]
+        ctx.update(paths=paths, error=error, results=results, attention=attention, out=out, out_json=json.dumps(out or ""))
+        app.template = ("Reapply.html", ctx)
+
+    @htmlPy.Slot()
+    def reapply_page(self):
+        self._reapply_render(self._reapply_paths())
+
+    @htmlPy.Slot(str)
+    def reapply_browse(self, field):
+        window = QtWidgets.QMainWindow()
+        folder = QtWidgets.QFileDialog.getExistingDirectory(window, "Select folder", ".")
+        if folder:
+            app.evaluate_javascript("document.getElementById(%s).value=%s;" % (json.dumps(field), json.dumps(os.path.normpath(folder))))
+
+    @htmlPy.Slot(str, result=str)
+    def reapply_run(self, json_data):
+        paths = json.loads(json_data)
+        missing = [label for key, label in (("base", "Previous generation"), ("edited", "Your workspace"),
+                                            ("new", "New generation"), ("out", "Output folder")) if not paths.get(key)]
+        if missing:
+            self._reapply_render(paths, error="Choose these folders first: %s." % ", ".join(missing))
+            return ""
+        try:
+            with open(self.__data_dir + self.REAPPLY_FILE, 'w', encoding='utf-8') as fh:
+                json.dump({k: paths[k] for k in ("base", "edited", "new")}, fh, indent=1)
+        except OSError as exc:
+            log_failure("Remembering the Re-apply edits folders", exc)
+        try:
+            results = cogent_carry.carry_forward(paths["base"], paths["edited"], paths["new"], paths["out"])
+            report = cogent_carry.report(results, paths["base"], paths["edited"], paths["new"], paths["out"])
+            with open(os.path.join(paths["out"], "CARRY_FORWARD.md"), 'w', encoding='utf-8') as fh:
+                fh.write(report)
+        except cogent_carry.UsageError as exc:
+            self._reapply_render(paths, error="Nothing was written: %s." % exc)
+            return ""
+        except Exception as exc:
+            path = log_failure("Re-applying edits", exc, paths)
+            self._reapply_render(paths, error="Re-applying the edits failed (%s). Details: %s" % (_describe(exc), path))
+            return ""
+        self._reapply_render(paths, results=results, out=paths["out"])
+        return ""
+
+    @htmlPy.Slot(str)
+    def reapply_open(self, folder):
+        if folder and os.path.isdir(folder):
+            os.startfile(folder)
+
+    @htmlPy.Slot()
+    def keep_codegen_copy(self):
+        op = "Keeping a copy of CODE_GEN"
+        files = [f for f in cogent_generate.GENERATED_FILES + cogent_generate.REPORT_FILES
+                 if os.path.isfile(os.path.join(cogent_generate.OUTPUT_DIR, f))]
+        if not files:
+            self._alert(CogentError(op, "CODE_GEN has no generated files", hint="Press Generate code first.").user_message())
+            return
+        stem = os.path.splitext(os.path.basename(self.__dbc or 'CODE_GEN'))[0]
+        target = os.path.join(cogent_generate.OUTPUT_DIR, "%s_%s" % (stem, datetime.datetime.now().strftime('%Y-%m-%d_%H%M%S')))
+        try:
+            os.makedirs(target)
+            for f in files:
+                shutil.copy2(os.path.join(cogent_generate.OUTPUT_DIR, f), target)
+        except OSError as exc:
+            self._fail(op, exc, item="copying to " + target, hint="Check that CODE_GEN is writable.")
+            return
+        self._alert("Copy of CODE_GEN saved\n%s\nUse it as 'Previous generation' when you re-apply your edits to the next "
+                    "generation." % os.path.abspath(target))
 
     @htmlPy.Slot()
     def fifo_page(self):

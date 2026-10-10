@@ -164,7 +164,7 @@ function render(v) {
 
   document.getElementById("ro-list").innerHTML = v.receive_only.length ? v.receive_only.map(function (r, i) {
     return '<span class="cg-chip' + (r.problem ? ' cg-chip-warn' : '') + '">' + esc(r.name) + ' ' + r.id +
-      (r.problem ? ' - ' + esc(r.problem) : '') + ' <a class="cg-link" onclick="removeReceiveOnly(' + i + ')">x</a></span>';
+      (r.problem ? ' - ' + esc(r.problem) : '') + ' <button type="button" class="cg-linkbtn ro-remove" data-name="' + esc(r.name) + '" onclick="removeReceiveOnly(' + i + ')" title="Remove">x</button></span>';
   }).join("") : '<p class="cg-muted cg-small">None.</p>';
   var sel = document.getElementById("ro-select");
   sel.innerHTML = VIEW.receive_only_choices.filter(function (c) { return state.additional.indexOf(c.name) < 0; })

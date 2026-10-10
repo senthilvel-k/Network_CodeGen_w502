@@ -150,3 +150,16 @@ def test_card_counts_messages_without_saved_settings(qtbot, app):
     assert js(qtbot, gui, TOTAL) == "208"
     assert "1 message has no saved settings" in js(qtbot, gui, CARD)
     (home / "data" / "CanDbcMsgConfiguration.data").write_text(json.dumps(msg), encoding="utf-8")
+
+
+def test_receive_only_message_can_be_added_and_removed(qtbot, app):
+    back_end, home, fx, dbc = app
+    gui = back_end.app
+    navigate(qtbot, gui, FIFO_LINK)
+    wait_js(qtbot, gui, TOTAL, "182")                       # blocks pre-selected on opening
+    js(qtbot, gui, "document.getElementById('ro-select').value='BMS19_100'; document.getElementById('ro-add').click(); 1")
+    wait_js(qtbot, gui, TOTAL, "183")
+    assert "BMS19_100" in js(qtbot, gui, "document.getElementById('ro-list').innerText")
+    js(qtbot, gui, "document.querySelector('.ro-remove[data-name=\"BMS19_100\"]').click(); 1")
+    wait_js(qtbot, gui, TOTAL, "182")
+    assert "BMS19_100" not in js(qtbot, gui, "document.getElementById('ro-list').innerText")

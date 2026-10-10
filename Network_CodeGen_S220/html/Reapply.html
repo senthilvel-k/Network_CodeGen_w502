@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>CoGeNT - Re-apply edits</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="{{'cogent.css'|staticfile }}">
+</head>
+<body>
+<div class="cg-app">
+{% set active = 'reapply' %}
+{% include '_sidebar.html' %}
+<main class="cg-main">
+  <h1>Re-apply edits</h1>
+  <div class="cg-banner cg-banner-err" id="reapply-error"{% if not error %} style="display:none"{% endif %}>{{ error or '' }}</div>
+
+  <section class="cg-card">
+    <h2>Folders</h2>
+    <p class="cg-muted cg-small">Your hand edits (the differences between the previous generation and your workspace) are
+      applied to the new generation. The three input folders are only read; the result goes to the output folder.</p>
+    <div class="cg-form">
+      <label for="reapply-base">Previous generation</label>
+      <input class="cg-input" id="reapply-base" value="{{ paths.base }}" placeholder="the generated files your workspace edits started from, e.g. CODE_GEN\DBC_40024">
+      <input type="button" class="cg-btn" value="Browse" onclick="BackEnd.reapply_browse('reapply-base')">
+      <label for="reapply-edited">Your workspace</label>
+      <input class="cg-input" id="reapply-edited" value="{{ paths.edited }}" placeholder="e.g. D:\networkgen\dc.app.scl.vehiclecomm">
+      <input type="button" class="cg-btn" value="Browse" onclick="BackEnd.reapply_browse('reapply-edited')">
+      <label for="reapply-new">New generation</label>
+      <input class="cg-input" id="reapply-new" value="{{ paths.new }}">
+      <input type="button" class="cg-btn" value="Browse" onclick="BackEnd.reapply_browse('reapply-new')">
+      <label for="reapply-out">Output folder</label>
+      <input class="cg-input" id="reapply-out" value="{{ paths.out }}">
+      <input type="button" class="cg-btn" value="Browse" onclick="BackEnd.reapply_browse('reapply-out')">
+    </div>
+    <div class="cg-actions" style="margin-top:12px">
+      <input type="button" class="cg-btn cg-btn-primary" id="reapply-run" value="Re-apply my edits" onclick="run()">
+      <input type="button" class="cg-btn" id="keep-copy" value="Keep a copy of CODE_GEN" onclick="BackEnd.keep_codegen_copy()"
+             title="Copies the generated files to CODE_GEN\<DBC>_<date>; use that copy as 'Previous generation' next time">
+    </div>
+    <p class="cg-muted cg-small">Needs Git for Windows (git merge-file). can_rxrule.cfg and nw_can_dll.h are taken from the new
+      generation because the Receive FIFO settings produce them.</p>
+  </section>
+
+  {% if results %}
+  <section class="cg-card">
+    <div class="cg-head"><h2>Result</h2>
+      <button type="button" class="cg-linkbtn" id="reapply-open" style="margin-left:auto" data-out="{{ out }}" onclick="BackEnd.reapply_open(this.dataset.out)">Open result folder</button></div>
+    <p class="cg-muted cg-small">{{ out }} - full report: CARRY_FORWARD.md in that folder.</p>
+    <table class="cg-table" id="reapply-results">
+      <tr><th>File</th><th>Result</th><th>Your edit regions</th><th>Conflicts</th><th>Note</th></tr>
+      {% for r in results %}
+      <tr><td class="cg-mono">{{ r.file }}</td>
+        <td class="{{ 'cg-over' if r.conflicts or r.checks else ('cg-ok' if r.status in ('merged', 'new generation taken') else '') }}">{{ r.status }}</td>
+        <td>{{ r.edits }}</td><td>{{ r.conflicts|length }}</td>
+        <td class="cg-small">{{ ([r.detail] + r.rules_applied)|select|join('; ') }}</td></tr>
+      {% endfor %}
+    </table>
+  </section>
+
+  <section class="cg-card" id="reapply-attention">
+    <h2>Manual Action Required</h2>
+    {% if attention %}
+    <ul>{% for a in attention %}<li>{{ a }}</li>{% endfor %}</ul>
+    <p class="cg-muted cg-small">Each item is described with file, location, versions, steps and verification in CARRY_FORWARD.md.</p>
+    {% else %}
+    <p class="cg-ok">None. Review the result and copy the files into your workspace.</p>
+    {% endif %}
+  </section>
+  {% endif %}
+</main>
+</div>
+<script>
+function run() {
+  var v = function (id) { return document.getElementById(id).value.trim(); };
+  BackEnd.reapply_run(JSON.stringify({base: v("reapply-base"), edited: v("reapply-edited"), "new": v("reapply-new"), out: v("reapply-out")}));
+}
+</script>
+</body>
+</html>
