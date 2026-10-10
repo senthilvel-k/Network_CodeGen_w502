@@ -211,3 +211,64 @@ def test_dispatch_snippet_lists_every_merged_message():
     assert "(pRmd->Identifier.I32 & 0x7F0u) == 0x3D0u" in code
     assert "case 0x3D2u: canFrameHandle = VNIM_BMS11_100_MESSAGE; break;" in code
     assert code.count("case 0x") == 13
+
+
+# ---- configuration API used by the GUI ------------------------------------------------------
+def test_config_dict_round_trip_keeps_only_non_default_limits():
+    from cogent_fifo import config_from_dict, config_to_dict
+    raw = {"merge_blocks": REFERENCE_BLOCKS, "additional_rx_messages": ["BMS19_100"]}
+    assert config_to_dict(config_from_dict(raw)) == raw
+    raw2 = dict(raw, max_rx_rules=190)
+    assert config_to_dict(config_from_dict(raw2)) == raw2
+
+
+def test_config_from_dict_names_the_bad_setting():
+    from cogent_fifo import FifoConfigError, config_from_dict
+    with pytest.raises(FifoConfigError) as exc:
+        config_from_dict({"merge_blocks": [{"base": "0x3D1", "mask": "0x7F0"}]}, "GUI")
+    assert "0x3D1" in str(exc.value) and "GUI" in str(exc.value)
+
+
+def test_save_config_then_load_config(tmp_path):
+    from cogent_fifo import config_from_dict, load_config, save_config
+    cfg = config_from_dict({"merge_blocks": REFERENCE_BLOCKS, "additional_rx_messages": ["BMS20_100"]})
+    path = save_config(str(tmp_path), cfg)
+    loaded = load_config(str(tmp_path))
+    assert path.endswith("CanFifoConfiguration.data")
+    assert [(b.base, b.mask) for b in loaded.merge_blocks] == [(0x3D0, 0x7F0), (0x4F0, 0x7F0)]
+    assert loaded.additional_rx_messages == ["BMS20_100"]
+
+
+@pytest.mark.parametrize("rx, words", [
+    ([msg(0x3D0, "A"), msg(0x3D2, "B")], []),
+    ([msg(0x123, "A")], ["no enabled"]),
+    ([msg(0x3D0, "A", "8"), msg(0x3D2, "B", "6")], ["DLC", "B=6"]),
+])
+def test_block_problems_for_one_block(rx, words):
+    from cogent_fifo import MergeBlock, block_problems
+    problems = block_problems({"IL": rx, "TP": [], "NM": []}, MergeBlock(0x3D0, 0x7F0))
+    assert (problems == []) == (words == [])
+    assert all(w in " ".join(problems) for w in words)
+
+
+def test_preselect_on_40024_picks_the_blocks_the_user_merged_by_hand():
+    from cogent_fifo import preselect, suggest_merge_blocks
+    base_cfg = fifo_cfg(additional_rx_messages=["BMS19_100", "BMS20_100"])
+    plan = plan_for_fixture(base_cfg)
+    added, fits = preselect(plan_for_fixture, base_cfg, suggest_merge_blocks(plan))
+    assert fits and [(b.base, b.mask) for b in added] == [(0x4F0, 0x7F0), (0x3D0, 0x7F0)]
+
+
+def test_preselect_reports_when_candidates_are_not_enough():
+    from cogent_fifo import preselect, suggest_merge_blocks
+    rx = [msg(0x100 + 0x10 * i, "M%03d" % i) for i in range(100)] + [msg(0x101 + 0x10 * i, "N%03d" % i) for i in range(100)]
+    dbc, cfg_data = FakeDbc(rx), il_cfg(rx)
+    plan_fn = lambda cfg: __import__("can_rx_filt_gen").plan_rx_rules(dbc, cfg_data, cfg)
+    base_cfg = fifo_cfg()
+    added, fits = preselect(plan_fn, base_cfg, suggest_merge_blocks(plan_fn(base_cfg)))
+    assert len(added) == 8 and fits      # 200 rules, 100 two-message blocks: 8 merges are enough
+    rx2 = [msg(0x10 * i, "S%03d" % i) for i in range(120)] + [msg(0x10 * i + 8, "T%03d" % i, "6") for i in range(80)]
+    dbc2, data2 = FakeDbc(rx2), il_cfg(rx2)
+    plan_fn2 = lambda cfg: __import__("can_rx_filt_gen").plan_rx_rules(dbc2, data2, cfg)
+    added2, fits2 = preselect(plan_fn2, base_cfg, suggest_merge_blocks(plan_fn2(base_cfg)))
+    assert added2 == [] and fits2 is False     # every block mixes DLC 8 and 6: nothing can be combined

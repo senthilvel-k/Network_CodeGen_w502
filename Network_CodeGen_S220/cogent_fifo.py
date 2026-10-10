@@ -132,6 +132,12 @@ def load_config(data_dir):
             raw = json.load(fh)
     except ValueError as exc:
         raise FifoConfigError("%s is not valid JSON (%s)" % (path, exc))
+    return config_from_dict(raw, path)
+
+
+def config_from_dict(raw, path=None):
+    """FifoConfig from the JSON object of CanFifoConfiguration.data (or from the GUI); path names the
+    source in error messages."""
     if not isinstance(raw, dict):
         raise FifoConfigError("%s must contain a JSON object" % path)
     unknown = sorted(set(raw) - set(KNOWN_KEYS))
@@ -167,6 +173,27 @@ def load_config(data_dir):
     return cfg
 
 
+def config_to_dict(cfg):
+    """JSON object for CanFifoConfiguration.data; limits are written only when they differ from the platform."""
+    raw = {}
+    defaults = FifoConfig()
+    for key in ('max_rx_rules', 'max_rules_per_fifo'):
+        if getattr(cfg, key) != getattr(defaults, key):
+            raw[key] = getattr(cfg, key)
+    raw['merge_blocks'] = [{"base": "0x%03X" % b.base, "mask": "0x%03X" % b.mask} for b in cfg.merge_blocks]
+    raw['additional_rx_messages'] = list(cfg.additional_rx_messages)
+    return raw
+
+
+def save_config(data_dir, cfg):
+    """Write cfg to data_dir/CanFifoConfiguration.data (the GUI's only way to store FIFO settings)."""
+    path = os.path.join(data_dir, CONFIG_FILE)
+    with open(path, 'w', encoding='utf-8') as fh:
+        json.dump(config_to_dict(cfg), fh, indent=1)
+        fh.write("\n")
+    return path
+
+
 # ---- planning helpers used by can_rx_filt_gen ----------------------------------------------------
 def add_additional_messages(il_mes, received, all_rx, config):
     """Add config.additional_rx_messages (application messages) to il_mes, keeping name order."""
@@ -181,26 +208,34 @@ def add_additional_messages(il_mes, received, all_rx, config):
     return sorted(il_mes + added, key=lambda x: x['Msg_name'])
 
 
+def block_problems(categories, block):
+    """Why block cannot be received through one rule ([] when it can). categories as for merge_blocks."""
+    inside = [(kind, m) for kind, msgs in categories.items() for m in msgs if block.contains(int(m['id']))]
+    if not inside:
+        return ["merge block %s: no enabled received message has an ID in this block" % block.label()]
+    kinds = sorted({k for k, _ in inside})
+    if len(kinds) > 1:
+        return ["merge block %s mixes message layers %s (%s): one dispatch entry can serve only one layer"
+                % (block.label(), " and ".join(kinds), ", ".join("%s=%s" % (m['Msg_name'], k) for k, m in inside))]
+    dlcs = sorted({m['DLC'] for _, m in inside})
+    if len(dlcs) > 1:
+        return ["merge block %s: messages have different DLC (%s): the dispatch entry checks one DLC for all of them"
+                % (block.label(), ", ".join("%s=%s" % (m['Msg_name'], m['DLC']) for _, m in inside))]
+    return []
+
+
 def merge_blocks(categories, config, all_rx=()):
     """categories: {'IL': [...], 'TP': [...], 'NM': [...]} message dicts in rule order.
     Returns (categories without the merged-away members, {representative id: rule mask}, groups,
     [(block, message) DBC messages inside a block that were not received before])."""
     problems, groups, masks, removed, unreceived = [], [], {}, set(), []
     for block in config.merge_blocks:
+        found = block_problems(categories, block)
+        if found:
+            problems += found
+            continue
         inside = [(kind, m) for kind, msgs in categories.items() for m in msgs if block.contains(int(m['id']))]
-        if not inside:
-            problems.append("merge block %s: no enabled received message has an ID in this block" % block.label())
-            continue
         kinds = sorted({k for k, _ in inside})
-        if len(kinds) > 1:
-            problems.append("merge block %s mixes message layers %s (%s): one dispatch entry can serve only one layer"
-                            % (block.label(), " and ".join(kinds), ", ".join("%s=%s" % (m['Msg_name'], k) for k, m in inside)))
-            continue
-        dlcs = sorted({m['DLC'] for _, m in inside})
-        if len(dlcs) > 1:
-            problems.append("merge block %s: messages have different DLC (%s): the dispatch entry checks one DLC for all of them"
-                            % (block.label(), ", ".join("%s=%s" % (m['Msg_name'], m['DLC']) for _, m in inside)))
-            continue
         members = sorted((m for _, m in inside), key=lambda m: int(m['id']))
         groups.append(MergedGroup(block, kinds[0], members))
         masks[int(members[0]['id'])] = RULE_MASK_FLAGS | block.mask
@@ -246,6 +281,22 @@ def suggest_merge_blocks(plan, mask=0x7F0):
             continue
         out.append(MergedGroup(MergeBlock(base, mask), rules[0].kind, sorted((r.message for r in rules), key=lambda m: int(m['id']))))
     return sorted(out, key=lambda g: (-len(g.members), g.base))
+
+
+def preselect(plan_fn, config, candidates):
+    """Fewest candidate blocks (largest saving first, then lowest base) so the plan fits.
+    plan_fn(FifoConfig) -> RxPlan. Returns (added MergeBlocks, fits)."""
+    chosen = []
+    trial = config
+    if not check_limits(plan_fn(trial), trial):
+        return [], True
+    for group in sorted(candidates, key=lambda g: (-len(g.members), g.base)):
+        chosen.append(group.block)
+        trial = FifoConfig(config.max_rx_rules, config.max_rules_per_fifo, list(config.merge_blocks) + chosen,
+                           list(config.additional_rx_messages), config.source)
+        if not check_limits(plan_fn(trial), trial):
+            return chosen, True
+    return chosen, False
 
 
 def dispatch_snippet(group):
