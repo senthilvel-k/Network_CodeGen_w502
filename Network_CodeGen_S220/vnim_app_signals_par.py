@@ -2,6 +2,7 @@ import sys,json
 import os
 from cogent_io import open_output, close_output
 import cogent_mux
+import cogent_overrides
 from py2compat import py2_print as print, Py2Dict  # Python 2 print/dict-order semantics
 dbc=None
 dbc_file_name=None
@@ -1793,13 +1794,17 @@ def vnim_app_h_gen():
     if len(node_msg_list[node]) > 1:
       print('   VNIM_'+rx_node_cfg[node].upper()+'_MSGID,/*'+node+' Key msg - '+node+' msg start Index*/')
       cnt =0
+      entries = []
       for mes in node_msg_list[node]:
         if mes.upper() != rx_node_cfg[node].upper():
           if cnt == (len(node_msg_list[node])-1):
-            print('   VNIM_'+mes.upper()+'_MSGID,/*'+node+' msg stop index*/')
+            entries.append((mes, '   VNIM_'+mes.upper()+'_MSGID,/*'+node+' msg stop index*/'))
           else:
-            print('   VNIM_'+mes.upper()+'_MSGID,')
+            entries.append((mes, '   VNIM_'+mes.upper()+'_MSGID,'))
         cnt+=1
+      # Code overrides numeric_order: the lines move with their comments, as in the S2XX hand edit
+      for i in cogent_overrides.numeric_positions([mes for mes, _ in entries]):
+        print(entries[i][1])
     else:
       print('   VNIM_'+rx_node_cfg[node].upper()+'_MSGID,/*'+node+' Key msg - '+node+' msg start/Stop Index*/')
   print('   NUM_VNIM_MESSAGES')

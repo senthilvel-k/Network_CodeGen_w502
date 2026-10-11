@@ -90,6 +90,26 @@ def enable_indexed(home, dbc, node="SMART_CORE", names=("BMS19_100", "BMS20_100"
     (data / "CanDbcSigConfiguration.data").write_text(json.dumps(sig_cfg), encoding="utf-8")
 
 
+# The Code overrides that reproduce the S2XX hand edits (data\CanOverrideConfiguration.data)
+S2XX_OVERRIDES = {
+    "tx": dict([("EX_SUMMARY_RESPONSE_%d" % i, {"attribute": "Event", "period": 0, "offset": 0}) for i in range(4)] + [
+        ("MCM_SP", {"attribute": "Event", "offset": 0}),
+        ("MCM_WAKEUP", {"attribute": "Event"}),
+        ("REM_ACK_MSG", {"attribute": "Periodic+Event"}),
+        ("IC10_200", {"confirmation": True}),
+        ("IC11_500", {"confirmation": True}),
+        ("MCM4_1000", {"confirmation": True})]),
+    "rx": {"TC_NSM": {"timeout": 100}},
+    "nm_tx": [{"message": "MCM_WAKEUP", "label": "MCM_WAKEUP_REASON", "buffer": "Nm_wakeup_buffer"},
+              {"message": "IC_ACTIVE", "label": "IC_ACTIVE", "buffer": "Nm_msg_buffer"},
+              {"message": "MCM_ACTIVE", "label": "MCM_ACTIVE", "buffer": "Nm_msg_buffer"},
+              {"message": "IS_ACTIVE", "label": "IS_ACTIVE", "buffer": "Nm_msg_buffer"},
+              {"message": "MCM_SLEEP", "label": "MCM_SLEEP", "buffer": "Nm_msg_buffer"}],
+    "host_forward": {"prefix": "REM_MSG_", "function": "host_update_msg"},
+    "numeric_order": ["REM_MSG_"],
+}
+
+
 def run_folder_count(home):
     import cogent_generate
     return len(cogent_generate.run_folders(str(Path(home) / "CODE_GEN")))

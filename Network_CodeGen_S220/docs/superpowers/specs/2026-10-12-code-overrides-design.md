@@ -38,8 +38,12 @@ Every key is optional; an empty or missing file means no override.
   `<function>(VNIM_<MSG>);` instead of the `#if vnim_notify_used ... os_notify ... #endif` lines, and a
   `R E M    M A C R O S` block (`#define VNIM_<MSG> <index>`, messages in order) follows the
   `IS_*_DLC_FAULT` defines of nw_vnim_app_signals_par.c.
-- `numeric_order`: message names that start with one of the prefixes and end in digits sort by that number
-  (REM_MSG_2 before REM_MSG_10) everywhere messages are ordered by name; nothing else changes order.
+- `numeric_order`: message names made of one of the prefixes and a number are put in the order of their
+  numbers (REM_MSG_2 before REM_MSG_10) where the workspace has that order: the receive message handles and
+  the receive frame table of nw_il_par.h and the VNIM message IDs of nw_vnim_app_signals_par.h (the enum
+  lines move with their comments, as in the hand edit). Only within one node; key messages stay first;
+  nothing else changes order (buffers, flags, functions and indications keep the string order, as in the
+  workspace; every reference is by name).
 
 ## 2. Automatic
 

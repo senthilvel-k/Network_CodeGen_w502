@@ -211,6 +211,52 @@ def apply_messages(messages):
             message['GenMsgCycleTime'] = str(timeout)
 
 
+# Transmit frame table (nw_il_par.h): the generator's line formats; Periodic+Event as in the S2XX hand edit
+TX_ATTRIBUTE_TEXT = {'Periodic': '(IL_TX_ATTR_PERIODIC)', 'Event': '(IL_TX_ATTR_EVENT)',
+                     'Periodic+Event': '(IL_TX_ATTR_PERIODIC|IL_TX_ATTR_EVENT)'}
+TX_ATTRIBUTE_NOTIFY_TEXT = {'Periodic': '(IL_TX_ATTR_PERIODIC | IL_TX_ATTR_TXC_NOTIFY)',
+                            'Event': '(IL_TX_ATTR_EVENT | IL_TX_ATTR_TXC_NOTIFY)',
+                            'Periodic+Event': '(IL_TX_ATTR_PERIODIC | IL_TX_ATTR_EVENT | IL_TX_ATTR_TXC_NOTIFY)'}
+PERIOD_LINE = '   IL_TIME_IN_TASK_TICS( %d ),                /* Primary Period in Task Tics  */     \\'
+OFFSET_LINE = '   IL_TIME_IN_TASK_TICS( %d ),                /* Offset Delay in Task Tics    */    \\'
+
+
+def tx_confirmation(name):
+    """The Tx message gets the confirmation and precopy callbacks (as with a debounced signal)."""
+    override = _active.tx.get(name.upper())
+    return bool(override and override.confirmation)
+
+
+def tx_attribute(name, notify):
+    """Frame attribute text of a Tx message with an attribute override (None: from the DBC)."""
+    override = _active.tx.get(name.upper())
+    if override is None or override.attribute is None:
+        return None
+    return (TX_ATTRIBUTE_NOTIFY_TEXT if notify else TX_ATTRIBUTE_TEXT)[override.attribute]
+
+
+def tx_periodic(name, from_dbc):
+    """The frame table entry points to the message's periodic attributes (NULL for Event)."""
+    override = _active.tx.get(name.upper())
+    if override is None or override.attribute is None:
+        return from_dbc
+    return override.attribute != 'Event'
+
+
+def tx_row(name, lines):
+    """The period and offset lines of the message's periodic transmit table row: `lines` as generated,
+    with an overridden value replacing its line."""
+    override = _active.tx.get(name.upper())
+    if override is None:
+        return lines
+    period, offset = lines
+    if override.period is not None:
+        period = PERIOD_LINE % override.period
+    if override.offset is not None:
+        offset = OFFSET_LINE % override.offset
+    return [period, offset]
+
+
 def _number(name, prefix):
     rest = name.upper()[len(prefix):] if name.upper().startswith(prefix) else ''
     return int(rest) if rest.isdigit() else None

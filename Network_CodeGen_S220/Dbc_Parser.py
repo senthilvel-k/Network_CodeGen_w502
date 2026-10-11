@@ -1,6 +1,7 @@
 import pickle
 import sys,re 
 from py2compat import Py2Dict
+import cogent_overrides
 
 #note - class  dbc_parser not completed 
 class dbc_parser:
@@ -332,6 +333,7 @@ class dbc_parser:
                 if prop in self.__message_parameters and prop not in self.__message[keys]:
                     self.__message[keys][prop]=self.__default_values[prop]
                     #print self.__message  
+        cogent_overrides.apply_messages(self.__message)   # Code overrides: receive timeouts
     
     def __add_default_signal_parameters(self):         
         for keys in self.__message:

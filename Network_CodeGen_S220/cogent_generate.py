@@ -25,6 +25,7 @@ from dataclasses import dataclass, field
 
 import cogent_fifo
 import cogent_io
+import cogent_overrides
 from cogent_errors import (MSG_DATA_FILE, MSG_PAGE, SIG_DATA_FILE, SIG_PAGE, CogentError, log_failure,
                            missing_config_entry)
 
@@ -121,9 +122,14 @@ def run_code_generation(dbc, node, time_str):
         _check_output_dir()
         run = _new_run_name()
         msg_cfg = _check_inputs(dbc, node)
+        overrides = _check_overrides(dbc, node)
         _check_multiplex(dbc, node, msg_cfg)
         plan, fifo_config = _check_fifo(dbc, node, msg_cfg)
-        _run_generators(dbc, node, time_str)
+        cogent_overrides.activate(overrides)
+        try:
+            _run_generators(dbc, node, time_str)
+        finally:
+            cogent_overrides.deactivate()
         _check_generated_rules(plan)
         manual = _write_reports(plan, fifo_config, dbc, node, msg_cfg, os.path.join("CODE_GEN", run))
         folder = _publish(run)
@@ -175,6 +181,27 @@ def _check_inputs(dbc, node):
                               hint="Open '%s' and press 'Save and Back' to write it again, or use "
                                    "'Load configuration' to load a saved configuration." % page) from exc
     return loaded[MSG_DATA_FILE]
+
+
+def _check_overrides(dbc, node):
+    """The Code overrides of the run (data\\CanOverrideConfiguration.data), checked against the DBC."""
+    from Dbc_Parser import dbc_parser
+    item = "reading the Code overrides settings"
+    hint = ("Nothing was changed. Open 'Code overrides' (left menu), correct or remove the named entry and "
+            "press Save, then Generate code again.")
+    try:
+        overrides = cogent_overrides.load(DATA_DIR)
+    except cogent_overrides.OverrideConfigError as exc:
+        raise CogentError("Code generation", str(exc), item=item, hint=hint) from exc
+    if overrides.empty():
+        return overrides
+    parser = dbc_parser(dbc, node)
+    names = {d: {m['Msg_name'].upper() for m in parser.get_msg_type('ALL', d)} for d in ('tx', 'rx')}
+    problems = cogent_overrides.check_names(overrides, names['tx'], names['rx'])
+    if problems:
+        raise CogentError("Code generation", "data\\%s: %s" % (cogent_overrides.CONFIG_FILE, "; ".join(problems)),
+                          item=item, hint=hint)
+    return overrides
 
 
 def multiplex_error(msg_name, multiplexor, problem):

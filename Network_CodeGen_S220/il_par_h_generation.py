@@ -2,6 +2,7 @@ import sys,json
 import os
 from cogent_io import open_output, close_output
 import cogent_mux
+import cogent_overrides
 from py2compat import py2_print as print, Py2Dict  # Python 2 print/dict-order semantics
 dbc=None
 dbc_file_name=None
@@ -247,7 +248,12 @@ def message_structure_generation_tx_rx():
     for mes in il_sorted_mes_rx:
       if mes['Msg_name'] == order_msg:
         il_sorted_mes_rx_ordered.append(mes)
-     
+  # receive handles and frame table: Code overrides numeric_order (within a node, key messages stay first)
+  il_rx_numbered = [il_sorted_mes_rx_ordered[i] for i in cogent_overrides.numeric_positions(
+    [mes['Msg_name'] for mes in il_sorted_mes_rx_ordered],
+    [None if vnim_msg_cfg_data[mes['Msg_name']+'_rx_key_msg'] in ['on','ON','On',1,'1']
+     else vnim_msg_cfg_data[mes['Msg_name']+'_node_name'].upper() for mes in il_sorted_mes_rx_ordered])]
+
   print('''/* ===========================================================================
    Interaction Layer Number of Transmit Messages, Signals
   =========================================================================*/
@@ -361,7 +367,10 @@ def message_structure_generation_tx_rx():
       if  vnim_sig_cfg_data[signal.upper()+'_tx_debounce'] in ['on','On',1,'1','ON']:
         signal_debounce=1
         tx_confirmation=1
-        
+    if cogent_overrides.tx_confirmation(mes['Msg_name']):      # Code overrides
+      signal_debounce=1
+      tx_confirmation=1
+
     if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_tx_enable'] in ['on','On',1,'1','ON']:
       print('   /*'+mes['Msg_name']+' Message */\\')
       print('   {\\')
@@ -370,7 +379,10 @@ def message_structure_generation_tx_rx():
         print('   (NW_HW_ALL_VARIANTS),         /* HW variants              */   \\')
       else:
         print('   (NW_HW_TCU_VARIANTS),         /* HW variants              */   \\')
-      if mes['GenMsgSendType'] in ['0','Cyclic',0]:
+      attribute = cogent_overrides.tx_attribute(mes['Msg_name'], tx_confirmation == 1)
+      if attribute:
+        print('   '+attribute+',         /* Frame Transmission Attributes              */   \\')
+      elif mes['GenMsgSendType'] in ['0','Cyclic',0]:
         if tx_confirmation == 1: 
           print('   (IL_TX_ATTR_PERIODIC | IL_TX_ATTR_TXC_NOTIFY),         /* Frame Transmission Attributes              */   \\')
         else:
@@ -393,7 +405,7 @@ def message_structure_generation_tx_rx():
       print('   &il_tx_delay_count[ VNIM_'+ mes['Msg_name'].upper() + '_MESSAGE ],                                /* Pointer to the Transmit Delay Count          */  \\')
       print('   IL_TIME_IN_TASK_TICS( 0 ),                                           /* Minimum Transmit Delay in Timer Tics         */   \\')
       
-      if mes['GenMsgSendType'] in ['0','Cyclic','Combined(Event/Periodic)','5',0,5] or int(mes['GenMsgCycleTime']) >0:
+      if cogent_overrides.tx_periodic(mes['Msg_name'], mes['GenMsgSendType'] in ['0','Cyclic','Combined(Event/Periodic)','5',0,5] or int(mes['GenMsgCycleTime']) >0):
         print('   &il_tx_periodic[ VNIM_' + mes['Msg_name'].upper() + '_MESSAGE ],                               /* Pointer to the Periodic Attributes (or NULL) */  \\')
         temp_periodic_count+=1
       else:
@@ -434,13 +446,13 @@ def message_structure_generation_tx_rx():
       print('   /* '+mes['Msg_name'] +'Message is Periodic */                                                     \\')
       print('   {                                                                                 \\')
       if mes['GenMsgSendType'] in ['0','Cyclic','Combined(Event/Periodic)','5',0,5] or int(mes['GenMsgCycleTime']) >0:
-        print('   IL_TIME_IN_TASK_TICS( '+mes['GenMsgCycleTime']+' ),                /* Primary Period in Task Tics  */     \\')
-        print('   IL_TIME_IN_TASK_TICS( '+str(150+(temp_count*5))+'),                /* Offset Delay in Task Tics    */    \\')
-        print('   &il_tx_periodic_count[ VNIM_' + mes['Msg_name'] + '_MESSAGE ]                      /* Pointer to Periodic Count    */     \\')
+        row = ['   IL_TIME_IN_TASK_TICS( '+mes['GenMsgCycleTime']+' ),                /* Primary Period in Task Tics  */     \\',
+               '   IL_TIME_IN_TASK_TICS( '+str(150+(temp_count*5))+'),                /* Offset Delay in Task Tics    */    \\']
       else:
-        print('   IL_TIME_IN_TASK_TICS( 0 ),                /* Primary Period in Task Tics  */     \\')
-        print('   IL_TIME_IN_TASK_TICS( 0 ),                /* Offset Delay in Task Tics    */    \\')
-        print('   &il_tx_periodic_count[ VNIM_' + mes['Msg_name'] + '_MESSAGE ]                      /* Pointer to Periodic Count    */     \\')
+        row = ['   IL_TIME_IN_TASK_TICS( 0 ),                /* Primary Period in Task Tics  */     \\',
+               '   IL_TIME_IN_TASK_TICS( 0 ),                /* Offset Delay in Task Tics    */    \\']
+      print('\n'.join(cogent_overrides.tx_row(mes['Msg_name'], row)))     # Code overrides: period / offset
+      print('   &il_tx_periodic_count[ VNIM_' + mes['Msg_name'] + '_MESSAGE ]                      /* Pointer to Periodic Count    */     \\')
       if temp_count == (len(il_sorted_mes_tx)-1):
         print('   }                                                                                 ')
       else:
@@ -470,7 +482,7 @@ def message_structure_generation_tx_rx():
     for signal in mes['Sig_List']:
       if  vnim_sig_cfg_data[signal.upper()+'_tx_debounce'] in ['on','On',1,'1','ON']:
         signal_debounce=1
-    if signal_debounce == 1:
+    if signal_debounce == 1 or cogent_overrides.tx_confirmation(mes['Msg_name']):
       print('extern void Vnim_'+mes['Msg_name'].upper()+'_PreCopy(void);')
       print('extern void Vnim_'+mes['Msg_name'].upper()+'_Conf(void);')
       
@@ -491,7 +503,7 @@ def message_structure_generation_tx_rx():
     Interaction Layer Receive Message Enumerations
   =========================================================================*/''')
   temp_count = 0
-  for mes in il_sorted_mes_rx_ordered:
+  for mes in il_rx_numbered:
     if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON']:
       print('#define VNIM_'+mes['Msg_name'].upper()+'_MESSAGE     '+str(temp_count))
       temp_count+=1
@@ -538,7 +550,7 @@ extern CAN_UINT8 const vnim_msg_node_list[];
   =========================================================================*/''')
   temp_count=0
   print('#define IL_RX_FRAME_TABLE                                                                                                        \\')
-  for mes in il_sorted_mes_rx_ordered: 
+  for mes in il_rx_numbered:
     if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON']:
       print('   /* '+mes['Msg_name']+'Message */                                                                                           \\')
       print('   {                                                                                                                           \\')
