@@ -127,3 +127,50 @@ def test_types_text_of_bms19():
            "bms_celltemp_index_0;" in text
     assert "/* BMS19_100 */\ntypedef struct {\n  CAN_UINT8 BMS_CELLTEMP_INDEX:8;\n  CAN_UINT8 unused1:8;\n" \
            "  BMS_CELLTEMP_DATA_Sigbuf  bms_celltemp_data;\n}BMS19_100_msgType;" in text
+
+
+def norm(text):
+    import re
+    return [re.sub(r"\s+", "", l) for l in text.split("\n") if l.strip()]
+
+
+def test_put_get_functions_of_a_split_signal():
+    from cogent_mux import get_functions, put_functions
+    lays = {"BMS20_100": layout(VOLTS)}
+    put = norm("\n".join(put_functions(lays)))
+    assert put[:5] == norm("void ILRxPut_BMS_CELLVOLTAGE1(CAN_UINT16 data)\n{\n    CAN_ENTER_CRITICAL_SECTION(0);\n"
+                           "   BMS20_100.bms20_100.bms_cellvoltage_index_0.BMS_CELLVOLTAGE1_0 = (CAN_UINT8) ((data) & 0x0f);\n"
+                           "   BMS20_100.bms20_100.bms_cellvoltage_index_0.BMS_CELLVOLTAGE1_1 = (CAN_UINT8) (((data) >>4) & 0x3f);")
+    get = norm("\n".join(get_functions(lays)))
+    assert get[:6] == norm("CAN_UINT16 IlRxGetBMS_CELLVOLTAGE1(void)\n{\n   CAN_UINT16  rValue;\n"
+                           "    CAN_ENTER_CRITICAL_SECTION(0);\n"
+                           "   rValue = (CAN_UINT16)((CAN_UINT16)BMS20_100.bms20_100.bms_cellvoltage_index_0.BMS_CELLVOLTAGE1_0);\n"
+                           "   rValue |= (CAN_UINT16)(((CAN_UINT16)BMS20_100.bms20_100.bms_cellvoltage_index_0.BMS_CELLVOLTAGE1_1) << 4);")
+
+
+def test_precopy_checks_only_the_received_index():
+    from cogent_mux import precopy
+    text = norm(precopy(layout(VOLTS)))
+    assert text[:4] == norm("void BMS20_100_PreCopy (void)\n{\n   CAN_UINT16 rValue;\n"
+                            "   if (0 == (il_status & (CAN_UINT8) IL_STATUS_SUSPEND))")
+    assert norm("if((BMS20_100.bms20_100.bms_cellvoltage_index_0.BMS_CELLVOLTAGE_INDEX != "
+                "Rx_buffer.bms20_100.bms_cellvoltage_index_0.BMS_CELLVOLTAGE_INDEX))\n{\n"
+                "ILSet_BMS_CELLVOLTAGE_INDEX_DataChanged();") == text[5:8]
+    assert norm("if(Rx_buffer.bms20_100.bms_cellvoltage_index_0.BMS_CELLVOLTAGE_INDEX == 1)")[0] in text
+    i = text.index(norm("if(rValue != BMS20_100__CELLVOLTAGE1)")[0])
+    assert text[i:i + 5] == norm("if(rValue != BMS20_100__CELLVOLTAGE1)\n{\nBMS20_100__CELLVOLTAGE1 = rValue;\n"
+                                 "ILSet_BMS_CELLVOLTAGE1_DataChanged();\n}")
+
+
+def test_precopy_compares_a_plain_signal():
+    from cogent_mux import precopy
+    m = mes("GAP_100", [("SEL", "M", 0, 8), ("B", "m3", 16, 8), ("A", "m0", 24, 8), ("CRC", None, 56, 8)])
+    text = norm(precopy(layout(m)))
+    i = text.index(norm("if((GAP_100.gap_100.CRC != Rx_buffer.gap_100.CRC))")[0])
+    assert text[i + 2] == "ILSet_CRC_DataChanged();"
+    assert "CAN_UINT8rValue;" in text
+
+
+def test_shadows():
+    from cogent_mux import shadows
+    assert shadows({"BMS19_100": layout(TEMPS)})[0] == "CAN_UINT16 BMS19_100__CELLTEMP1;"

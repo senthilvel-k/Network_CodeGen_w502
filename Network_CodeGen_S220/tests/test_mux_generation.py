@@ -88,3 +88,15 @@ def test_macros_and_prototypes_after_the_regular_ones(both):
     assert h.index("void ILRxPut_RESERVED_WLC(") < h.index("void ILRxPut_BMS_CELLTEMP1(CAN_UINT16 data);")
     assert h.count("void ILRxPut_BMS_CELLTEMP1(") == 1 and h.count("#define ILSet_BMS_CELLTEMP1_DataChanged") == 1
     assert "VNIM_RX_BMS_CELLTEMP1" not in h and "VNIM_RX_BMS_CELLTEMP_INDEX" not in h
+
+
+def test_receive_code_after_the_regular_code(both):
+    c = both[True]["nw_il_par.c"]
+    assert c.index("WLC_NSM_buf WLC_NSM;") < c.index("CAN_UINT16 BMS19_100__CELLTEMP1;")
+    assert c.index("void ILRxPut_RESERVED_WLC(") < c.index("void ILRxPut_BMS_CELLTEMP1(CAN_UINT16 data)")
+    assert c.index("void IlRxGetRESERVED_WLC(") < c.index("CAN_UINT16 IlRxGetBMS_CELLTEMP1(void)")
+    assert c.index("void WLC_NSM_PreCopy (void)") < c.index("void BMS19_100_PreCopy (void)") \
+        < c.index("void BMS20_100_PreCopy (void)")
+    for fn in ("void BMS19_100_PreCopy", "void ILRxPut_BMS_CELLTEMP1(", "CAN_UINT16 IlRxGetBMS_CELLVOLTAGE96("):
+        assert c.count(fn) == 1, fn
+    assert "vin_index_data" in c and "bms_celltemp_index_data" not in c

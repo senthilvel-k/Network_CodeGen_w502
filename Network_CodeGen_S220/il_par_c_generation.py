@@ -1,6 +1,7 @@
 import sys,json
 import os
 from cogent_io import open_output, close_output
+import cogent_mux
 from py2compat import py2_print as print, Py2Dict  # Python 2 print/dict-order semantics
 dbc=None
 dbc_file_name=None
@@ -340,6 +341,7 @@ def message_Put_rx():
   diag_msg_rx=[]
            
   all_message_rx = dbc.get_msg_type(full_msg,'rx')
+  indexed = cogent_mux.layouts(all_message_rx, vnim_msg_cfg_data)
   for mes in all_message_rx:
     if vnim_msg_cfg_data[mes['Msg_name']+'_rx_enable'] in ['on','ON','On',1,'1']:
       if vnim_msg_cfg_data[mes['Msg_name']+'_msg_type_no_of_events'] == 'Appl':
@@ -389,7 +391,7 @@ def message_Put_rx():
 
   for mes in il_sorted_mes_rx_ordered:
     #print mes
-    if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON']:
+    if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON'] and mes['Msg_name'].upper() not in indexed:
       if mes['Multiplex'] == 'YES':
         mul_msg=dbc.get_multiplex(mes['id'])
         multiplexor_id=mul_msg['Multiplexor']
@@ -833,6 +835,10 @@ def message_Put_rx():
                   print('   CAN_EXIT_CRITICAL_SECTION(0);')
                   print('}\n')
        
+  if indexed:
+    print('\n'.join(cogent_mux.put_functions(indexed)))
+
+
 def message_Get_tx():
   global dbc,datatype_16,datatype_8,datatype_32,il_data_dir,tp_generic_config,nm_generic_config,il_generic_config
   
@@ -1167,6 +1173,7 @@ def message_Get_rx():
     
        
   all_message_rx = dbc.get_msg_type(full_msg,'rx')
+  indexed = cogent_mux.layouts(all_message_rx, vnim_msg_cfg_data)
   for mes in all_message_rx:
     if vnim_msg_cfg_data[mes['Msg_name']+'_rx_enable'] in ['on','ON','On',1,'1']:
       if vnim_msg_cfg_data[mes['Msg_name']+'_msg_type_no_of_events'] == 'Appl':
@@ -1214,7 +1221,7 @@ def message_Get_rx():
   =====================================================================================*/
 ''')
   for mes in il_sorted_mes_rx_ordered:
-    if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON']:
+    if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON'] and mes['Msg_name'].upper() not in indexed:
       if mes['Multiplex'] == 'YES':
         mul_msg=dbc.get_multiplex(mes['id'])
         multiplexor_id=mul_msg['Multiplexor']
@@ -1736,6 +1743,10 @@ def message_Get_rx():
                 print('}\n')
 
               
+  if indexed:
+    print('\n'.join(cogent_mux.get_functions(indexed)))
+
+
 def message_precopy():
   global dbc,datatype_16,datatype_8,datatype_32,il_data_dir,tp_generic_config,nm_generic_config,il_generic_config
   
@@ -1749,6 +1760,7 @@ def message_precopy():
     
        
   all_message_rx = dbc.get_msg_type(full_msg,'rx')
+  indexed = cogent_mux.layouts(all_message_rx, vnim_msg_cfg_data)
   for mes in all_message_rx:
     if vnim_msg_cfg_data[mes['Msg_name']+'_rx_enable'] in ['on','ON','On',1,'1']:
       if vnim_msg_cfg_data[mes['Msg_name']+'_msg_type_no_of_events'] == 'Appl':
@@ -1797,7 +1809,7 @@ def message_precopy():
 ''')
 
   for mes in il_sorted_mes_rx:
-    if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON']:
+    if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON'] and mes['Msg_name'].upper() not in indexed:
       sig_list =[]
       if mes['Multiplex'] == 'YES':
         mul_msg=dbc.get_multiplex(mes['id'])
@@ -2124,6 +2136,10 @@ def message_precopy():
     print('   }')
     print('}\n')
     
+  for lay in indexed.values():
+    print(cogent_mux.precopy(lay))
+
+
 def buffer_obj():
   global dbc,datatype_16,datatype_8,datatype_32,il_data_dir,tp_generic_config,nm_generic_config,il_generic_config
   
@@ -2145,6 +2161,7 @@ def buffer_obj():
   il_sorted_mes_tx = sorted(il_msg_tx,key = lambda x: x['Msg_name'])
        
   all_message_rx = dbc.get_msg_type(full_msg,'rx')
+  indexed = cogent_mux.layouts(all_message_rx, vnim_msg_cfg_data)
   for mes in all_message_rx:
     if vnim_msg_cfg_data[mes['Msg_name']+'_rx_enable'] in ['on','ON','On',1,'1']:
       if vnim_msg_cfg_data[mes['Msg_name']+'_msg_type_no_of_events'] == 'Appl':
@@ -2208,9 +2225,11 @@ Rx_Msg_buf  Rx_buffer;
   for mes in il_sorted_mes_rx_ordered:
     if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON']:
       print(mes['Msg_name'].upper()+'_buf '+mes['Msg_name'].upper()+';')  
-
+  if indexed:
+    print('\n' + '\n'.join(cogent_mux.shadows(indexed)))
 
 #f=open('nm_il_msg.h','w')
+
 def il_par_c_gen_function():
 
   global il_code_gen_dir,footer,tp_generic_config,nm_generic_config,il_generic_config

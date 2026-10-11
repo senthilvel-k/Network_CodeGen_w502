@@ -322,3 +322,72 @@ def put_prototypes(lays):
 
 def get_prototypes(lays):
     return ['%s IlRxGet%s(void);' % (s.ctype, s.name) for lay in lays.values() for s in _function_signals(lay)]
+
+
+# ---- nw_il_par.c --------------------------------------------------------------------------------------
+def _mask(width):
+    return '0x%02x' % ((1 << width) - 1)
+
+
+def shadows(lays):
+    """Last received value of each multiplexed signal (PreCopy compares against it)."""
+    return ['%s %s;' % (s.ctype, s.shadow) for lay in lays.values() for s in lay.signals if s.shadow]
+
+
+def _assemble(target, root, s):
+    t, lines, shift = s.ctype, [], 0
+    for k, (part, width) in enumerate(zip(s.parts, s.widths)):
+        src = '%s.%s.%s' % (root, s.path, part)
+        lines.append('%s = (%s)((%s)%s);' % (target, t, t, src) if k == 0 else
+                     '%s |= (%s)(((%s)%s) << %d);' % (target, t, t, src, shift))
+        shift += width
+    return lines
+
+
+def put_functions(lays):
+    out = []
+    for lay in lays.values():
+        for s in _function_signals(lay):
+            out += ['void ILRxPut_%s(%s data)' % (s.name, s.ctype), '{', '    CAN_ENTER_CRITICAL_SECTION(0);']
+            shift = 0
+            for k, (part, width) in enumerate(zip(s.parts, s.widths)):
+                value = '((data) & %s)' % _mask(width) if k == 0 else '(((data) >>%d) & %s)' % (shift, _mask(width))
+                out.append('   %s.%s.%s = (CAN_UINT8) %s;' % (lay.name, s.path, part, value))
+                shift += width
+            out += ['   CAN_EXIT_CRITICAL_SECTION(0);', '}', '']
+    return out
+
+
+def get_functions(lays):
+    out = []
+    for lay in lays.values():
+        for s in _function_signals(lay):
+            out += ['%s IlRxGet%s(void)' % (s.ctype, s.name), '{', '   %s  rValue;' % s.ctype,
+                    '    CAN_ENTER_CRITICAL_SECTION(0);']
+            out += ['   ' + line for line in _assemble('rValue', lay.name, s)]
+            out += ['   CAN_EXIT_CRITICAL_SECTION(0);', '   return rValue;', '}', '']
+    return out
+
+
+def precopy(lay):
+    """PreCopy of an indexed message: multiplexor change, then only the signals of the received index
+    against their shadow values, then the plain signals."""
+    mux = lay.multiplexor
+    widest = max((s.ctype for s in lay.signals if s.shadow), key=lambda t: int(t[len('CAN_UINT'):]))
+    sel = 'Rx_buffer.%s.%s' % (mux.path, mux.parts[0])
+    out = ['void %s_PreCopy (void)' % lay.name, '{', '   %s rValue;' % widest, '',
+           '   if (0 == (il_status & (CAN_UINT8) IL_STATUS_SUSPEND))', '   {',
+           '     if((%s.%s.%s != %s))' % (lay.name, mux.path, mux.parts[0], sel), '     {',
+           '         ILSet_%s_DataChanged();' % mux.name, '     }', '']
+    for i in lay.indexes:
+        out += ['     if(%s == %d)' % (sel, i), '     {']
+        for s in [s for s in lay.signals if s.index == i]:
+            out += ['         ' + line for line in _assemble('rValue', 'Rx_buffer', s)]
+            out += ['         if(rValue != %s)' % s.shadow, '         {', '             %s = rValue;' % s.shadow,
+                    '             ILSet_%s_DataChanged();' % s.name, '         }', '']
+        out += ['     }', '']
+    for s in [s for s in lay.signals if s.index is None and s is not mux]:
+        cond = ' || '.join('(%s.%s.%s != Rx_buffer.%s.%s)' % (lay.name, s.path, p, s.path, p) for p in s.parts)
+        out += ['     if(%s)' % cond, '     {', '         ILSet_%s_DataChanged();' % s.name, '     }', '']
+    out += ['   }', '}', '']
+    return '\n'.join(out)
