@@ -154,6 +154,8 @@ def _check(mes):
     mux, sigs = _signals(mes)
     if mux is None:
         raise OutOfScope(name, None, 'it has multiplexed signals but no multiplexor signal (M)')
+    if not any(s.index is not None for s in sigs):
+        raise OutOfScope(name, mux.name, 'the node receives its multiplexor but no multiplexed signal')
     for s in sigs:
         if s.index is not None and s.length > 32:
             raise OutOfScope(name, mux.name, 'signal %s is longer than 32 bits' % s.name)

@@ -178,7 +178,9 @@ Generating the 40024 configuration with BMS19_100 and BMS20_100 enabled reproduc
    for every other message (missing in the hand code; found while implementing).
 8. `vnim_msg_byte_position` / `vnim_msg_bit_mask` have one entry per message (hand code: 192 for 193).
 9. Formatting: the generator's spaces instead of the hand tabs; on-fail values in the generator's format
-   (`0x0u`, hand code partly `0x00`); `~0x20u` in `ILClr_BMS_CELLVOLTAGE78_DataChanged` (hand code `~0x20`).
+   (`0x0u`, hand code partly `0x00`); `~0x20u` in `ILClr_BMS_CELLVOLTAGE78_DataChanged` (hand code `~0x20`);
+   the init values as the signals page writes the DBC start value (`0x1f4u`, hand code `0x1F4u`; type
+   0x1F4 on the page to get the hand-code text).
 `tests/test_mux_reference.py` pins exactly this list (counted, white space ignored) against the workspace.
 
 ## 10. Errors

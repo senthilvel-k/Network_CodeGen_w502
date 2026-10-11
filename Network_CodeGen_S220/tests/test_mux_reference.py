@@ -38,6 +38,8 @@ INTENDED = {
         ("missing", r"ILRxPut_BMS_CELLVOLTAGE\d+\(0x00\);", 96, "9"),
         ("extra", r"ILRxPut_BMS_CELLVOLTAGE_INDEX\(0x0u\);", 2, "4, 9"),
         ("missing", r"ILRxPut_BMS_CELLVOLTAGE_INDEX\(0x00\);", 2, "3 set twice, 9"),
+        ("extra", r"ILRxPut_BMS_CELLTEMP\d+\(0x1f4u\);", 64, "9 init value as the signals page writes it"),
+        ("missing", r"ILRxPut_BMS_CELLTEMP\d+\(0x1F4u\);", 64, "9"),
         ("extra", r"ILRxPut_BMS_CELLTEMP_INDEX\(0x0u\);", 1, "9"),
         ("missing", r"ILRxPut_BMS_CELLTEMP_INDEX\(0x00\);", 1, "9"),
         ("extra", r"ILSet_BMS_CELLVOLTAGE_INDEX_DataChanged\(\);", 2, "3, 7 all-frames case"),

@@ -1,7 +1,7 @@
 def init_value_default(start):
-    """Init value shown for a signal without saved settings: the DBC start value, upper-case hex."""
+    """Init value shown for a signal without saved settings: the DBC start value (hex() as before)."""
     try:
-        return '0x%X' % int(start)
+        return hex(int(start))
     except (TypeError, ValueError):
         return '0x0'
 

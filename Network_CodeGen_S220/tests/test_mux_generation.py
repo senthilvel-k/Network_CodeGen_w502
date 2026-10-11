@@ -124,7 +124,7 @@ def test_vnim_lists_follow_the_hand_code_order(both):
 def test_init_list_appended_multiplexor_first(both):
     v = both[True]["nw_vnim_app_signals_par.c"]
     i = v.index("   ILRxPut_BMS_CELLTEMP_INDEX(0x0u);")
-    assert v.index("ILRxPut_RESERVED_WLC(&Onfail_value_zero[0]);") < i < v.index("   ILRxPut_BMS_CELLTEMP1(0x1F4u);") \
+    assert v.index("ILRxPut_RESERVED_WLC(&Onfail_value_zero[0]);") < i < v.index("   ILRxPut_BMS_CELLTEMP1(0x1f4u);") \
         < v.index("   ILRxPut_BMS_CELLVOLTAGE_INDEX(0x0u);") < v.index("   ILRxPut_BMS_CELLVOLTAGE1(0x0u);")
 
 

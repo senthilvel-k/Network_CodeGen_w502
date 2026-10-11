@@ -234,6 +234,17 @@ def resolve_counts(new, base, edited, new_text, generated=0):
     return out
 
 
+RX_COUNT = re.compile(r"^(#define IL_RX_NUM_(?:PERIODIC|MESSAGES|FRAMES)\s+)(\d+)(\s*)$", re.M)
+
+
+def set_receive_counts(text, n):
+    """IL_RX_NUM_PERIODIC / _MESSAGES / _FRAMES = the n messages of the VNIM enum, as the generator writes
+    them (your change and the new generation's can look alike but count different messages).
+    Returns (text, changed)."""
+    new = RX_COUNT.sub(lambda m: m.group(1) + str(n) + m.group(3), text)
+    return new, new != text
+
+
 def _split_handles(lines):
     idx = [i for i, l in enumerate(lines) if HANDLE.match(l)]
     if not idx:
@@ -533,10 +544,14 @@ def _hand_added_status(base_dir, edited_root, new_dir):
     if not dropped:
         return status, None
     base_signals = set(SIGNAL_FLAG.findall(base_h))
-    owned = dropped | {"IL_MUX_MSG_OFFSET_ID"}
-    if len(dropped) == len(status):                  # every hand-added signal belongs to a dropped message
-        owned |= set(SIGNAL_FLAG.findall(edited_h)) - base_signals
+    added = set(SIGNAL_FLAG.findall(edited_h)) - base_signals
+    generated_signals = added & set(SIGNAL_FLAG.findall(new_h))   # signals of the messages generated now
+    owned = set(dropped) | generated_signals
     foreign = (set(handles(base_h)) - PSEUDO_HANDLES) | base_signals | (set(status) - dropped)
+    if len(dropped) == len(status):                  # every hand-added signal (and the flag area) is theirs
+        owned |= added | {"IL_MUX_MSG_OFFSET_ID"}
+    else:                                            # the others belong to messages whose hand code stays
+        foreign |= added - generated_signals
     return status, (lambda lines: region_kind(lines, owned, foreign))
 
 
@@ -615,6 +630,9 @@ def carry_forward(base_dir, edited_root, new_dir, out_dir):
         merged, changed = rebuild_handles(merged, order, t["new"], t["edited"])
         if changed:
             r["rules_applied"].append("VNIM_*_MESSAGE handle numbers rebuilt (%d messages, then Diag/NM)" % len(order))
+        merged, changed = set_receive_counts(merged, len(order))
+        if changed:
+            r["rules_applied"].append("IL_RX_NUM_* set to the %d messages of the VNIM enum" % len(order))
         t["merged"] = merged
         r["conflicts"] = _join(_blocks(merged))[1]
     if order is not None and ENUM_FILE in texts and texts[ENUM_FILE]["edited"] is not None:

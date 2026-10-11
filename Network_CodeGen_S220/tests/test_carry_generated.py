@@ -190,3 +190,26 @@ def test_workspace_edits_onto_a_dbc_without_bms(tmp_path):
         assert not _bms(_text(tmp_path / "out", name)), name
     il = next(r for r in results if r["file"] == "nw_il_par.h")
     assert il["hand_added"] == [("BMS19_100", "not in the DBC"), ("BMS20_100", "not in the DBC")]
+
+
+def test_generated_and_re_applied_hand_added_messages_together(tmp_path):
+    """B is generated now, E (still in the DBC, Rx enable off) keeps its hand code: E's flag in the
+    multiplex area must stay."""
+    F, G = ("F_U", "0", "0x4"), ("G_T", "0", "0x8")
+    E = ("W_Q", "IL_MUX_MSG_OFFSET_ID + 0", "0x2")         # a signal name without the message name
+    base = il_par_h(3, "#define IL_NUM_OF_RX_DATA_CHANGED_FLAG   1\n", ["A", "C", "F"], [A, C, F])
+    edited = il_par_h(5, "#define IL_NUM_OF_RX_DATA_CHANGED_FLAG   (1 + 1) \n#define IL_MUX_MSG_OFFSET_ID   1 \n",
+                      ["A", "B", "C", "E", "F"], [A, C, F, B, E]) + "/* my note */\n"
+    new = il_par_h(5, "#define IL_NUM_OF_RX_DATA_CHANGED_FLAG   (1 + 1) \n#define IL_MUX_MSG_OFFSET_ID   1 \n",
+                   ["A", "B", "C", "F", "G"], [A, C, F, G, B])     # G: new in the DBC, at the end
+    based = folder(tmp_path, "base", base, ["A", "C", "F"])
+    ed = folder(tmp_path, "edited", edited, ["A", "B", "C", "E", "F"])
+    newd = folder(tmp_path, "new", new, ["A", "B", "C", "F", "G"], dbc=["A", "B", "C", "E", "F", "G"])
+    results = carry_forward(based, ed, newd, tmp_path / "out")
+    text = (tmp_path / "out" / "app.nos.arch3" / "src" / "nw_il_par.h").read_text(encoding="latin-1")
+    il = next(r for r in results if r["file"] == "nw_il_par.h")
+    assert ("B", "now generated") in il["hand_added"] and ("E", "re-applied") in il["hand_added"]
+    assert text.count("#define ILSet_W_Q_DataChanged()") == 1 and text.count("#define ILSet_B_Z_DataChanged()") == 1
+    assert "VNIM_E_MESSAGE" in text and "#define IL_RX_NUM_MESSAGES   6" in text and "/* my note */" in text
+    # both sides append flags at the end of the list: you decide the order (one conflict, E's flag on your side)
+    assert len(il["conflicts"]) == 1 and any("W_Q" in line for line in il["conflicts"][0][3])

@@ -188,7 +188,20 @@ def test_parser_reads_start_values_of_mixed_case_signals():
     assert sigs["BMS19_100"]["BMS_CELLTEMP_INDEX"]["GenSigStartValue"] == "0"
 
 
-def test_signal_page_init_value_default_is_upper_case_hex():
+def test_signal_page_init_value_default_is_the_dbc_start_value():
     from Can_dbc_gen import init_value_default
-    assert init_value_default("500") == "0x1F4"
+    assert init_value_default("500") == "0x1f4"                   # hex(), as the legacy page writes it
     assert init_value_default("0") == "0x0" and init_value_default("") == "0x0" and init_value_default(None) == "0x0"
+
+
+def test_multiplexor_without_multiplexed_signals_is_named():
+    """The node receives only the multiplexor (and a plain signal) of a multiplexed message."""
+    m = mes("ONLYMUX_100", [("SEL", "M", 0, 8), ("CRC", None, 56, 8)])
+    with pytest.raises(OutOfScope) as exc:
+        classify(m)
+    assert "no multiplexed signal" in exc.value.problem
+
+
+def test_signal_page_default_of_a_negative_start_value():
+    from Can_dbc_gen import init_value_default
+    assert init_value_default("-5") == "-0x5"

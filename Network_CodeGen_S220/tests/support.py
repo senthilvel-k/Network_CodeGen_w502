@@ -84,7 +84,7 @@ def enable_indexed(home, dbc, node="SMART_CORE", names=("BMS19_100", "BMS20_100"
             for sig, d in mes["Sig_List"].items():
                 start = d.get("GenSigStartValue") or "0"
                 sig_cfg.update({sig + "_green_drive": "", sig + "_os_notify_no_of_events": notify,
-                                sig + "_rx_init_value": "0x%X" % int(float(start)),
+                                sig + "_rx_init_value": hex(int(float(start))),
                                 sig + "_signal_content": "", sig + "_signal_fault_id": ""})
     (data / "CanDbcMsgConfiguration.data").write_text(json.dumps(msg_cfg), encoding="utf-8")
     (data / "CanDbcSigConfiguration.data").write_text(json.dumps(sig_cfg), encoding="utf-8")
