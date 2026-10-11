@@ -235,6 +235,23 @@ def _workspace_dll(home, text):
     return ws / "src" / "nw_can_dll.c"
 
 
+@pytest.mark.parametrize("edited", [5, "unreadable"])
+def test_a_workspace_that_cannot_be_searched_does_not_stop_the_generation(home, monkeypatch, edited):
+    import cogent_carry
+    _fifo_config(home, REFERENCE_CONFIG)
+    if edited == "unreadable":
+        (home.parent / "ws").mkdir()
+        edited = str(home.parent / "ws")
+
+        def unreadable(root, name):
+            raise PermissionError(13, "Access is denied", root)
+        monkeypatch.setattr(cogent_carry, "find_file", unreadable)
+    (home / "data" / "ReapplyEdits.data").write_text(json.dumps({"base": "", "edited": edited}), encoding="utf-8")
+    result = _generate()
+    assert result.manual_actions > 0
+    assert "## MANUAL: nw_can_dll.c dispatch for the merged block 0x3D0-0x3DF" in _report(home)
+
+
 def test_dispatch_of_the_workspace_is_checked(home):
     import re
     _fifo_config(home, REFERENCE_CONFIG)

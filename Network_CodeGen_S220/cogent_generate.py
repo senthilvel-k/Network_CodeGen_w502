@@ -299,19 +299,16 @@ def _workspace_dispatch(plan):
     """(path, {block label: findings}) for the nw_can_dll.c of the workspace folder chosen on the Re-apply
     edits page, checked against the merged ID blocks; None when there is none."""
     import cogent_carry
-    try:
+    try:                        # a report detail: no problem here may stop the generation
         with open(os.path.join(DATA_DIR, REAPPLY_SETTINGS), encoding='utf-8') as fh:
             folder = json.load(fh).get('edited') or ''
-    except (OSError, ValueError, AttributeError):
-        return None
-    if not plan.groups or not os.path.isdir(folder):
-        return None
-    path = cogent_carry.find_file(folder, 'nw_can_dll.c')[0]
-    if path is None:
-        return None
-    try:
+        if not plan.groups or not isinstance(folder, str) or not os.path.isdir(folder):
+            return None
+        path = cogent_carry.find_file(folder, 'nw_can_dll.c')[0]
+        if path is None:
+            return None
         return str(path), {g.block.label(): cogent_fifo.check_dispatch_code(path, [g]) for g in plan.groups}
-    except OSError:
+    except (OSError, ValueError, AttributeError):
         return None
 
 
