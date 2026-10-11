@@ -213,3 +213,85 @@ def test_tx_override_of_a_disabled_message_is_ignored(tmp_path, runs):
     """TGU1_100 is a transmit message of the DBC whose Tx is not enabled in the fixture."""
     out = _in_home(tmp_path, _generate, tmp_path, {"tx": {"TGU1_100": {"attribute": "Event", "confirmation": True}}})
     assert out["nw_il_par.h"] == runs["plain"]["nw_il_par.h"]
+
+
+# ---------------------------------------------------------------- NM transmit table (nw_nm_par.h)
+
+NM_HEAD = [
+    '#define NM_TX_MSG_DATA_STRUCT                            \t\t\t\t\t\t\t\t\\',
+    '{                                                                                  \t\t\\',
+    '\t/* MCM_WAKEUP_REASON */\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\\',
+    '\t{\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\\',
+    '\t   CAN_GPNUM_8,                                 /* CAN message data length  */     \t\\',
+    '\t   0x9A,                                       \t/* CAN message identifier   */     \t\\',
+    '\t   &Nm_wakeup_buffer[0],                        /* Pointer to Data          */      \\',
+    '\t   CANB_TX_STD_DATA,                            /* CAN message options      */      \\',
+    '\t   (DLL_NUM_IL_TX_FRAMES+1)                     /* Transmit Message Handle  */      \\',
+    '\t},\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\\',
+    '\t/* IC_ACTIVE */\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\\',
+    '\t{\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\\',
+    '\t   CAN_GPNUM_8,                                 /* CAN message data length  */     \t\\',
+    '\t   0x234,                                       /* CAN message identifier   */     \t\\',
+    '\t   &Nm_msg_buffer[0],                           /* Pointer to Data          */      \\',
+    '\t   CANB_TX_STD_DATA,                            /* CAN message options      */      \\',
+    '\t   (DLL_NUM_IL_TX_FRAMES+2)                     /* Transmit Message Handle  */      \\',
+    '\t},\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\\',
+    '\t/* MCM_ACTIVE */\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\\',
+]
+
+
+def nm_table(text):
+    lines = text.replace("\r", "").split("\n")
+    start = next(i for i, l in enumerate(lines) if l.startswith("#define NM_TX_MSG_DATA_STRUCT"))
+    end = lines.index("}", start)
+    return lines[start:end + 1]
+
+
+def test_nm_transmit_table(runs):
+    table = nm_table(runs["over"]["nw_nm_par.h"])
+    assert table[:len(NM_HEAD)] == NM_HEAD                                  # the S2XX layout, tabs included
+    assert table[-2:] == ['\t}\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\\', '}']
+    assert re.findall(r"/\* (\w+) \*/\t", "\n".join(table)) == [
+        "MCM_WAKEUP_REASON", "IC_ACTIVE", "MCM_ACTIVE", "IS_ACTIVE", "MCM_SLEEP"]
+    assert re.findall(r"\t   (0x[0-9A-F]+),", "\n".join(table)) == ["0x9A", "0x234", "0x3BD", "0x3C5", "0x3BB"]
+    assert re.findall(r"\(DLL_NUM_IL_TX_FRAMES\+(\d)\)", "\n".join(table)) == ["1", "2", "3", "4", "5"]
+    assert len(table) == 2 + 5 * 8 + 1
+
+
+def test_nm_transmit_table_without_override(runs):
+    table = nm_table(runs["plain"]["nw_nm_par.h"])
+    assert len(table) == 8 and "0x234," in table[3]
+    rest = lambda t: t[t.index("typedef enum"):]                            # noqa: E731
+    assert rest(runs["over"]["nw_nm_par.h"]) == rest(runs["plain"]["nw_nm_par.h"])
+
+
+# ---------------------------------------------------------------- host forwarding (REM)
+
+REM_HEAD = ["", "/* ===========================================================================",
+            "          R E M    M A C R O S",
+            "  =========================================================================*/", ""]
+
+
+def test_rem_macros_after_the_dlc_fault_defines(runs):
+    v = runs["over"]["nw_vnim_app_signals_par.c"]
+    lines = v.replace("\r", "").split("\n")
+    i = lines.index("          R E M    M A C R O S") - 2
+    assert lines[i - 1].startswith("#define IS_WLC_DLC_FAULT(msg_id)")
+    assert lines[i:i + 5] == REM_HEAD
+    assert lines[i + 5:i + 21] == ["#define VNIM_REM_MSG_%-2d %d" % (n, n) for n in range(16)]
+    assert lines[i + 21] == "" and lines[i + 22].startswith("/* ====") and "M E M O R Y" in lines[i + 23]
+    assert "R E M    M A C R O S" not in runs["plain"]["nw_vnim_app_signals_par.c"]
+
+
+def test_forwarded_indications_call_the_host_function(runs):
+    over, plain = runs["over"]["nw_vnim_app_signals_par.c"], runs["plain"]["nw_vnim_app_signals_par.c"]
+    for name in REM:
+        ind = _function(over, "void VnimIlRx_%s_MsgIndication( void )" % name)
+        assert "              host_update_msg(VNIM_%s);\n" % name in ind
+        assert "VNRCL_%s_MSGID" % name not in ind
+        before = _function(plain, "void VnimIlRx_%s_MsgIndication( void )" % name)
+        assert ind == before.replace("              #if (vnim_notify_used(VNRCL_%s_MSGID) == YES)\n"
+                                     "                os_notify(VNRCL_%s_MSGID,0, NULL );\n"
+                                     "              #endif" % (name, name),
+                                     "              host_update_msg(VNIM_%s);" % name)
+    assert "host_update_msg" not in _function(over, "void VnimIlRx_REM_MSG_0_Timeout( void )")

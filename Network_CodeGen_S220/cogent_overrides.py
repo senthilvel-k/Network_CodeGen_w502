@@ -257,6 +257,63 @@ def tx_row(name, lines):
     return [period, offset]
 
 
+def _tabs_to(text, column=88, tab=4):
+    """`text` followed by tabs up to `column` (tab width 4): the layout of the S2XX NM transmit table."""
+    width = 0
+    for ch in text:
+        width = (width // tab + 1) * tab if ch == '\t' else width + 1
+    tabs = ''
+    while width < column:
+        width = (width // tab + 1) * tab
+        tabs += '\t'
+    return text + tabs
+
+
+def _spaces_to(text, column=52):
+    return text + ' ' * max(1, column - len(text.expandtabs(4)))
+
+
+def nm_tx_table(ids):
+    """NM_TX_MSG_DATA_STRUCT of nw_nm_par.h with one entry per nm_tx row (handles DLL_NUM_IL_TX_FRAMES+1,
+    +2, ...), in the S2XX layout; None without nm_tx rows. `ids`: upper-case message name -> CAN ID."""
+    rows = _active.nm_tx
+    if not rows:
+        return None
+    lines = [_tabs_to('#define NM_TX_MSG_DATA_STRUCT' + ' ' * 28) + '\\', _tabs_to('{' + ' ' * 82) + '\\']
+    for n, row in enumerate(rows, 1):
+        lines += [_tabs_to('\t/* %s */' % row.label) + '\\',
+                  _tabs_to('\t{') + '\\',
+                  _tabs_to('\t   CAN_GPNUM_8,' + ' ' * 33 + '/* CAN message data length  */     ') + '\\',
+                  _tabs_to(_tabs_to('\t   0x%X,' % ids[row.message] + ' ' * 39, 52)
+                           + '/* CAN message identifier   */     ') + '\\',
+                  _spaces_to('\t   &%s[0],' % row.buffer) + '/* Pointer to Data          */      \\',
+                  _spaces_to('\t   CANB_TX_STD_DATA,') + '/* CAN message options      */      \\',
+                  _spaces_to('\t   (DLL_NUM_IL_TX_FRAMES+%d)' % n) + '/* Transmit Message Handle  */      \\',
+                  _tabs_to('\t},' if n < len(rows) else '\t}') + '\\']
+    return lines + ['}']
+
+
+def host_forward(name):
+    """The call that replaces the os_notify lines in the indication of a forwarded receive message."""
+    if _active.host_prefix and name.upper().startswith(_active.host_prefix):
+        return '%s(VNIM_%s);' % (_active.host_function, name.upper())
+    return None
+
+
+def host_forward_block(names):
+    """'R E M    M A C R O S' block of nw_vnim_app_signals_par.c (lines, starting and ending with an empty
+    line): VNIM_<MSG> = index of each forwarded receive message in `names`, numeric_order applied."""
+    names = [n.upper() for n in names if host_forward(n)]
+    if not names:
+        return []
+    names = [names[i] for i in numeric_positions(names)]
+    width = max(len('VNIM_' + n) for n in names)
+    return (['', '/* ===========================================================================',
+             '          R E M    M A C R O S',
+             '  =========================================================================*/', '']
+            + ['#define %-*s %d' % (width, 'VNIM_' + n, i) for i, n in enumerate(names)] + [''])
+
+
 def _number(name, prefix):
     rest = name.upper()[len(prefix):] if name.upper().startswith(prefix) else ''
     return int(rest) if rest.isdigit() else None
