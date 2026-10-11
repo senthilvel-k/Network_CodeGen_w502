@@ -58,7 +58,33 @@ A message that has no saved settings counts as not received in the receive-rule 
 
 The signals of the enabled application (Appl) messages: init value, debounce, notification, content error
 check and DTC, green drive. Save the message page first; the signal page uses its settings. New signals are
-green, with the same banner as on the message page.
+green, with the same banner as on the message page. The init value of a new signal is the DBC start value
+(for example 0x1F4 for a cell temperature with start value 500).
+
+When many signals are new (for example after enabling BMS19_100 and BMS20_100), set their notification in one
+step: choose it in "Notification for new rows" in the banner and press Apply to new rows. Only the green rows
+change; check them, then press Save and Back.
+
+## Multiplexed messages
+
+A multiplexed message carries a multiplexor signal (M in the DBC) and signals that are only valid for one
+multiplexor value (m0, m1, ...). CoGeNT generates received multiplexed messages when their Rx enable is on:
+
+- VCU5_500 keeps its layout (multiplexed signals from bit 0, multiplexor in byte 7).
+- Every other one, such as BMS19_100 and BMS20_100, is generated in the layout of the S2XX code: one struct
+  per multiplexor value inside a union (of the multiplexed bytes when the multiplexor has a byte of its own,
+  of whole frames when it shares a byte with a multiplexed signal), one stored value per signal, a PreCopy
+  that checks only the signals of the received value, data-changed flags in their own area after the
+  others (`IL_MUX_MSG_OFFSET_ID`, computed so it never overlaps the other flags), and a notification to the
+  host for every received frame.
+
+To generate BMS19_100 and BMS20_100: tick their Rx enable on TX/RX messages, Save and Back; on TX/RX signals
+set the notification of the new rows (the S2XX BMS signals use 200ms_Delay_g1) and check the init values,
+Save and Back; Generate code. Their `additional_rx_messages` entries on Receive FIFO are then no longer
+needed (`MANUAL_ACTIONS.md` says so).
+
+Not generated (Generate code stops and names the message): transmitted multiplexed messages, Motorola
+multiplexed signals, multiplexed signals longer than 32 bits, more than one multiplexor, a DLC above 8.
 
 ## Receive FIFO
 
@@ -146,6 +172,10 @@ generation to workspace) are applied to the new file:
 - Values derived from the message list are recomputed: `IL_RX_NUM_*` (your change on top of the new value),
   `IL_MUX_MSG_OFFSET_ID` and `IL_NUM_OF_RX_DATA_CHANGED_FLAG` (first free flag byte), the `VNIM_*_MESSAGE`
   handle numbers, and the arrays `vnim_msg_byte_position` and `vnim_msg_bit_mask`.
+- Messages you added by hand (for example BMS19_100 and BMS20_100 in the 40024 workspace): when the new
+  generation produces them, your hand code is not re-applied and the generated code is used once; when the
+  new DBC does not have them, their hand code is left out. The report lists them under "Messages you added
+  by hand".
 - The result is checked: no conflict marker, no definition lost or doubled, tables with one entry per message,
   handles in the right order.
 
@@ -186,7 +216,7 @@ Every error says what failed, why, and what to do. Details for the tool maintain
 | CAN receive rules are needed, but the controller accepts 192 | Open Receive FIFO, check the ticked blocks, press Apply, generate again |
 | Merge block ... no enabled received message / different DLC / mixes message layers | Open Receive FIFO and remove or change the block marked "Not applied" |
 | The saved configuration has no setting for message/signal X | Open the page named in the message, press Save and Back, generate again |
-| Message X is multiplexed ... | CoGeNT generates only the VCU5_500 multiplex layout; untick the message's Rx enable (or add it as a receive-only message if you write its code by hand) |
+| Message X is multiplexed ... and ... | The reason names what CoGeNT cannot generate (see Multiplexed messages); untick the message's Rx enable, or correct the DBC |
 | CODE_GEN\<date_time> could not be created | Check that CODE_GEN is writable and not locked by another program, generate again |
 | Node is not defined in the DBC | Use one of the nodes the message lists |
 | Re-apply: output folder is inside ... / is not empty | Choose a new output folder |

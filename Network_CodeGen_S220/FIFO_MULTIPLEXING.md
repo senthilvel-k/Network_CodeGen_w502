@@ -24,6 +24,9 @@ configuration archives:
 ```
 
 Optional keys `max_rx_rules` (192) and `max_rules_per_fifo` (64) are written only when changed.
+`additional_rx_messages` receives messages whose Rx enable is off (their code written by hand). Since
+CoGeNT generates multiplexed receive messages such as BMS19_100 / BMS20_100 (enable their Rx instead), an
+entry for an enabled message changes nothing and `MANUAL_ACTIONS.md` lists it as REVIEW.
 `cogent_fifo.config_from_dict` validates everything (11-bit IDs, base aligned to the mask, no overlap, numbers).
 
 ## Merged ID blocks

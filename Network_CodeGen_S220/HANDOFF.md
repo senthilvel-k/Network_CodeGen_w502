@@ -182,7 +182,19 @@ Done on branch `fifo-multiplexing` (2026-10-10, GUI work; spec
   41490 overflow error on 2026-10-10).
 - `USER_GUIDE.md` (whole tool) shown on the Help page.
 
-Remaining (see section 8 for the ordered list): multiplex layouts beyond VCU5_500, the Python 2.7 oracle
+Done on branch `multiplex-generation` (2026-10-11; spec
+`docs/superpowers/specs/2026-10-11-multiplex-generation-design.md`, plan
+`docs/superpowers/plans/2026-10-11-multiplex-generation.md`):
+- `cogent_mux.py`: received multiplexed messages other than the VCU5_500 layout (BMS19_100, BMS20_100) are
+  generated in the S2XX hand-code layout (data union / frame union, shadow values, index-aware PreCopy,
+  multiplex flag area with a computed `IL_MUX_MSG_OFFSET_ID`, immediate host notification); VCU5_500 and
+  all other output unchanged. `tests/test_mux_reference.py` pins the remaining differences to the workspace
+  (spec section 9: three BMS20 slips, a shift slip, the flag overlap, message-loss cases, format).
+- Re-apply edits leaves out the hand code of messages that are generated now or not in the new DBC.
+- Signals page: DBC start values of mixed-case signals are read (parser fix), "Apply to new rows" for the
+  notification.
+
+Remaining (see section 8 for the ordered list): the Python 2.7 oracle
 comparison, the optional workflow fixes (load configuration also loads the DBC; working-directory
 independence), a non-blocking UI during code gen, and repository hygiene/cleanup items.
 
@@ -192,7 +204,7 @@ independence), a non-blocking UI during code gen, and repository hygiene/cleanup
 
 | # | Issue | Root cause | Status |
 |---|---|---|---|
-| 1 | Enabling Rx of multiplexed messages such as `BMS19_100` / `BMS20_100` (S2XX 40024 DBC; also enabled in `Config\Test.cfg`) stops code gen. | `msg.msg_struct_gen_multiplex` only supports the VCU5_500 layout: each multiplexed signal starts at bit 0 (one 8x`temp_len` grid per signal), and the multiplexor is in byte 7 (`mul_sig_index = 6`). The BMS cell temperatures start at bit 16+, so the legacy code overflowed the grid (`IndexError`). No correct output for such messages has ever existed. | **Detected before any file is written.** The popup names the message, the signal (e.g. `BMS_CELLTEMP1`, start bit 16, length 16, Intel) and the fix (untick Rx). Real support needs a C-layout decision for the union/struct and a check of the other generators' multiplex handling. |
+| 1 | Enabling Rx of multiplexed messages such as `BMS19_100` / `BMS20_100` (S2XX 40024 DBC; also enabled in `Config\Test.cfg`) stops code gen. | `msg.msg_struct_gen_multiplex` only supports the VCU5_500 layout: each multiplexed signal starts at bit 0 (one 8x`temp_len` grid per signal), and the multiplexor is in byte 7 (`mul_sig_index = 6`). The BMS cell temperatures start at bit 16+, so the legacy code overflowed the grid (`IndexError`). No correct output for such messages has ever existed. | Fixed on `multiplex-generation` (2026-10-11): `cogent_mux.py` generates both S2XX hand layouts; VCU5_500 unchanged. |
 | 2 | 144 tests skipped (`INCOMPLETE: no Python 2.7 oracle output`). | Python 2.7 could not be installed in the migration session (installer and downloaded-runtime execution were blocked). | References used instead: legacy `CODE_GEN` runs from the current source (11/11 identical for `DBC_S237_36144_2`, `DBC_40024`, `DBC_40024_2`) and pages archived inside `.cfg` files. Open item. |
 | 3 | After restarting the app or loading a configuration, code gen asks to **Load DBC** and to save both pages again. | Legacy design: per-session flags `__load`, `__msg_saved`, `__sig_saved`. `load_cfg` restores the DBC path but not `__load`. Load DBC now also resets the saved flags when the DBC or node changes, because saved settings for another DBC cause `KeyError`s. | Popups explain exactly what to do. Optional fix: `load_cfg` validates and loads the DBC (old plan Task 9a). |
 | 4 | Starting the app from another working directory (e.g. a shortcut with a different "Start in") reads and writes the wrong `data/`, `html/` and `CODE_GEN/`. | All paths are CWD-relative (legacy). Templates use `base_dir`, so the UI looks fine. | Open. Fix: `os.chdir(base_dir)` at the top of `CoGeNT.pyw` (Task 9b). The exe started from Explorer is fine (CWD = exe folder). |
@@ -321,12 +333,9 @@ Test notes:
 
 ## 8. Next steps (in order)
 
-1. **Decide multiplex support** for `BMS19_100`/`BMS20_100`-type messages (issue 1). The user's S2XX
-   workspace has hand-written C for both messages, but in two different layouts (details in the local,
-   uncommitted `local_reports/reference_workspace_analysis.md`). Choose one layout with the user, then extend `msg.msg_struct_gen_multiplex` and
-   `msg.multiplex_layout_problem`, check how `il_par_h/c` and `vnim_app_signals_par` handle multiplexed Rx
-   messages, and add a fixture with BMS19 enabled. Until then they are received via
-   receive-only messages (Receive FIFO page) and their code is re-applied with the Re-apply edits page.
+1. Multiplex support for `BMS19_100`/`BMS20_100`-type messages (issue 1): done on `multiplex-generation`
+   (`cogent_mux.py`; both hand layouts are generated, chosen from the DBC). Open: confirm with the user the
+   message-loss cases the generator adds for BMS19/BMS20 (spec section 9 item 6).
 2. **Python 2.7 oracle** (issue 2), if allowed: install 2.7.18, run `tools/make_expected.py`, commit
    `tests/expected/`, re-run the suite (the 144 skipped tests then run).
 3. **Working-directory independence** (issue 4): add `os.chdir(os.path.dirname(os.path.abspath(__file__)))`
