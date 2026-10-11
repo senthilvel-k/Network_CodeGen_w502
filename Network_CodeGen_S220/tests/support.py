@@ -90,7 +90,9 @@ def enable_indexed(home, dbc, node="SMART_CORE", names=("BMS19_100", "BMS20_100"
     (data / "CanDbcSigConfiguration.data").write_text(json.dumps(sig_cfg), encoding="utf-8")
 
 
-# The Code overrides that reproduce the S2XX hand edits (data\CanOverrideConfiguration.data)
+# The Code overrides of the S2XX hand edits (data\CanOverrideConfiguration.data), with neutral names for the
+# NM buffer and the host function (the repository is public; tests/test_overrides_reference.py uses the
+# project's own names from your local configuration archive)
 S2XX_OVERRIDES = {
     "tx": dict([("EX_SUMMARY_RESPONSE_%d" % i, {"attribute": "Event", "period": 0, "offset": 0}) for i in range(4)] + [
         ("MCM_SP", {"attribute": "Event", "offset": 0}),

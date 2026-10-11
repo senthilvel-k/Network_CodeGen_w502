@@ -132,13 +132,8 @@ code (an unknown name stops the generation and is named in the message).
 | Host forwarding | Receive messages whose name starts with the prefix call the function with their index (`VNIM_<MSG>`, defined in an "R E M M A C R O S" block of `nw_vnim_app_signals_par.c`) instead of `os_notify` when a signal changes |
 | Numeric order | For the name prefixes listed, numbered messages get their receive handles (`nw_il_par.h`) and VNIM message IDs (`nw_vnim_app_signals_par.h`) in numeric order (REM_MSG_2 before REM_MSG_10); every other list keeps the name order |
 
-The S2XX project uses: EX_SUMMARY_RESPONSE_0..3 Event with period and offset 0; MCM_SP Event with offset 0;
-MCM_WAKEUP Event; REM_ACK_MSG Periodic+Event; confirmation for IC10_200, IC11_500 and MCM4_1000; TC_NSM
-timeout 100; the NM entries MCM_WAKEUP (comment MCM_WAKEUP_REASON, buffer Nm_wakeup_buffer),
-IC_ACTIVE, MCM_ACTIVE, IS_ACTIVE and MCM_SLEEP (buffer Nm_msg_buffer); host forwarding REM_MSG_ to
-host_update_msg; numeric order REM_MSG_.
-
-Loading a configuration archive without Code overrides keeps your current ones (a note says so).
+The settings of a project are saved in its configuration archive (Save configuration), so you set them up
+once. Loading a configuration archive without Code overrides keeps your current ones (a note says so).
 
 ## Generate code
 
