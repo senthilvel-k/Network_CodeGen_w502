@@ -1,6 +1,7 @@
 import sys,json
 import os
 from cogent_io import open_output, close_output
+import cogent_mux
 from py2compat import py2_print as print, Py2Dict  # Python 2 print/dict-order semantics
 dbc=None
 dbc_file_name=None
@@ -78,6 +79,7 @@ def msg_order_enum_gen():
   il_sorted_mes_tx = sorted(il_msg_tx,key = lambda x: x['Msg_name'])
   
   all_message_rx = dbc.get_msg_type(full_msg,'rx')
+  indexed = cogent_mux.layouts(all_message_rx, vnim_msg_cfg_data)
   for mes in all_message_rx:
     if vnim_msg_cfg_data[mes['Msg_name']+'_rx_enable'] in ['on','ON','On',1,'1']:
       if vnim_msg_cfg_data[mes['Msg_name']+'_msg_type_no_of_events'] == 'Appl':
@@ -438,13 +440,15 @@ void vnim_clr_missing(void)
             
   print('/* Rx signal initialisation  */ ')
   for mes in il_sorted_mes_rx_ordered:
-      if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON']:
+      if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON'] and mes['Msg_name'].upper() not in indexed:
         for signals in mes['Sig_List']:
           if int(mes['Sig_List'][signals]['Len']) >32:
             print('   ILRxPut_'+signals.upper()+'(&Onfail_value_zero[0]);')
           else:
             print('   ILRxPut_'+signals.upper()+'('+vnim_sig_cfg_data[signals.upper()+'_rx_init_value']+'u);')
             
+  if indexed:
+    print('\n'.join(cogent_mux.init_lines(indexed, vnim_sig_cfg_data)))
   print('}\n')
   
   print('''\n/* ===========================================================================
@@ -681,7 +685,7 @@ void vnim_message_monitoring_periodic(void)
           print('       ret = vnim_start_error_healing(VNIM_'+msg_name+'_MSGID,VNIM_'+msg_name+'_MESSAGE,MSG_TIMEOUT_HEAL_COUNT);')
         print('       if( ret == TRUE)')
         print('       {')
-        for signal in mes['Sig_List']:
+        for signal in cogent_mux.vnim_order(mes, indexed):
           print('           ILSet_'+signal.upper()+'_DataChanged();')
         print('       }')
         if (signal_content == 1):
@@ -717,7 +721,7 @@ void vnim_message_monitoring_periodic(void)
         print('          (IS_'+node+'_DLC_FAULT(VNIM_'+msg_name+'_MSGID) == FALSE)) ||')
         print('          (IS_NM_NODE_MONITORING_ON() != TRUE))')
         print('      {')
-        for signal in mes['Sig_List']:
+        for signal in cogent_mux.vnim_order(mes, indexed, mux_first=True):
           print('          if(ILGet_'+signal.upper()+'_DataChanged() != FALSE)')
           print('          {')
           word_str = signal.upper()
@@ -739,6 +743,8 @@ void vnim_message_monitoring_periodic(void)
           
           print('              ILClr_'+signal.upper()+'_DataChanged();')
           print('          }\n')
+        if msg_name in indexed:
+          print('\n'.join(cogent_mux.indication_notify(indexed[msg_name], node, vnim_sig_cfg_data)))
         if no_delay == 1:    
           print('          if((msg_changed == TRUE) && ('+node+'_node_cfg_st == CF_OPT_'+node+'_PRSNT))')
           print('          {')
@@ -851,7 +857,7 @@ void vnim_message_monitoring_periodic(void)
         green_en = 0
         non_green_drv_sig=''
         green_drv_sig = ''
-        for signal in mes['Sig_List']:
+        for signal in cogent_mux.vnim_order(mes, indexed):
           non_green_drv_sig=signal.upper()
           if vnim_sig_cfg_data[signal.upper()+'_green_drive'] in ['on','On',1,'1','ON']:
             green_en = 1
@@ -1204,7 +1210,7 @@ void vnim_message_monitoring_periodic(void)
       msg_name=mes['Msg_name'].upper()
       node = vnim_msg_cfg_data[mes['Msg_name'].upper()+'_node_name']
       print('       case VNIM_'+msg_name+'_MSGID:')
-      for signals in mes['Sig_List']:
+      for signals in cogent_mux.vnim_order(mes, indexed):
         if int(mes['Sig_List'][signals]['Len']) <=32:
           print('         ILRxPut_'+signals.upper()+'('+vnim_sig_cfg_data[signals.upper()+'_rx_init_value']+'u);')
         else:
@@ -1217,7 +1223,7 @@ void vnim_message_monitoring_periodic(void)
       green_en = 0
       non_green_drv_sig=''
       green_drv_sig = ''
-      for signal in mes['Sig_List']:
+      for signal in cogent_mux.vnim_order(mes, indexed):
         non_green_drv_sig=signal.upper()
         if vnim_sig_cfg_data[signal.upper()+'_green_drive'] in ['on','On',1,'1','ON']:
           green_en = 1
@@ -1271,7 +1277,7 @@ void vnim_message_monitoring_periodic(void)
       green_en = 0
       non_green_drv_sig=''
       green_drv_sig = ''
-      for signal in mes['Sig_List']:
+      for signal in cogent_mux.vnim_order(mes, indexed):
         non_green_drv_sig=signal.upper()
         if vnim_sig_cfg_data[signal.upper()+'_green_drive'] in ['on','On',1,'1','ON']:
           green_en = 1
@@ -1700,6 +1706,7 @@ def vnim_app_h_gen():
   il_sorted_mes_tx = sorted(il_msg_tx,key = lambda x: x['Msg_name'])
   
   all_message_rx = dbc.get_msg_type(full_msg,'rx')
+  indexed = cogent_mux.layouts(all_message_rx, vnim_msg_cfg_data)
   for mes in all_message_rx:
     if vnim_msg_cfg_data[mes['Msg_name']+'_rx_enable'] in ['on','ON','On',1,'1']:
       if vnim_msg_cfg_data[mes['Msg_name']+'_msg_type_no_of_events'] == 'Appl':
@@ -1962,7 +1969,7 @@ BOOL vnim_is_message_missing(unsigned8 vnim_msgid);
 ''')
   
   for mes in il_sorted_mes_rx_ordered:
-    if vnim_msg_cfg_data[mes['Msg_name']+'_rx_enable'] in ['on','ON','On',1,'1']:
+    if vnim_msg_cfg_data[mes['Msg_name']+'_rx_enable'] in ['on','ON','On',1,'1'] and mes['Msg_name'].upper() not in indexed:
       sig_list=[]
       for signal in mes['Sig_List']:  
         mes['Sig_List'][signal]['Sig_name']=signal

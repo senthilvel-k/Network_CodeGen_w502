@@ -391,3 +391,40 @@ def precopy(lay):
         out += ['     if(%s)' % cond, '     {', '         ILSet_%s_DataChanged();' % s.name, '     }', '']
     out += ['   }', '}', '']
     return '\n'.join(out)
+
+
+# ---- nw_vnim_app_signals_par.c / .h ---------------------------------------------------------------------
+DELAYED = ('200ms_Delay_g1', '200ms_Delay_g2')
+
+
+def vnim_order(mes, lays, mux_first=False):
+    """Signal names of a message in the order the VNIM templates list them: the legacy order, or for an
+    indexed message the signal order (multiplexor last, or first for the indication's check list)."""
+    lay = lays.get(mes['Msg_name'].upper())
+    if lay is None:
+        return list(mes['Sig_List'])
+    names = [s.name for s in lay.signals]
+    return names[-1:] + names[:-1] if mux_first else names
+
+
+def init_lines(lays, sig_cfg):
+    """vnim_set_init_signals entries: per message the multiplexor first, then the signal order."""
+    return ['   ILRxPut_%s(%su);' % (name, sig_cfg[name + '_rx_init_value'])
+            for lay in lays.values() for name in vnim_order({'Msg_name': lay.name}, lays, mux_first=True)]
+
+
+def indication_notify(lay, node, sig_cfg):
+    """Forward every received frame of an indexed message to the host from its indication (each frame
+    carries another index; the 200 ms notification alone would miss frames). Only needed when the message
+    uses the delayed notification (<MSG>_msg_changed)."""
+    if not any(sig_cfg[s.name + '_os_notify_no_of_events'] in DELAYED for s in lay.signals):
+        return []
+    msg = lay.name
+    return ['          if((%s_msg_changed == TRUE) && (%s_node_cfg_st == CF_OPT_%s_PRSNT) && '
+            '(IS_%s_DLC_FAULT(VNIM_%s_MSGID) == FALSE))' % (msg, node, node, node, msg),
+            '          {',
+            '              #if (vnim_notify_used(VNRCL_%s_MSGID) == YES)' % msg,
+            '                  os_notify(VNRCL_%s_MSGID,0, NULL );' % msg,
+            '              #endif',
+            '              %s_msg_changed = FALSE;' % msg,
+            '          }', '']

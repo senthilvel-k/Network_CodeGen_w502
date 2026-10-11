@@ -318,9 +318,10 @@ class dbc_parser:
                     if "BA_" in line and "SG_" in line:#checking for BA_ and SG_ symbol in line for signal parameters
                         if line[1].rstrip('\"').lstrip('\"') in self.__signal_parameters:#signal_parameters list contains signal parameters defined in the database file 
                                 if line[3] in self.__message:
-                                    if line[4] in self.__message[line[3]]['Sig_List']:
+                                    # Sig_List keys are upper case (SG_ names are upper-cased when parsed)
+                                    if line[4].upper() in self.__message[line[3]]['Sig_List']:
                                         #rstrip and lstrip are used to remove " symbol in the string name
-                                       self.__message[line[3]]['Sig_List'][line[4]][line[1].rstrip('\"').lstrip('\"')]=line[5].rstrip('\"').lstrip('\"')
+                                       self.__message[line[3]]['Sig_List'][line[4].upper()][line[1].rstrip('\"').lstrip('\"')]=line[5].rstrip('\"').lstrip('\"')
             temp_file.close()
 
     def __add_default_message_parameters(self):

@@ -100,3 +100,34 @@ def test_receive_code_after_the_regular_code(both):
     for fn in ("void BMS19_100_PreCopy", "void ILRxPut_BMS_CELLTEMP1(", "CAN_UINT16 IlRxGetBMS_CELLVOLTAGE96("):
         assert c.count(fn) == 1, fn
     assert "vin_index_data" in c and "bms_celltemp_index_data" not in c
+
+
+def _function(text, head):
+    start = text.index(head)
+    return text[start:text.index("\n}\n", start)]
+
+
+def test_vnim_lists_follow_the_hand_code_order(both):
+    v = both[True]["nw_vnim_app_signals_par.c"]
+    ind = _function(v, "void VnimIlRx_BMS19_100_MsgIndication( void )")
+    sets = re.findall(r"ILSet_(\w+)_DataChanged", ind)
+    assert sets[0] == "BMS_CELLTEMP1" and sets[-1] == "BMS_CELLTEMP_INDEX"
+    gets = re.findall(r"if\(ILGet_(\w+)_DataChanged", ind)
+    assert gets[0] == "BMS_CELLTEMP_INDEX" and gets[1] == "BMS_CELLTEMP1" and len(gets) == 33
+    assert "ILSet_BMS_CELLVOLTAGE_INDEX_DataChanged();" in _function(v, "void VnimIlRx_BMS20_100_Timeout( void )")
+    case = v[v.index("       case VNIM_BMS20_100_MSGID:\n         ILRxPut_BMS_CELLVOLTAGE1"):]
+    case = case[:case.index("break;")]
+    assert "NM_MSG_MISSING(VNIM_BMS20_100_MSGID);" in case and "ILSet_BMS_CELLVOLTAGE_INDEX_DataChanged();" in case
+    assert case.index("ILRxPut_BMS_CELLVOLTAGE96(") < case.index("ILRxPut_BMS_CELLVOLTAGE_INDEX(")
+
+
+def test_init_list_appended_multiplexor_first(both):
+    v = both[True]["nw_vnim_app_signals_par.c"]
+    i = v.index("   ILRxPut_BMS_CELLTEMP_INDEX(0x0u);")
+    assert v.index("ILRxPut_RESERVED_WLC(&Onfail_value_zero[0]);") < i < v.index("   ILRxPut_BMS_CELLTEMP1(0x1F4u);") \
+        < v.index("   ILRxPut_BMS_CELLVOLTAGE_INDEX(0x0u);") < v.index("   ILRxPut_BMS_CELLVOLTAGE1(0x0u);")
+
+
+def test_no_per_signal_application_macros(both):
+    assert "VNIM_IS_BMS_CELLTEMP1_MISSING" not in both[True]["nw_vnim_app_signals_par.h"]
+    assert "VNIM_IS_BMS_CELLTEMP1_MISSING" not in both[True]["nw_vnim_app_signals_par.c"]

@@ -174,3 +174,15 @@ def test_precopy_compares_a_plain_signal():
 def test_shadows():
     from cogent_mux import shadows
     assert shadows({"BMS19_100": layout(TEMPS)})[0] == "CAN_UINT16 BMS19_100__CELLTEMP1;"
+
+
+def test_parser_reads_start_values_of_mixed_case_signals():
+    """BA_ "GenSigStartValue" SG_ 1003 BMS_CellTemp1 500; - the signals page default comes from it."""
+    import sys
+    sys.path.insert(0, "tests")
+    from support import load_fixture
+    from Dbc_Parser import dbc_parser
+    fx = load_fixture("s2xx_40024_a")
+    sigs = {m["Msg_name"]: m["Sig_List"] for m in dbc_parser(str(fx.dbc), fx.node).get_msg_type("ALL", "rx")}
+    assert sigs["BMS19_100"]["BMS_CELLTEMP1"]["GenSigStartValue"] == "500"
+    assert sigs["BMS19_100"]["BMS_CELLTEMP_INDEX"]["GenSigStartValue"] == "0"
