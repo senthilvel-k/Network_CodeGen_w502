@@ -172,7 +172,9 @@ Each run folder is laid out like your repository, so you can copy its folders ov
 `MANUAL_ACTIONS.md` lists each item with the file and location, the current value, the required change, why
 CoGeNT cannot do it, dependencies, steps and how to verify it. MANUAL items are edits in files CoGeNT does not
 generate (for example `nw_can_dll.c`); REVIEW items are behaviour you should confirm (for example IDs a combined
-block accepts although no message uses them).
+block accepts although no message uses them). When "Your workspace" is set on the Re-apply edits page, CoGeNT
+checks the `nw_can_dll.c` found there: a combined block whose IDs it already maps is listed as done, otherwise
+the item names what is missing.
 
 ## Re-apply edits
 

@@ -34,7 +34,9 @@ entry for an enabled message changes nothing and `MANUAL_ACTIONS.md` lists it as
 A block (base, mask) is received through one rule: the lowest received ID keeps its rule slot (and FIFO) with
 mask `0xC0000000 | mask`; the other members' rules and `nw_can_dll.h` dispatch entries are removed. All members
 must share the layer (IL, TP, NM) and the DLC (`cogent_fifo.block_problems`). `nw_can_dll.c` is hand-written and
-must map each member ID to its VNIM handle; `MANUAL_ACTIONS.md` contains the code (`cogent_fifo.dispatch_snippet`).
+must map each member ID to its VNIM handle; `MANUAL_ACTIONS.md` contains the code (`cogent_fifo.dispatch_snippet`)
+and, when the workspace folder of the Re-apply edits page holds `nw_can_dll.c`, the result of
+`cogent_fifo.check_dispatch_code` for it (done, or what is missing).
 Candidates: aligned 16-ID blocks with at least two single-ID rules of one layer and DLC
 (`suggest_merge_blocks`); the page pre-selects the fewest needed (`preselect`, largest saving first).
 

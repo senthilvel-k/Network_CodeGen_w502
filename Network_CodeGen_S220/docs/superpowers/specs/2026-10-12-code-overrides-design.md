@@ -66,4 +66,13 @@ removed per row; Save writes the settings file; invalid entries (unknown message
 enabled (cell temperatures 0x1F4, notification 200ms_Delay_g1), every override above, debounce on
 REMOTE_HV_CONNECT_REQ_TGU. The 40024 one, generated, equals the workspace except: the IC2_100 Tx signal
 order (older generator), the revision-note comment of can_rxrule.cfg, and the corrections of
-`2026-10-11-multiplex-generation-design.md` section 9.
+`2026-10-11-multiplex-generation-design.md` section 9 (white space ignored; `tests/test_overrides_reference.py`).
+White-space-only differences that remain: the workspace's re-aligned receive-handle block of nw_il_par.h,
+the hand tabs of the BMS code, the column spacing of can_rxrule.cfg and one hand-indented frame-table line.
+
+## 5. Found while implementing (added 2026-10-12)
+
+- Configuration archives contained the app's own pages; loading an archive of an earlier version restored
+  them (old home page, sidebar without Code overrides). Archives no longer contain them and loading skips them.
+- The numeric order of the workspace is limited to the receive handles / receive frame table and the VNIM
+  message IDs (section 1).
