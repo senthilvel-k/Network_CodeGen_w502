@@ -4,7 +4,7 @@ import sys
 from support import CODE_FILES, ROOT, load_fixture, normalize_header, run_harness
 
 APP_ITEMS = ["Dbc_Parser.py", "can_rx_filt_gen.py", "msg.py", "il_par_h_generation.py",
-             "il_par_c_generation.py", "vnim_app_signals_par.py", "cogent_io.py", "py2compat.py",
+             "il_par_c_generation.py", "vnim_app_signals_par.py", "cogent_io.py", "cogent_fifo.py", "py2compat.py",
              "html", "js"]
 
 

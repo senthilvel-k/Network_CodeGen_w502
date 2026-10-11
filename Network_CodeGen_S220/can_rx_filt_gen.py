@@ -1,6 +1,7 @@
 import sys,json
 import os
 from cogent_io import open_output, close_output
+import cogent_fifo
 from py2compat import py2_print as print, Py2Dict  # Python 2 print/dict-order semantics
 dbc=None
 dbc_file_name=None
@@ -51,6 +52,83 @@ Traceability        : '''+dbc_file_name+'''
 Change Description  : Tool Generated code
 *****************************************************************************/'''
 
+def plan_rx_rules(dbc_obj, filter_cfg_data, fifo_config=None):
+  """Receive rules for can_rxrule.cfg and nw_can_dll.h (legacy assignment; see cogent_fifo).
+  Application messages in name order: 64 to FIFO 0 (PTR1 0x100), 64 to FIFO 1 (0x200), the rest to
+  FIFO 2 (0x400); then Diag and NM messages to FIFO 2. fifo_config may merge ID blocks into one rule
+  and add receive-only messages; without it the result is the legacy one."""
+  if fifo_config is None:
+    fifo_config = cogent_fifo.FifoConfig()
+  all_msg_rx=dbc_obj.get_msg_type('ALL','rx')
+  all_mes_sorted_mes_rx = sorted(all_msg_rx,key = lambda x: x['Msg_name'])
+  il_mes=[]
+  nm_mes =[]
+  diag_mes =[]
+  for mes in all_mes_sorted_mes_rx:
+    if filter_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','ON','On',1,'1']:
+      if filter_cfg_data[mes['Msg_name'].upper()+'_msg_type_no_of_events'] == 'Appl':
+        il_mes.append(mes)
+      elif filter_cfg_data[mes['Msg_name'].upper()+'_msg_type_no_of_events'] == 'NM':
+        nm_mes.append(mes)
+      elif filter_cfg_data[mes['Msg_name'].upper()+'_msg_type_no_of_events'] == 'Diag':
+        diag_mes.append(mes)
+      else:
+        pass
+  if fifo_config.additional_rx_messages:
+    il_mes = cogent_fifo.add_additional_messages(il_mes, il_mes+nm_mes+diag_mes, all_mes_sorted_mes_rx, fifo_config)
+  masks = {}
+  groups = []
+  unreceived = []
+  if fifo_config.merge_blocks:
+    cats, masks, groups, unreceived = cogent_fifo.merge_blocks({'IL': il_mes, 'TP': diag_mes, 'NM': nm_mes}, fifo_config, all_mes_sorted_mes_rx)
+    il_mes, diag_mes, nm_mes = cats['IL'], cats['TP'], cats['NM']
+
+  no_of_receive_rule = 256
+  no_of_rx_msg_available = no_of_receive_rule-(len(nm_mes)-len(diag_mes))
+  if not (len(il_mes) < no_of_rx_msg_available):
+    raise cogent_fifo.FifoPlanError(['%d application messages are received, but at most %d receive rules can be assigned to them'
+                                     % (len(il_mes), no_of_rx_msg_available-1)])
+  buffers = [[], [], []]
+  def add(index, mes, kind, default_mask):
+    buffers[index].append(cogent_fifo.RxRule(mes, kind, masks.get(int(mes['id']), default_mask), cogent_fifo.FIFO_PTR1[index]))
+
+  msg_count = 0
+  if len(il_mes) <= 32:
+    il_mes_max = 15
+    if len(il_mes)%2 == 0:
+      il_mes_max=(len(il_mes)//2)-1
+    else:
+      il_mes_max=(len(il_mes)//2)
+    for mes in il_mes:
+      if msg_count <= il_mes_max:
+        add(0, mes, 'IL', 0xC00007FF)
+      elif msg_count  > il_mes_max:
+        add(1, mes, 'IL', 0xC00007FF)
+      msg_count+=1
+  elif len(il_mes) <= 48:
+    for mes in il_mes:
+      if msg_count <= 15:
+        add(0, mes, 'IL', 0xC00007FF)
+      elif msg_count  > 15 and msg_count <32:
+        add(1, mes, 'IL', 0xC00007FF)
+      elif msg_count  >= 32 and msg_count <48:
+        add(2, mes, 'IL', 0xC00007FF)
+      msg_count+=1
+  else:
+    for mes in il_mes:
+      if msg_count < 64:
+        add(0, mes, 'IL', 0xC00007FF)
+      elif msg_count  >= 64 and msg_count < 128:
+        add(1, mes, 'IL', 0xC00007FF)
+      elif msg_count  >= 128 and msg_count < no_of_rx_msg_available:
+        add(2, mes, 'IL', 0xC00007FF)
+      msg_count+=1
+  for mes in diag_mes:
+    add(2, mes, 'TP', 0xC0000700)
+  for mes in nm_mes:
+    add(2, mes, 'NM', 0xC00007FF)
+  return cogent_fifo.RxPlan(buffers, groups, unreceived)
+
 def filter_gen():
   global dbc,footer,filter_code_gen_dir,filter_data_dir,tp_generic_config,nm_generic_config,il_generic_config
   dir = './CODE_GEN'
@@ -62,10 +140,6 @@ def filter_gen():
   filter_cfg_data = json.loads(filter_cfg_file.read())
   filter_cfg_file.close()
   
-  nm_sorted_mes_rx=[]
-  il_sorted_mes_rx=[]
-  tp_sorted_mes_rx=[]
-  
   il_mes_tx=[]
   all_msg_tx=dbc.get_msg_type('ALL','tx')
   all_mes_sorted_mes_tx = sorted(all_msg_tx,key = lambda x: x['Msg_name'])
@@ -75,41 +149,15 @@ def filter_gen():
       if filter_cfg_data[mes['Msg_name'].upper()+'_msg_type_no_of_events'] == 'Appl':
         il_mes_tx.append(mes)
   
-  
-  all_mes =[]
-  
-  all_msg_rx=dbc.get_msg_type('ALL','rx')
-  all_mes_sorted_mes_rx = sorted(all_msg_rx,key = lambda x: x['Msg_name'])
-  
-  
-  
-  il_mes=[]
-  nm_mes =[]
-  diag_mes =[]
-  
-  for mes in all_mes_sorted_mes_rx:
-    if filter_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','ON','On',1,'1']:
-      if filter_cfg_data[mes['Msg_name'].upper()+'_msg_type_no_of_events'] == 'Appl':
-        il_mes.append(mes)
-      elif filter_cfg_data[mes['Msg_name'].upper()+'_msg_type_no_of_events'] == 'NM':
-        nm_mes.append(mes)
-      elif filter_cfg_data[mes['Msg_name'].upper()+'_msg_type_no_of_events'] == 'Diag':
-        diag_mes.append(mes)
-      else:
-        pass
-  
-  no_of_receive_rule = 256
-  
-  #print diag_mes
-  no_of_rx_msg_available = no_of_receive_rule-(len(nm_mes)-len(diag_mes))
-  tx_rx_buf_0 = []
-  tx_rx_buf_1 = []
-  tx_rx_buf_2 = []
-  
-  tx_rx_buf_msg_0 = []
-  tx_rx_buf_msg_1 = []
-  tx_rx_buf_msg_2 = []
-  
+  fifo_config = cogent_fifo.load_config(filter_data_dir)
+  rx_plan = plan_rx_rules(dbc, filter_cfg_data, fifo_config)
+  tx_rx_buf_0, tx_rx_buf_1, tx_rx_buf_2 = [[(hex(r.can_id), '0x%08X' % r.mask, hex(r.ptr1)) for r in buf] for buf in rx_plan.buffers]
+  tx_rx_buf_msg_0, tx_rx_buf_msg_1, tx_rx_buf_msg_2 = [[(r.message['id'], r.dlc, r.name, r.kind) for r in buf] for buf in rx_plan.buffers]
+  il_mes = [r for r in rx_plan.rules() if r.kind == 'IL']
+  nm_mes = [r for r in rx_plan.rules() if r.kind == 'NM']
+  diag_mes = [r for r in rx_plan.rules() if r.kind == 'TP']
+  no_of_rx_msg_available = 256-(len(nm_mes)-len(diag_mes))
+
   header = '''#ifndef CAN_RX_RULECONFIG
 #define CAN_RX_RULECONFIG
 
@@ -134,62 +182,6 @@ def filter_gen():
     gui_avail_msg=len(il_mes)+len(nm_mes)+len(diag_mes)
     print('#define MAX_NO_RX_RULES_PER_CH	  '+str(gui_avail_msg),'\n')
     print('#define CAN0_NO_OF_RX_RULES	  '+str(gui_avail_msg),'\n')
-    msg_count = 0
-    if len(il_mes) <= 32:
-      il_mes_max = 15
-      if len(il_mes)%2 == 0:
-        il_mes_max=(len(il_mes)//2)-1
-      else:
-        il_mes_max=(len(il_mes)//2)
-      #print il_mes_max
-      for mes in il_mes:
-        if msg_count <= il_mes_max:
-          tx_rx_buf_0.append((hex(int(mes['id'])),'0xC00007FF','0x100'))
-          tx_rx_buf_msg_0.append((mes['id'],mes['DLC'],mes['Msg_name'],'IL'))
-        elif msg_count  > il_mes_max:
-          tx_rx_buf_1.append((hex(int(mes['id'])),'0xC00007FF','0x200'))
-          tx_rx_buf_msg_1.append((mes['id'],mes['DLC'],mes['Msg_name'],'IL'))
-        else:
-          pass
-        msg_count+=1
-    
-    elif len(il_mes) <= 48:
-      for mes in il_mes:
-        if msg_count <= 15:
-          tx_rx_buf_0.append((hex(int(mes['id'])),'0xC00007FF','0x100'))
-          tx_rx_buf_msg_0.append((mes['id'],mes['DLC'],mes['Msg_name'],'IL'))
-        elif msg_count  > 15 and msg_count <32:
-          tx_rx_buf_1.append((hex(int(mes['id'])),'0xC00007FF','0x200'))
-          tx_rx_buf_msg_1.append((mes['id'],mes['DLC'],mes['Msg_name'],'IL'))
-        elif msg_count  >= 32 and msg_count <48:
-          tx_rx_buf_2.append((hex(int(mes['id'])),'0xC00007FF','0x400'))
-          tx_rx_buf_msg_2.append((mes['id'],mes['DLC'],mes['Msg_name'],'IL'))
-        else:
-          pass
-        msg_count+=1
-
-    elif len(il_mes) <= no_of_rx_msg_available:
-      for mes in il_mes:
-        if msg_count < 64:
-          tx_rx_buf_0.append((hex(int(mes['id'])),'0xC00007FF','0x100'))
-          tx_rx_buf_msg_0.append((mes['id'],mes['DLC'],mes['Msg_name'],'IL'))
-        elif msg_count  >= 64 and msg_count < 128:
-          tx_rx_buf_1.append((hex(int(mes['id'])),'0xC00007FF','0x200'))
-          tx_rx_buf_msg_1.append((mes['id'],mes['DLC'],mes['Msg_name'],'IL'))
-        elif msg_count  >= 128 and msg_count < no_of_rx_msg_available:
-          tx_rx_buf_2.append((hex(int(mes['id'])),'0xC00007FF','0x400'))
-          tx_rx_buf_msg_2.append((mes['id'],mes['DLC'],mes['Msg_name'],'IL'))
-        else:
-          pass
-        msg_count+=1
-
-    for mes in diag_mes:
-      tx_rx_buf_2.append((hex(int(mes['id'])),'0xC0000700','0x400'))
-      tx_rx_buf_msg_2.append((mes['id'],mes['DLC'],mes['Msg_name'],'TP'))
-    for mes in nm_mes:
-      tx_rx_buf_2.append((hex(int(mes['id'])),'0xC00007FF','0x400'))
-      tx_rx_buf_msg_2.append((mes['id'],mes['DLC'],mes['Msg_name'],'NM'))
-
     temp_count = 1
     print('\n/* Message ID Definitions */\n')
     for val in tx_rx_buf_0:
@@ -266,7 +258,7 @@ def filter_gen():
         print('   {CAN0_RX_RULE'+str(val)+'_ID,CAN0_RX_RULE'+str(val)+'_MASK,CAN0_RX_RULE'+str(val)+'_PTR0,CAN0_RX_RULE'+str(val)+'_PTR1},  \\')   
     print('}')
   else:  
-    app.evaluate_javascript("alert('No of message exceeds receive filter mask range')")
+    raise cogent_fifo.FifoPlanError(['No of message exceeds receive filter mask range'])
    
   print('\n\n#endif')
   print(footer)

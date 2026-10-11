@@ -16,7 +16,7 @@ def html(file_name,node):
     <!DOCTYPE html>
     <html>
     <head>
-    <title>Filter</title>
+    <title>CoGeNT - Filter</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script type="text/javascript" src="data.json"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -50,7 +50,7 @@ def html(file_name,node):
     </head>
     <body onload="load()" class="w3-container w3-grey">"""
 
-    file1=open(html_dir+'Tool_Index_Page.html','r',encoding='latin-1')
+    file1=open(html_dir+'_page_shell.html','r',encoding='latin-1')
     start=0
     for line in file1.readlines():
         if '<!--copy_start-->' == line.rstrip('\n'):
@@ -74,7 +74,7 @@ def html(file_name,node):
     </thead>
     <tr><th>Message Name</th>
     <th>Enable/Disable Msg</th>
-    <th>Messsage Type</th>
+    <th>Message Type</th>
     </tr>
     '''
 
@@ -149,7 +149,7 @@ def html(file_name,node):
     </thead>
     <tr><th>Message Name</th>
     <th>Enable/Disable Msg</th>
-    <th>Messsage Type</th>
+    <th>Message Type</th>
     </tr>
     '''
     try:

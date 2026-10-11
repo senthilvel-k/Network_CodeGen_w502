@@ -1,10 +1,16 @@
                    
 from cogent_gui import webgui as htmlPy
+import datetime
 import io
 import json
 import os
+import shutil
 from PySide6 import QtGui, QtWidgets
+import cogent_carry
+import cogent_fifo
 import cogent_generate
+import cogent_help
+import cogent_project
 from cogent_errors import CogentError, MSG_PAGE, SIG_PAGE, log_failure
 
 ''' This the Backend HTML application controlling the GUI portion '''
@@ -17,6 +23,56 @@ def _describe(exc):
     if isinstance(exc, PermissionError):
         return "access denied to %s (is it open in another program or read-only?)" % exc.filename
     return "%s: %s" % (type(exc).__name__, exc)
+
+
+def _fifo_note(archive_names):
+    """Archives saved before the Receive FIFO settings existed do not contain them: the current settings
+    are kept (they belong to the project, not to a DBC version). Returns a note for the user."""
+    current = os.path.join('.', 'data', cogent_fifo.CONFIG_FILE)
+    if 'data/' + cogent_fifo.CONFIG_FILE in archive_names or not os.path.isfile(current):
+        return ""
+    return "This archive has no Receive FIFO settings; your current Receive FIFO settings were kept.\n"
+
+
+STYL_LINK = """<link rel="stylesheet" href="{{'styl.css'|staticfile }}">"""
+
+
+NEW_SHELL = """<div class="cg-app">\n{% include '_sidebar.html' %}\n<div class="cg-main cg-config">\n"""
+
+
+def _legacy_shell():
+    """The layout Can_dbc_gen / Can_filter_python_gen copy into the pages (as they copy it)."""
+    text, copying = "", False
+    with open('./html/_page_shell.html', encoding='latin-1') as fh:
+        for line in fh:
+            if line.rstrip('\n') == '<!--copy_start-->':
+                copying = True
+            elif line.rstrip('\n') == '<!--copy_end-->':
+                copying = False
+            if copying:
+                text += line
+    return text
+
+
+def _themed(page):
+    """Configuration pages built from the generator output get the CoGeNT layout and theme, and the
+    new-row banner script."""
+    page = page.replace(STYL_LINK, STYL_LINK + """<link rel="stylesheet" href="{{'cogent.css'|staticfile }}">"""
+                        """<script src="{{'cogent_pages.js'|staticfile }}"></script>""", 1)
+    return page.replace(_legacy_shell(), NEW_SHELL, 1)
+
+
+def script_json(value):
+    """JSON for embedding in a <script> element: '</' is escaped so data can never close the script."""
+    return json.dumps(value).replace("</", "<\\/")
+
+
+def _read_json(path):
+    """Saved page settings as a dict ({} when the page was never saved)."""
+    if not os.path.exists(path):
+        return {}
+    with open(path, encoding='utf-8') as fh:
+        return json.load(fh)
 
 
 def _open_data_or_empty(path):
@@ -112,7 +168,7 @@ class BackEnd(htmlPy.Object):
             return  # dialog cancelled
         op = "Loading the configuration"
         item = "reading " + os.path.basename(file_val)
-        hint = "Choose a .cfg archive created with 'save_cofiguration' (they are kept in the Config folder)."
+        hint = "Choose a .cfg archive created with 'Save configuration' (they are kept in the Config folder)."
         try:
             # Check the archive before extracting, so a bad file cannot overwrite the current settings.
             with zipfile.ZipFile(file_val) as zip1:
@@ -120,6 +176,7 @@ class BackEnd(htmlPy.Object):
                     raise CogentError(op, "%s is a zip archive but not a CoGeNT configuration archive (data/dbc_details.data is missing)" % file_val,
                                       item=item, hint=hint)
                 dbc_details = json.loads(zip1.read('data/dbc_details.data').decode('utf-8'))
+                fifo_note = _fifo_note(zip1.namelist())
                 zip1.extractall()
         except CogentError as err:
             self._fail(op, err)
@@ -139,7 +196,8 @@ class BackEnd(htmlPy.Object):
         if dbc_details.get("ch0_node_name", '') !='':
             self.__node=dbc_details["ch0_node_name"]
         self.default_page()
-        self._alert("Configuration loaded successfully\n%s\nPress 'Load DBC' before opening the configuration pages or running code gen." % file_val)
+        self._alert("Configuration loaded successfully\n%s\n%sPress 'Load DBC' before opening the configuration pages or generating code."
+                    % (file_val, fifo_note))
 
 
 
@@ -169,11 +227,39 @@ class BackEnd(htmlPy.Object):
             return  # dialog cancelled: keep the current path
         app.evaluate_javascript("document.getElementById('file_path').value=%s;" % json.dumps(file_val))
     
+    def _project(self):
+        """(cached DBC, message settings, signal settings) of the loaded DBC."""
+        return (cogent_project.cached_dbc(self.__dbc, self.__node),
+                _read_json(self.__data_dir + 'CanDbcMsgConfiguration.data'),
+                _read_json(self.__data_dir + 'CanDbcSigConfiguration.data'))
+
+    def _context(self, active):
+        """Template context for the pages with the sidebar: FIFO view and new items of the loaded DBC."""
+        ctx = {"active": active, "dbc_name": os.path.basename(self.__dbc or ''), "fifo": None, "fifo_error": None,
+               "new": None, "config_error": None}
+        if self.__load != 0:
+            return ctx
+        try:
+            dbc, msg_cfg, sig_cfg = self._project()
+            ctx["new"] = cogent_project.new_items(dbc, msg_cfg, sig_cfg)
+            try:
+                config = cogent_fifo.load_config(self.__data_dir)
+            except cogent_fifo.FifoConfigError as exc:
+                ctx["config_error"] = ("The saved Receive FIFO settings could not be read (%s). Apply saves new "
+                                       "settings." % exc)
+                ctx["fifo_error"] = ctx["config_error"]
+                config = cogent_fifo.FifoConfig()
+            ctx["fifo"] = cogent_project.fifo_view(dbc, msg_cfg, config)
+            ctx["fifo_config"] = config
+        except Exception as exc:
+            path = log_failure("Computing the receive-rule usage", exc, {"DBC file": self.__dbc, "Node": self.__node})
+            ctx["fifo_error"] = "The receive-rule usage could not be computed (%s). Details: %s" % (_describe(exc), path)
+        return ctx
+
     #for default display
     @htmlPy.Slot()
     def default_page(self):
-        #print 'asdfa'
-        app.template = ("Tool_Index_Page.html", {})
+        app.template = ("Tool_Index_Page.html", self._context("home"))
         #print self.__dbc ,self.__node,'-------------------------'
         
         if self.__dbc or self.__node:
@@ -194,11 +280,11 @@ class BackEnd(htmlPy.Object):
         missing = [label for label, value in (("DBC File", dbc), ("Node Name", node)) if not value]
         if missing:
             self._alert(CogentError(op, "no %s was entered" % " and no ".join(missing),
-                                    hint="Enter the DBC file (or use 'Browse ..') and the node name, then press 'Load DBC'.").user_message())
+                                    hint="Enter the DBC file (or use 'Browse') and the node name, then press 'Load DBC'.").user_message())
             return
         if not os.path.isfile(dbc):
             self._alert(CogentError(op, "DBC file not found: %s" % dbc,
-                                    hint="Check the path or select the file with 'Browse ..', then press 'Load DBC' again.").user_message())
+                                    hint="Check the path or select the file with 'Browse', then press 'Load DBC' again.").user_message())
             return
         try:
             from Dbc_Parser import dbc_parser
@@ -221,7 +307,156 @@ class BackEnd(htmlPy.Object):
         self.__node = node
         self.__path = dbc
         self.__load = 0
+        self.default_page()
         self._alert("Database loaded successfully")
+
+    # ---- Re-apply edits ----------------------------------------------------------------------------
+    REAPPLY_FILE = 'ReapplyEdits.data'
+
+    def _reapply_paths(self):
+        saved = {}
+        try:
+            saved = _read_json(self.__data_dir + self.REAPPLY_FILE)
+        except ValueError:
+            pass                                       # damaged: start from the defaults
+        stem = os.path.splitext(os.path.basename(self.__dbc or 'CODE_GEN'))[0]
+        stamp = datetime.datetime.now().strftime('%Y-%m-%d_%H%M')
+        return {"base": saved.get("base", ""), "edited": saved.get("edited", ""),
+                "new": saved.get("new") or os.path.abspath(cogent_generate.OUTPUT_DIR),
+                "out": os.path.join(os.path.abspath('MERGED'), "%s_%s" % (stem, stamp))}
+
+    def _reapply_render(self, paths, error=None, results=None, out=None):
+        ctx = self._context("reapply")
+        attention = []
+        for r in results or []:
+            attention += ["%s: check failed: %s" % (r["file"], c) for c in r["checks"]]
+            if r["origin"]:
+                attention.append("%s: your file was generated from %s (previous generation: %s); review the re-applied "
+                                 "differences" % (r["file"], r["origin"][0], r["origin"][1]))
+            if r["status"] in ("new file taken", "skipped") and not r["conflicts"]:
+                attention.append("%s: %s (%s)" % (r["file"], r["status"], r["detail"]))
+            attention += ["%s line %d: the new generation changed lines you edited" % (r["file"], c[0]) for c in r["conflicts"]]
+        ctx.update(paths=paths, error=error, results=results, attention=attention, out=out, out_json=json.dumps(out or ""))
+        app.template = ("Reapply.html", ctx)
+
+    @htmlPy.Slot()
+    def reapply_page(self):
+        self._reapply_render(self._reapply_paths())
+
+    @htmlPy.Slot(str)
+    def reapply_browse(self, field):
+        window = QtWidgets.QMainWindow()
+        folder = QtWidgets.QFileDialog.getExistingDirectory(window, "Select folder", ".")
+        if folder:
+            app.evaluate_javascript("document.getElementById(%s).value=%s;" % (json.dumps(field), json.dumps(os.path.normpath(folder))))
+
+    @htmlPy.Slot(str, result=str)
+    def reapply_run(self, json_data):
+        paths = json.loads(json_data)
+        missing = [label for key, label in (("base", "Previous generation"), ("edited", "Your workspace"),
+                                            ("new", "New generation"), ("out", "Output folder")) if not paths.get(key)]
+        if missing:
+            self._reapply_render(paths, error="Choose these folders first: %s." % ", ".join(missing))
+            return ""
+        try:
+            with open(self.__data_dir + self.REAPPLY_FILE, 'w', encoding='utf-8') as fh:
+                json.dump({k: paths[k] for k in ("base", "edited", "new")}, fh, indent=1)
+        except OSError as exc:
+            log_failure("Remembering the Re-apply edits folders", exc)
+        try:
+            results = cogent_carry.carry_forward(paths["base"], paths["edited"], paths["new"], paths["out"])
+            report = cogent_carry.report(results, paths["base"], paths["edited"], paths["new"], paths["out"])
+            with open(os.path.join(paths["out"], "CARRY_FORWARD.md"), 'w', encoding='utf-8') as fh:
+                fh.write(report)
+        except cogent_carry.UsageError as exc:
+            self._reapply_render(paths, error="Nothing was written: %s." % exc)
+            return ""
+        except Exception as exc:
+            path = log_failure("Re-applying edits", exc, paths)
+            self._reapply_render(paths, error="Re-applying the edits failed (%s). Details: %s" % (_describe(exc), path))
+            return ""
+        self._reapply_render(paths, results=results, out=paths["out"])
+        return ""
+
+    @htmlPy.Slot(str)
+    def reapply_open(self, folder):
+        if folder and os.path.isdir(folder):
+            os.startfile(folder)
+
+    @htmlPy.Slot()
+    def keep_codegen_copy(self):
+        op = "Keeping a copy of CODE_GEN"
+        files = [f for f in cogent_generate.GENERATED_FILES + cogent_generate.REPORT_FILES
+                 if os.path.isfile(os.path.join(cogent_generate.OUTPUT_DIR, f))]
+        if not files:
+            self._alert(CogentError(op, "CODE_GEN has no generated files", hint="Press Generate code first.").user_message())
+            return
+        stem = os.path.splitext(os.path.basename(self.__dbc or 'CODE_GEN'))[0]
+        target = os.path.join(cogent_generate.OUTPUT_DIR, "%s_%s" % (stem, datetime.datetime.now().strftime('%Y-%m-%d_%H%M%S')))
+        try:
+            os.makedirs(target)
+            for f in files:
+                shutil.copy2(os.path.join(cogent_generate.OUTPUT_DIR, f), target)
+        except OSError as exc:
+            self._fail(op, exc, item="copying to " + target, hint="Check that CODE_GEN is writable.")
+            return
+        self._alert("Copy of CODE_GEN saved\n%s\nUse it as 'Previous generation' when you re-apply your edits to the next "
+                    "generation." % os.path.abspath(target))
+
+    @htmlPy.Slot()
+    def help_page(self):
+        ctx = self._context("help")
+        guide = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'USER_GUIDE.md')
+        try:
+            ctx["help_html"], ctx["toc"] = cogent_help.render_guide(guide)
+        except OSError as exc:
+            self._fail("Opening Help", exc, item="reading " + guide,
+                       hint="USER_GUIDE.md belongs next to the program; reinstall CoGeNT or open the file from the source folder.")
+            return
+        app.template = ("Help.html", ctx)
+
+    @htmlPy.Slot()
+    def fifo_page(self):
+        if self.__load != 0:
+            self._not_loaded("Opening the Receive FIFO page")
+            return
+        ctx = self._context("fifo")
+        if ctx["fifo"] is None:
+            self._alert(CogentError("Opening the Receive FIFO page", ctx["fifo_error"] or "no data").user_message())
+            return
+        ctx["view_json"] = script_json(ctx["fifo"])
+        ctx["saved_json"] = script_json(cogent_fifo.config_to_dict(ctx["fifo_config"]))
+        app.template = ("Fifo.html", ctx)
+
+    @htmlPy.Slot(str, result=str)
+    def fifo_preview(self, json_data):
+        """Receive-rule view for the selection on the Receive FIFO page (nothing is saved)."""
+        try:
+            config = cogent_fifo.config_from_dict(json.loads(json_data), "Receive FIFO page")
+            dbc, msg_cfg, _ = self._project()
+            return json.dumps(cogent_project.fifo_view(dbc, msg_cfg, config))
+        except cogent_fifo.FifoConfigError as exc:
+            return json.dumps({"error": str(exc).replace("Receive FIFO page: ", "")})
+        except Exception as exc:
+            path = log_failure("Previewing the receive rules", exc, {"DBC file": self.__dbc, "Selection": json_data})
+            return json.dumps({"error": "The preview failed (%s). Details: %s" % (_describe(exc), path)})
+
+    @htmlPy.Slot(str, result=str)
+    def fifo_apply(self, json_data):
+        op = "Saving the Receive FIFO settings"
+        try:
+            config = cogent_fifo.config_from_dict(json.loads(json_data), "Receive FIFO page")
+            cogent_fifo.save_config(self.__data_dir, config)
+        except cogent_fifo.FifoConfigError as exc:
+            self._alert(CogentError(op, str(exc).replace("Receive FIFO page: ", ""),
+                                    hint="Correct the selection on the Receive FIFO page and press Apply again.").user_message())
+            return ""
+        except OSError as exc:
+            self._fail(op, exc, item="writing data\\" + cogent_fifo.CONFIG_FILE,
+                       hint="Check that the data folder of the tool is writable, then press Apply again.")
+            return ""
+        self.default_page()
+        return ""
 
 
     #code generate button callback
@@ -231,25 +466,30 @@ class BackEnd(htmlPy.Object):
         if self.__load != 0:
             self._alert(CogentError(op, "no DBC is loaded",
                                     hint="Select the DBC file and the node name and press 'Load DBC', then open and save "
-                                         "the configuration pages before running code gen.").user_message())
+                                         "the configuration pages before generating code.").user_message())
         elif self.__msg_saved != 0 or self.__sig_saved != 0:
             pages = [page for page, flag in ((MSG_PAGE, self.__msg_saved), (SIG_PAGE, self.__sig_saved)) if flag != 0]
             self._alert(CogentError(op, "the configuration of the loaded DBC has not been saved in this session: %s"
                                     % " and ".join("'%s'" % page for page in pages),
-                                    hint="Open each page listed, check the settings and press 'Save and Back', then run code gen again.").user_message())
+                                    hint="Open each page listed, check the settings and press 'Save and Back', then press Generate code again.").user_message())
         else:
             import datetime
             time_print = datetime.datetime.now()
             try:
-                files = cogent_generate.run_code_generation(self.__dbc, self.__node, time_print.strftime("%Y-%m-%d %H:%M"))
+                result = cogent_generate.run_code_generation(self.__dbc, self.__node, time_print.strftime("%Y-%m-%d %H:%M"))
             except CogentError as err:
                 self._alert(err.user_message())
             except Exception as exc:  # outside the generators (those are explained in cogent_generate)
                 self._fail(op, exc, item="preparing the code generation",
                            hint="Please send logs\\cogent.log to the tool maintainer.")
             else:
-                self._alert("Code Generated in CODE_GEN folder\n%d files written to %s"
-                            % (len(files), os.path.abspath(cogent_generate.OUTPUT_DIR)))
+                text = ("Code Generated in CODE_GEN folder\n%d files written to %s\nCAN receive rules: %d of %d (FIFO 0/1/2: %s)"
+                        % (len(result.files), os.path.abspath(cogent_generate.OUTPUT_DIR), sum(result.fifo_counts),
+                           result.max_rx_rules, "/".join(str(c) for c in result.fifo_counts)))
+                if result.manual_actions:
+                    text += ("\nManual action required: %d item(s), see CODE_GEN\\%s"
+                             % (result.manual_actions, cogent_generate.MANUAL_ACTIONS))
+                self._alert(text)
         self.default_page()
 
 
@@ -406,7 +646,7 @@ class BackEnd(htmlPy.Object):
              if(document.getElementById(key[i]))
              {
                 elem2=getClosest(elem,"tr");
-                elem2.style.backgroundColor="#616161";
+                elem2.style.backgroundColor="#ffffff";   // rows with saved settings (new rows turn green below)
                 if (document.getElementById(key[i]).type == "text")
                 {
                   
@@ -441,6 +681,7 @@ class BackEnd(htmlPy.Object):
             {
                 elem_obj=getClosest((document.getElementById(tx_row[i].id+"_tx_enable")),"tr");
                 elem_obj.style.backgroundColor="#3bb87e";
+                elem_obj.classList.add("cogent-new");
             }
          }
          for ( i = 2, len = (rx_row.length); i < len; i++)
@@ -449,19 +690,20 @@ class BackEnd(htmlPy.Object):
             {
                 elem_obj=getClosest((document.getElementById(rx_row[i].id+"_rx_enable")),"tr");
                 elem_obj.style.backgroundColor="#3bb87e";
+                elem_obj.classList.add("cogent-new");
             }
          }
-         
+         cogentMarkNew("messages");
 };</script>"""
                 new_file= open(self.__html_dir+'CAN_DBC_msg.html','w',encoding='latin-1')
-                new_file.write(final_data)
+                new_file.write(_themed(final_data))
                 new_file.close()
                 html_file.close()
                 jscript_file.close()
                 if data_file !=' ':
                     data_file.close()
                 
-                app.template = ("CAN_DBC_msg.html", {})
+                app.template = ("CAN_DBC_msg.html", self._context("messages"))
             except Exception as exc:
                 self._fail("Opening '%s'" % MSG_PAGE, exc, item="building the page from " + os.path.basename(str(self.__dbc)),
                            hint="Check that the DBC file is still available and that the html, js and data folders of the tool are complete, then try again.")
@@ -575,6 +817,7 @@ class BackEnd(htmlPy.Object):
             {
                 elem_obj=getClosest((document.getElementById(tx_row[i].id+"_tx_init_value")),"tr");
                 elem_obj.style.backgroundColor="#3bb87e";
+                elem_obj.classList.add("cogent-new");
             }
          }
          for ( i = 2, len = (rx_row.length); i < len; i++)
@@ -583,9 +826,10 @@ class BackEnd(htmlPy.Object):
             {
                 elem_obj=getClosest((document.getElementById(rx_row[i].id+"_rx_init_value")),"tr");
                 elem_obj.style.backgroundColor="#3bb87e";
+                elem_obj.classList.add("cogent-new");
             }
          }
-         
+         cogentMarkNew("signals");
         };'''
 
                 else:
@@ -593,14 +837,14 @@ class BackEnd(htmlPy.Object):
 
                 final_data+='''\n</script>'''
                 new_file= open(self.__html_dir+'CAN_DBC_sig.html','w',encoding='latin-1')
-                new_file.write(final_data)
+                new_file.write(_themed(final_data))
                 new_file.close()
                 html_file.close()
                 jscript_file.close()
                 if data_file !=' ':
                     data_file.close()
                 
-                app.template = ("CAN_DBC_sig.html", {})
+                app.template = ("CAN_DBC_sig.html", self._context("signals"))
             except Exception as exc:
                 self._fail("Opening '%s'" % SIG_PAGE, exc, item="building the page from " + os.path.basename(str(self.__dbc)),
                            hint="Check that the DBC file is still available and that the html, js and data folders of the tool are complete, then try again.")
@@ -688,12 +932,12 @@ class BackEnd(htmlPy.Object):
                 final_data+='''};\n</script>'''
                 
                 new_file= open(self.__html_dir+'Can_filter.html','w',encoding='latin-1')
-                new_file.write(final_data)
+                new_file.write(_themed(final_data))
                 new_file.close()
                 html_file.close()
                 jscript_file.close()
                 data_file.close()
-                app.template = ("Can_filter.html", {})
+                app.template = ("Can_filter.html", self._context("filter"))
             except Exception as exc:
                 self._fail("Opening the filter configuration page", exc, item="building the page from " + os.path.basename(str(self.__dbc)),
                            hint="Check that the DBC file is still available and that the html, js and data folders of the tool are complete, then try again.")
@@ -715,7 +959,7 @@ class BackEnd(htmlPy.Object):
     @htmlPy.Slot(str, result=str)
     def BackButton(self,json_data):
         #print "BackButton callback"     
-        app.template = ("Tool_Index_Page.html", {})
+        self.default_page()
 
     @htmlPy.Slot()        
     def pythonfn(self):

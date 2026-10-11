@@ -5,3 +5,8 @@ dist_py3/
 build_py3/
 logs/
 CODE_GEN/.staging/
+
+# Local analysis of the (private) reference workspace; never commit it, the repository is public
+local_reports/
+# Default output of 'Re-apply edits' (contains code from your private workspace)
+MERGED/

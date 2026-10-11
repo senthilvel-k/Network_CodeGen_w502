@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>CoGeNT - Receive FIFO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="{{'cogent.css'|staticfile }}">
+</head>
+<body>
+<div class="cg-app">
+{% set active = 'fifo' %}
+{% include '_sidebar.html' %}
+<main class="cg-main">
+  <h1>Receive FIFO</h1>
+  {% if config_error %}<div class="cg-banner cg-banner-err">{{ config_error }}</div>{% endif %}
+
+  <section class="cg-card">
+    <div class="cg-head"><h2>CAN receive rules with your selection</h2>
+      <span class="cg-big" id="fifo-total"></span><span class="cg-muted" id="fifo-max"></span></div>
+    <div class="cg-bars" id="fifo-bars"></div>
+    <p id="fifo-state"></p>
+    <p class="cg-problem" id="preview-error"></p>
+    <p class="cg-muted cg-small" id="fifo-unconfigured"></p>
+    <div class="cg-actions">
+      <input type="button" class="cg-btn cg-btn-primary" id="fifo-apply" value="Apply" onclick="apply()">
+      <a class="cg-btn" id="fifo-back" href="BackEnd.default_page" data-bind="true" style="text-decoration:none">Back without saving</a>
+    </div>
+  </section>
+
+  <section class="cg-card">
+    <h2>How combining works</h2>
+    <p class="cg-muted cg-small">Each received message normally needs one receive rule. An aligned block of IDs (for example
+      0x4F0 to 0x4FF) can be received through one rule instead; its lowest-ID message keeps the dispatch entry, and
+      nw_can_dll.c must hand each ID to its own message (CoGeNT writes that code to CODE_GEN\MANUAL_ACTIONS.md).
+      A block can only be combined when all its messages use the same layer and the same DLC.</p>
+  </section>
+
+  <section class="cg-card">
+    <h2>Combined ID blocks (saved)</h2>
+    <div class="cg-list" id="merged-list"></div>
+  </section>
+
+  <section class="cg-card">
+    <h2>Suggested blocks to combine</h2>
+    <p class="cg-muted cg-small" id="cand-note"></p>
+    <div class="cg-list" id="cand-list"></div>
+  </section>
+
+  <section class="cg-card">
+    <h2>Add a block by ID</h2>
+    <div class="cg-actions">
+      <input class="cg-input" id="add-base" style="width:140px" placeholder="0x4F0">
+      <select id="add-size"><option value="0x7F8">8 IDs</option><option value="0x7F0" selected>16 IDs</option><option value="0x7E0">32 IDs</option></select>
+      <input type="button" class="cg-btn" id="add-block" value="Add block" onclick="addBlock()">
+    </div>
+    <p class="cg-problem" id="add-error"></p>
+    <div class="cg-list" id="custom-list"></div>
+  </section>
+
+  <section class="cg-card">
+    <h2>Receive-only messages</h2>
+    <p class="cg-muted cg-small">Messages that must be received although their Rx enable is off on the message page
+      (their interaction-layer code is hand-written, for example multiplexed messages CoGeNT cannot generate).</p>
+    <div id="ro-list"></div>
+    <div class="cg-actions" style="margin-top:8px">
+      <select id="ro-select"></select>
+      <input type="button" class="cg-btn" id="ro-add" value="Add" onclick="addReceiveOnly()">
+    </div>
+  </section>
+
+  <section class="cg-card">
+    <details>
+      <summary>Controller limits</summary>
+      <p class="cg-muted cg-small">Change these only if your microcontroller accepts more receive rules.</p>
+      <div class="cg-actions">
+        <label>Total receive rules <input type="number" id="max-rules" min="1" onchange="limits()"></label>
+        <label>Rules per FIFO <input type="number" id="max-fifo" min="1" onchange="limits()"></label>
+      </div>
+    </details>
+  </section>
+</main>
+</div>
+<script>
+var VIEW = {{ view_json|safe }};
+var SAVED = {{ saved_json|safe }};
+var CANDIDATES = VIEW.candidates;
+var state = {
+  kept: SAVED.merge_blocks.slice(),
+  ticked: CANDIDATES.filter(function (c) { return c.preselected; }).map(function (c) { return c.label; }),
+  custom: [],
+  additional: SAVED.additional_rx_messages.slice(),
+  max_rx_rules: VIEW.max_rx_rules,
+  max_rules_per_fifo: VIEW.max_rules_per_fifo
+};
+var current = VIEW, pending = 0;
+
+function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return {"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]; }); }
+function names(members) {
+  var shown = members.slice(0, 8).map(function (m) { return esc(m.name) + ' <span class="cg-muted">' + m.id + '</span>'; });
+  return shown.join(', ') + (members.length > 8 ? ', ... (' + members.length + ' messages)' : '');
+}
+function proposal() {
+  var blocks = state.kept.slice();
+  CANDIDATES.forEach(function (c) { if (state.ticked.indexOf(c.label) >= 0) { blocks.push({base: c.base, mask: c.mask}); } });
+  return {merge_blocks: blocks.concat(state.custom), additional_rx_messages: state.additional,
+          max_rx_rules: state.max_rx_rules, max_rules_per_fifo: state.max_rules_per_fifo};
+}
+function merged(label) {
+  for (var i = 0; i < current.merged.length; i++) { if (current.merged[i].label === label) { return current.merged[i]; } }
+  return null;
+}
+function blockLabel(b) {
+  var base = parseInt(b.base, 16), mask = parseInt(b.mask, 16), high = (base & mask) | (0x7FF & ~mask);
+  return "0x" + base.toString(16).toUpperCase().padStart(3, "0") + "-0x" + high.toString(16).toUpperCase().padStart(3, "0");
+}
+
+function render(v) {
+  current = v;
+  document.getElementById("fifo-total").textContent = v.total;
+  document.getElementById("fifo-max").textContent = "of " + v.max_rx_rules;
+  document.getElementById("fifo-bars").innerHTML = v.fifo_counts.map(function (n, i) {
+    var over = n > v.max_rules_per_fifo, w = Math.min(100, Math.round(n * 100 / v.max_rules_per_fifo));
+    return '<div><div class="cg-bar-label"><span>FIFO ' + i + '</span><span>' + n + ' / ' + v.max_rules_per_fifo + '</span></div>' +
+           '<div class="cg-bar' + (over ? ' over' : '') + '"><div style="width:' + w + '%"></div></div></div>';
+  }).join("");
+  var st = document.getElementById("fifo-state");
+  if (v.fits) {
+    st.innerHTML = '<span class="cg-ok">Fits.</span> ' + v.total + ' of ' + v.max_rx_rules + ' receive rules. Press Apply to save this selection.';
+  } else {
+    var over = v.total - v.max_rx_rules;
+    st.innerHTML = '<span class="cg-over">' + (over > 0 ? over + ' rules over the limit.' : 'A FIFO has more than ' + v.max_rules_per_fifo + ' rules.') +
+      '</span> Tick more blocks below, untick Rx enable for messages this ECU does not need (message page), or raise the controller limits if your microcontroller allows it.';
+  }
+  document.getElementById("fifo-unconfigured").textContent = v.unconfigured.length ?
+    v.unconfigured.length + " message(s) have no saved settings and are counted as not received: " + v.unconfigured.join(", ") +
+    ". Open TX/RX messages and press Save and Back." : "";
+
+  document.getElementById("merged-list").innerHTML = state.kept.length ? state.kept.map(function (b, i) {
+    var m = merged(blockLabel(b)) || {members: [], problems: [], applied: false};
+    return '<div class="cg-item"><span></span><span class="cg-mono">' + blockLabel(b) + '</span><span>' + names(m.members) +
+      (m.problems.length ? '<div class="cg-problem">Not applied: ' + esc(m.problems.join("; ")) + '</div>' : '') +
+      '</span><span class="cg-muted">' + (m.members.length > 1 ? '-' + (m.members.length - 1) + ' rules' : '') +
+      '</span><span><input type="button" class="cg-btn cg-btn-small" value="Remove" onclick="removeKept(' + i + ')"></span></div>';
+  }).join("") : '<p class="cg-muted cg-small">No saved blocks.</p>';
+
+  document.getElementById("cand-note").textContent = CANDIDATES.length ?
+    (VIEW.fits ? "The saved selection fits; these blocks could be combined if more messages are added." :
+     (VIEW.preselect_fits ? "CoGeNT has ticked the fewest blocks needed. Check the messages of each block before you apply." :
+      "Even all suggested blocks are not enough; also untick messages or raise the limits.")) :
+    "No further blocks can be combined (each needs two or more messages with the same layer and DLC).";
+  document.getElementById("cand-list").innerHTML = CANDIDATES.map(function (c) {
+    var on = state.ticked.indexOf(c.label) >= 0;
+    return '<div class="cg-item"><span><input type="checkbox" class="cand" data-label="' + c.label + '"' + (on ? ' checked' : '') +
+      ' onchange="tick(this)"></span><span class="cg-mono">' + c.label + '</span><span>' + names(c.members) +
+      '</span><span class="cg-muted">' + c.layer + ', DLC ' + esc(c.dlc) + '</span><span>-' + c.saves + ' rules</span></div>';
+  }).join("");
+
+  document.getElementById("custom-list").innerHTML = state.custom.map(function (b, i) {
+    var m = merged(blockLabel(b)) || {members: [], problems: []};
+    return '<div class="cg-item"><span></span><span class="cg-mono">' + blockLabel(b) + '</span><span>' + names(m.members) +
+      (m.problems.length ? '<div class="cg-problem">Not applied: ' + esc(m.problems.join("; ")) + '</div>' : '') +
+      '</span><span></span><span><input type="button" class="cg-btn cg-btn-small" value="Remove" onclick="removeCustom(' + i + ')"></span></div>';
+  }).join("");
+
+  document.getElementById("ro-list").innerHTML = v.receive_only.length ? v.receive_only.map(function (r, i) {
+    return '<span class="cg-chip' + (r.problem ? ' cg-chip-warn' : '') + '">' + esc(r.name) + ' ' + r.id +
+      (r.problem ? ' - ' + esc(r.problem) : '') + ' <button type="button" class="cg-linkbtn ro-remove" data-name="' + esc(r.name) + '" onclick="removeReceiveOnly(' + i + ')" title="Remove">x</button></span>';
+  }).join("") : '<p class="cg-muted cg-small">None.</p>';
+  var sel = document.getElementById("ro-select");
+  sel.innerHTML = VIEW.receive_only_choices.filter(function (c) { return state.additional.indexOf(c.name) < 0; })
+    .map(function (c) { return '<option value="' + esc(c.name) + '">' + esc(c.name) + ' (' + c.id + ')</option>'; }).join("");
+  document.getElementById("max-rules").value = state.max_rx_rules;
+  document.getElementById("max-fifo").value = state.max_rules_per_fifo;
+}
+
+function refresh(onError) {
+  pending++;
+  BackEnd.fifo_preview(JSON.stringify(proposal()), function (r) {
+    pending--;
+    var v = JSON.parse(r);
+    if (v.error) {
+      if (onError) { onError(v.error); } else { document.getElementById("preview-error").textContent = v.error; }
+      return;
+    }
+    document.getElementById("preview-error").textContent = "";
+    render(v);
+  });
+}
+function tick(box) {
+  var l = box.dataset.label, i = state.ticked.indexOf(l);
+  if (box.checked && i < 0) { state.ticked.push(l); }
+  if (!box.checked && i >= 0) { state.ticked.splice(i, 1); }
+  refresh();
+}
+function removeKept(i) { state.kept.splice(i, 1); refresh(); }
+function removeCustom(i) { state.custom.splice(i, 1); refresh(); }
+function addBlock() {
+  var base = document.getElementById("add-base").value.trim(), mask = document.getElementById("add-size").value;
+  var err = document.getElementById("add-error");
+  err.textContent = "";
+  if (!/^(0x)?[0-9a-fA-F]{1,3}$/.test(base)) { err.textContent = "Enter the first ID of the block as a hex number, for example 0x4F0."; return; }
+  if (base.indexOf("0x") !== 0) { base = "0x" + base; }
+  var block = {base: base.toUpperCase().replace("0X", "0x"), mask: mask};
+  state.custom.push(block);
+  refresh(function (msg) { state.custom.pop(); err.textContent = msg; });
+}
+function addReceiveOnly() {
+  var name = document.getElementById("ro-select").value;
+  if (name && state.additional.indexOf(name) < 0) { state.additional.push(name); refresh(); }
+}
+function removeReceiveOnly(i) { state.additional.splice(i, 1); refresh(); }
+function limits() {
+  state.max_rx_rules = parseInt(document.getElementById("max-rules").value, 10) || state.max_rx_rules;
+  state.max_rules_per_fifo = parseInt(document.getElementById("max-fifo").value, 10) || state.max_rules_per_fifo;
+  refresh();
+}
+function apply() { BackEnd.fifo_apply(JSON.stringify(proposal())); }
+
+render(VIEW);
+refresh();
+</script>
+</body>
+</html>
