@@ -152,8 +152,34 @@ def _fail_with_diff(a, e, name, key, label):
     pytest.fail(f"{name} differs ({kind}) for {key}:\n{diff}")
 
 
+PRECOPY_HEAD = re.compile(rb"^void \w+_PreCopy \(void\)")
+RVALUE_DECLARED = re.compile(rb"^\s+\w+\s+rValue;")
+
+
+def comment_precopy_rvalue(data):
+    """The legacy PreCopy wrote stray 'rValue |= ...' lines where rValue is not declared (does not
+    compile); CoGeNT writes them commented out, as the S2XX workspace has them. Applied to the legacy
+    references of nw_il_par.c."""
+    out, inside, declared = [], False, False
+    for line in data.split(b"\n"):
+        if PRECOPY_HEAD.match(line):
+            inside, declared = True, False
+        elif line.rstrip(b"\r") == b"}":
+            inside = False
+        declared = declared or (inside and bool(RVALUE_DECLARED.match(line)))
+        if inside and not declared and line.startswith(b"   rValue |= "):
+            line = b"   // " + line[3:]
+        out.append(line)
+    return b"\n".join(out)
+
+
+def reference_bytes(path):
+    data = path.read_bytes()
+    return comment_precopy_rvalue(data) if path.name == "nw_il_par.c" else data
+
+
 def assert_same_file(actual, expected, key):
-    a, e = actual.read_bytes(), expected.read_bytes()
+    a, e = actual.read_bytes(), reference_bytes(expected)
     if a != e:
         _fail_with_diff(a, e, actual.name, key, "expected(py27)")
 
@@ -172,6 +198,6 @@ def normalize_date_by(data):
 
 
 def assert_same_as_legacy(actual, legacy, key):
-    a, e = normalize_header(actual.read_bytes()), normalize_header(legacy.read_bytes())
+    a, e = normalize_header(actual.read_bytes()), normalize_header(reference_bytes(legacy))
     if a != e:
         _fail_with_diff(a, e, actual.name, key, "legacy(py27 run)")

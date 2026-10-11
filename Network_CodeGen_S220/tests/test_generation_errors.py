@@ -6,7 +6,7 @@ import sys
 import pytest
 
 from support import (CODE_FILES, LEGACY_REFS, ROOT, load_fixture, normalize_date_by, normalize_header,
-                     run_file, run_folder_count)
+                     reference_bytes, run_file, run_folder_count)
 
 sys.path.insert(0, str(ROOT))
 
@@ -66,7 +66,7 @@ def test_generation_writes_all_files_identical_to_legacy_run(home):
     assert written.fifo_counts == (64, 64, 81) and written.manual_actions == 0
     legacy = LEGACY_REFS[FIXTURE][0]
     for f in CODE_FILES:
-        assert normalize_header(run_file(home, f).read_bytes()) == normalize_header((legacy / f).read_bytes()), f
+        assert normalize_header(run_file(home, f).read_bytes()) == normalize_header(reference_bytes(legacy / f)), f
     assert not (home / "CODE_GEN" / "errorlog.txt").exists()      # stale log removed after success
     assert not (home / "CODE_GEN" / ".staging").exists()
 

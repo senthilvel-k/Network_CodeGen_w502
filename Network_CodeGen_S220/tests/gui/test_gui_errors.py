@@ -9,7 +9,7 @@ import zipfile
 import pytest
 
 from gui_support import js, navigate, settle, start_app_copy, wait_alert
-from support import CODE_FILES, LEGACY_REFS, latest_run, normalize_header, run_file
+from support import CODE_FILES, LEGACY_REFS, latest_run, normalize_header, reference_bytes, run_file
 
 pytestmark = pytest.mark.gui
 FIXTURE = "s2xx_40024"
@@ -151,7 +151,7 @@ def test_code_gen_matches_legacy_and_keeps_path_with_apostrophe(qtbot, app):
     legacy = LEGACY_REFS[FIXTURE][0]
     for name in CODE_FILES:
         assert normalize_header(run_file(home, name).read_bytes()) == \
-            normalize_header((legacy / name).read_bytes()), name
+            normalize_header(reference_bytes(legacy / name)), name
     assert js(qtbot, gui, "document.getElementById('file_path').value") == dbc.as_posix()
     assert js(qtbot, gui, "document.getElementById('ch0_node_name').value") == "SMART_CORE"
     gui.alerts.clear()

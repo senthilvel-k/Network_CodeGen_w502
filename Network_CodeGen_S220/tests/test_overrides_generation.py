@@ -295,3 +295,20 @@ def test_forwarded_indications_call_the_host_function(runs):
                                      "              #endif" % (name, name),
                                      "              host_update_msg(VNIM_%s);" % name)
     assert "host_update_msg" not in _function(over, "void VnimIlRx_REM_MSG_0_Timeout( void )")
+
+
+# ---------------------------------------------------------------- automatic: PreCopy without stray rValue lines
+
+def test_precopy_writes_the_stray_rvalue_lines_commented_out(runs):
+    """The legacy PreCopy wrote 'rValue |= ...' for the parts of CRANK_COUNT_IBS, where rValue is not
+    declared (does not compile); the S2XX workspace has them commented out."""
+    c = runs["plain"]["nw_il_par.c"]
+    pre = _function(c, "void EMS46_500_PreCopy (void)")
+    assert "   // rValue |= (CAN_UINT32)(((CAN_UINT32) EMS46_500.ems46_500.CRANK_COUNT_IBS_1) << 1);\n" \
+           "   // rValue |= (CAN_UINT32)(((CAN_UINT32) EMS46_500.ems46_500.CRANK_COUNT_IBS_2) << 9);\n" in pre
+    for name in re.findall(r"^void (\w+_PreCopy) \(void\)$", c, re.M):
+        body = _function(c, "void %s (void)" % name)
+        if "rValue;" not in body:                                           # rValue not declared
+            assert not re.search(r"^\s*rValue", body, re.M), name
+    get = _function(c, "CAN_UINT32 IlRxGetCRANK_COUNT_IBS(void)")
+    assert "   rValue |= (CAN_UINT32)(((CAN_UINT32) EMS46_500.ems46_500.CRANK_COUNT_IBS_1) << 1);" in get

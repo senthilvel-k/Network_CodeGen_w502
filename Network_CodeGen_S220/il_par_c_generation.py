@@ -1915,7 +1915,8 @@ def message_precopy():
                         #print '   rValue |= ('+datatype_16+')((('+datatype_16+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');'
                         precopy.append(sig_name.upper()+'_'+str(cl))
                       elif length>16 and length <= 32:
-                        print('   rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');')
+                        # commented out, as in the S2XX workspace: rValue is not declared in a PreCopy
+                        print('   // rValue |= ('+datatype_32+')((('+datatype_32+') '+mes['Msg_name'].upper()+'.'+mes['Msg_name'].lower()+'.'+sig_name.upper()+'_'+str(cl)+') << '+str(bit_to_be_filled)+');')
                         precopy.append(sig_name.upper()+'_'+str(cl))
                       bit_to_be_filled+=8
                     elif rem>0 and rem<8:

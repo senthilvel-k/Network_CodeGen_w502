@@ -8,7 +8,7 @@ import sys
 import pytest
 
 from gui_support import js, navigate, start_app_copy, wait_alert, wait_ready
-from support import CODE_FILES, LEGACY_REFS, normalize_header, run_file
+from support import CODE_FILES, LEGACY_REFS, normalize_header, reference_bytes, run_file
 
 pytestmark = pytest.mark.gui
 FIXTURE = "s237_36144_2"
@@ -48,7 +48,7 @@ def test_full_generate_flow_matches_legacy_run(qtbot, app_copy):
     legacy_dir = LEGACY_REFS[FIXTURE][0]
     for name in CODE_FILES:
         assert normalize_header(run_file(home, name).read_bytes()) == \
-            normalize_header((legacy_dir / name).read_bytes()), name
+            normalize_header(reference_bytes(legacy_dir / name)), name
 
 
 def test_real_save_and_back_forms_keep_saved_configuration(qtbot, app_copy):
@@ -70,7 +70,7 @@ def test_real_save_and_back_forms_keep_saved_configuration(qtbot, app_copy):
     legacy_dir = LEGACY_REFS[FIXTURE][0]
     for name in CODE_FILES:
         assert normalize_header(run_file(home, name).read_bytes()) == \
-            normalize_header((legacy_dir / name).read_bytes()), name
+            normalize_header(reference_bytes(legacy_dir / name)), name
 
 
 def test_second_generate_in_same_session_gives_identical_files(qtbot, app_copy):
