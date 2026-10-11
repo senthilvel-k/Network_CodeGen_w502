@@ -128,7 +128,8 @@ as generated for any message.
 - Put/get function prototypes of indexed messages follow the last regular prototypes (same order as the
   functions).
 - No `VNIM_RX_<signal>()` macros for signals of indexed messages (the hand code has none: the host
-  receives the whole frame).
+  receives the whole frame); likewise no `VNIM_IS_<signal>_MISSING()` in nw_vnim_app_signals_par.h
+  (ruling made while planning).
 
 ## 6. VNIM (nw_vnim_app_signals_par.c)
 
@@ -142,7 +143,12 @@ All per-message code stays in the generator's sorted position and template; only
 - the on-fail initialisation list: the entries of indexed messages follow the last regular entry; per
   message (by name) the multiplexor first, then signal order without it.
 - On-fail values come from the signal settings (TX/RX signals page) as for every signal; defaults from the
-  DBC start value (cell temperatures 500 = 0x1F4).
+  DBC start value (cell temperatures 500 = 0x1F4). Found while implementing: the DBC parser ignored the start
+  value of signals whose DBC name is not upper case (BMS_CellTemp1); it now matches names case-insensitively
+  (only the signals page reads per-signal DBC attributes).
+- The indication of an indexed message that uses the delayed notification (`<MSG>_msg_changed`) also
+  notifies the host at once, as the hand code does: every frame carries another index and the 200 ms
+  notification alone would drop frames (found while implementing).
 
 ## 7. Unchanged outputs
 
@@ -162,13 +168,18 @@ Generating the 40024 configuration with BMS19_100 and BMS20_100 enabled reproduc
    FOD_ALERT and RESERVED_WLC share flag bits 0x1..0x8 of byte 161 with BMS_CELLTEMP1..4.
 2. `BMS20_100_PreCopy` sets the BMS_CELLVOLTAGE_INDEX flag (hand code: BMS_CELLTEMP_INDEX).
 3. BMS20_100 on-fail case: `NM_MSG_MISSING(VNIM_BMS20_100_MSGID)` and the BMS_CELLVOLTAGE_INDEX flag (hand
-   code: VNIM_BMS19_100_MSGID and BMS_CELLTEMP_INDEX).
+   code: VNIM_BMS19_100_MSGID and BMS_CELLTEMP_INDEX); the multiplexor is set once (hand code: twice).
 4. BMS20_100 signals are in the on-fail initialisation list (missing in the hand code).
-5. `vnim_msg_byte_position` / `vnim_msg_bit_mask` have one entry per message (hand code: 192 for 193).
-6. Formatting: the generator's spaces instead of the hand tabs; on-fail values in the generator's format
-   (`0x0u`, hand code partly `0x00`).
-Any other difference found while implementing is either fixed in the generator or added to this list
-with its reason before release.
+5. `ILRxPut_BMS_CELLVOLTAGE26` / `32` store the upper 8 bits shifted by 2 (the signal starts at bit 14:
+   2 + 8 bits); the hand code shifts by 3 (found while implementing).
+6. Message-loss cases for BMS19_100 / BMS20_100 (node timeout flag, on-fail values, `VNIM_MSG_LOSS`), as
+   for every other message; the hand code has only the message-gain cases (found while implementing).
+7. The all-frames IPCL case (`ALL_RX_FRAME_IPCL_INDEX`) sets the BMS19_100 / BMS20_100 multiplexor flags, as
+   for every other message (missing in the hand code; found while implementing).
+8. `vnim_msg_byte_position` / `vnim_msg_bit_mask` have one entry per message (hand code: 192 for 193).
+9. Formatting: the generator's spaces instead of the hand tabs; on-fail values in the generator's format
+   (`0x0u`, hand code partly `0x00`); `~0x20u` in `ILClr_BMS_CELLVOLTAGE78_DataChanged` (hand code `~0x20`).
+`tests/test_mux_reference.py` pins exactly this list (counted, white space ignored) against the workspace.
 
 ## 10. Errors
 
