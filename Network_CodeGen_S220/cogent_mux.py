@@ -277,3 +277,48 @@ def types(lay):
         out += ['  ' + m for m in members]
     out += ['}%s_msgType;' % lay.name, '']
     return '\n'.join(out) + '\n'
+
+
+# ---- nw_il_par.h --------------------------------------------------------------------------------------
+def count_lines(regular_signals, lays):
+    """IL_NUM_OF_RX_DATA_CHANGED_FLAG as (regular bytes + multiplex area bytes) and the area offset."""
+    g = (regular_signals + 7) // 8
+    m = (len(flag_area(lays)) + 7) // 8
+    return ['#define IL_NUM_OF_RX_DATA_CHANGED_FLAG   (%d + %d) ' % (g, m), '#define IL_MUX_MSG_OFFSET_ID   %d ' % g]
+
+
+def flag_lines(lays):
+    out = []
+    for name, k, mask in flag_area(lays):
+        at = 'il_Rx_DataChanged_Flag[IL_MUX_MSG_OFFSET_ID + %d]' % k
+        out += ['#define ILSet_%s_DataChanged()        (%s |= (CAN_UINT8) (%s))' % (name, at, hex(mask)),
+                '#define ILGet_%s_DataChanged()        (%s & (CAN_UINT8) (%s))' % (name, at, hex(mask)),
+                '#define ILClr_%s_DataChanged()        (%s &= (((CAN_UINT8) (0xff)) & ((CAN_UINT8)~%su)))'
+                % (name, at, hex(mask)), '']
+    return out
+
+
+def _macro_signals(lay):
+    return [s for s in lay.signals if s.one_field and s is not lay.multiplexor] + [lay.multiplexor]
+
+
+def _function_signals(lay):
+    return [s for s in lay.signals if not s.one_field]
+
+
+def put_macros(lays):
+    return ['#define ILRxPut_%s(data)    %s.%s.%s= data' % (s.name, lay.name, s.path, s.parts[0])
+            for lay in lays.values() for s in _macro_signals(lay)]
+
+
+def get_macros(lays):
+    return ['#define IlRxGet%s() \t\t%s.%s.%s' % (s.name, lay.name, s.path, s.parts[0])
+            for lay in lays.values() for s in _macro_signals(lay)]
+
+
+def put_prototypes(lays):
+    return ['void ILRxPut_%s(%s data);' % (s.name, s.ctype) for lay in lays.values() for s in _function_signals(lay)]
+
+
+def get_prototypes(lays):
+    return ['%s IlRxGet%s(void);' % (s.ctype, s.name) for lay in lays.values() for s in _function_signals(lay)]

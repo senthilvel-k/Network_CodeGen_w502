@@ -1,6 +1,7 @@
 import sys,json
 import os
 from cogent_io import open_output, close_output
+import cogent_mux
 from py2compat import py2_print as print, Py2Dict  # Python 2 print/dict-order semantics
 dbc=None
 dbc_file_name=None
@@ -78,6 +79,7 @@ def message_buf_generation():
   il_sorted_mes_tx = sorted(il_msg_tx,key = lambda x: x['Msg_name'])
   
   all_message_rx = dbc.get_msg_type(full_msg,'rx')
+  indexed = cogent_mux.layouts(all_message_rx, vnim_msg_cfg_data)
   for mes in all_message_rx:
     if vnim_msg_cfg_data[mes['Msg_name']+'_rx_enable'] in ['on','ON','On',1,'1']:
       if vnim_msg_cfg_data[mes['Msg_name']+'_msg_type_no_of_events'] == 'Appl':
@@ -203,6 +205,7 @@ def message_structure_generation_tx_rx():
   il_sorted_mes_tx = sorted(il_msg_tx,key = lambda x: x['Msg_name'])
        
   all_message_rx = dbc.get_msg_type(full_msg,'rx')
+  indexed = cogent_mux.layouts(all_message_rx, vnim_msg_cfg_data)
   for mes in all_message_rx:
     if vnim_msg_cfg_data[mes['Msg_name']+'_rx_enable'] in ['on','ON','On',1,'1']:
       if vnim_msg_cfg_data[mes['Msg_name']+'_msg_type_no_of_events'] == 'Appl':
@@ -454,7 +457,8 @@ def message_structure_generation_tx_rx():
   for mes in il_sorted_mes_rx_ordered:
     if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON']:
       temp_count+=1
-      temp_sig_count+=len(mes['Sig_List'])
+      if mes['Msg_name'].upper() not in indexed:       # their flags are in the multiplex area
+        temp_sig_count+=len(mes['Sig_List'])
       if mes['GenMsgSendType'] in ['0','Cyclic','Combined(Event/Periodic)','5',0,5] or int(mes['GenMsgCycleTime']) >0:
         temp_periodic_count+=1
         
@@ -478,7 +482,10 @@ def message_structure_generation_tx_rx():
   print('#define IL_RX_NUM_PERIODIC   '+str(temp_count))
   print('#define IL_RX_NUM_MESSAGES   '+str(temp_count))
   print('#define IL_RX_NUM_FRAMES     '+str(temp_count))
-  print('#define IL_NUM_OF_RX_DATA_CHANGED_FLAG   ' +str((temp_sig_count//8) if (temp_sig_count%8 == 0) else (temp_sig_count//8)+1))
+  if indexed:
+    print('\n'.join(cogent_mux.count_lines(temp_sig_count, indexed)))
+  else:
+    print('#define IL_NUM_OF_RX_DATA_CHANGED_FLAG   ' +str((temp_sig_count//8) if (temp_sig_count%8 == 0) else (temp_sig_count//8)+1))
  
   print('''/* ===========================================================================
     Interaction Layer Receive Message Enumerations
@@ -603,6 +610,7 @@ def signal_get_Put():
   il_sorted_mes_tx = sorted(il_msg_tx,key = lambda x: x['Msg_name'])
   
   all_message_rx = dbc.get_msg_type(full_msg,'rx')
+  indexed = cogent_mux.layouts(all_message_rx, vnim_msg_cfg_data)
   for mes in all_message_rx:
     if vnim_msg_cfg_data[mes['Msg_name']+'_rx_enable'] in ['on','ON','On',1,'1']:
       if vnim_msg_cfg_data[mes['Msg_name']+'_msg_type_no_of_events'] == 'Appl':
@@ -747,7 +755,7 @@ def signal_get_Put():
    Interaction Layer Transmit Signal Rx Put Macros
   =========================================================================*/''')
   for mes in il_sorted_mes_rx_ordered:
-    if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON']:
+    if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON'] and mes['Msg_name'].upper() not in indexed:
       if mes['Multiplex'] == 'YES':
         mul_msg=dbc.get_multiplex(mes['id'])
         multiplexor_id=mul_msg['Multiplexor']
@@ -794,12 +802,14 @@ def signal_get_Put():
             
     
   
+  if indexed:
+    print('\n'.join(cogent_mux.put_macros(indexed)))
   print('''\n/* ===========================================================================
    Interaction Layer Receive Signal Rx Get Macros
   =========================================================================*/''')
   
   for mes in il_sorted_mes_rx_ordered:
-    if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON']:
+    if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON'] and mes['Msg_name'].upper() not in indexed:
       if mes['Multiplex'] == 'YES':
         mul_msg=dbc.get_multiplex(mes['id'])
         multiplexor_id=mul_msg['Multiplexor']
@@ -844,13 +854,15 @@ def signal_get_Put():
             
     
   
+  if indexed:
+    print('\n'.join(cogent_mux.get_macros(indexed)))
   print('''/* ===========================================================================
   Interaction Layer Receive Signal Rx Put Functions to set application 
   values to Rx buffer
   =========================================================================*/''')
   
   for mes in il_sorted_mes_rx_ordered:
-    if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON']:
+    if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON'] and mes['Msg_name'].upper() not in indexed:
       for signal in mes['Sig_List']:
         if int(mes['Sig_List'][signal]['Len']) <=8:
           sig_start_bit = int(mes['Sig_List'][signal]['Endbit'])
@@ -885,11 +897,13 @@ def signal_get_Put():
           pass
           
   
+  if indexed:
+    print('\n'.join(cogent_mux.put_prototypes(indexed)))
   print('''/* ===========================================================================
    Interaction Layer Receive Signal Rx Get Functions 
   =========================================================================*/''')  
   for mes in il_sorted_mes_rx_ordered:
-    if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON']:
+    if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON'] and mes['Msg_name'].upper() not in indexed:
       for signal in mes['Sig_List']:
         if int(mes['Sig_List'][signal]['Len']) <=8:
           sig_start_bit = int(mes['Sig_List'][signal]['Endbit'])
@@ -924,11 +938,13 @@ def signal_get_Put():
         else:
           pass
     
+  if indexed:
+    print('\n'.join(cogent_mux.get_prototypes(indexed)))
   print('''/* ===========================================================================
     VNIM Interface Macros for Applications.For RX
    =========================================================================*/''')   
   for mes in il_sorted_mes_rx_ordered:
-    if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON']:
+    if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON'] and mes['Msg_name'].upper() not in indexed:
       for signal in mes['Sig_List']:
         if int(mes['Sig_List'][signal]['Len']) <=32:
          print('#define VNIM_RX_'+signal.upper()+'() IlRxGet'+signal.upper()+'()')
@@ -942,7 +958,7 @@ def signal_get_Put():
   no_signal = 0
   bit_signal=1
   for mes in il_sorted_mes_rx_ordered: 
-    if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON']:
+    if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON'] and mes['Msg_name'].upper() not in indexed:
       sig_list=[]
       for signal in mes['Sig_List']:
         mes['Sig_List'][signal]['Sig_name']=signal
@@ -959,6 +975,9 @@ def signal_get_Put():
             bit_signal=1
           
           
+  if indexed:
+    print('\n'.join(cogent_mux.flag_lines(indexed)))
+
 def il_par_h_gen_function():  
   global footer,il_code_gen_dir,tp_generic_config,nm_generic_config,il_generic_config
   #dir = './CODE_GEN'

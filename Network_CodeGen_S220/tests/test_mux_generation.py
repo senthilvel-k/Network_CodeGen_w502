@@ -55,3 +55,36 @@ def test_types_follow_the_legacy_multiplex_type(both):
 
 def test_disabled_messages_change_nothing(both):
     assert "BMS19_100" not in both[False]["nw_il_msg.h"]
+
+
+FLAG = re.compile(r"#define (ILSet_\w+)_DataChanged\(\) +(\(il_Rx_DataChanged_Flag\[[^\]]+\].*)")
+
+
+def flags(text):
+    return dict(FLAG.findall(text))
+
+
+def test_flag_area_and_counts(both):
+    h, plain = both[True]["nw_il_par.h"], both[False]["nw_il_par.h"]
+    assert "#define IL_NUM_OF_RX_DATA_CHANGED_FLAG   (162 + 17) " in h
+    assert "#define IL_MUX_MSG_OFFSET_ID   162 " in h and "IL_MUX_MSG_OFFSET_ID" not in plain
+    f, p = flags(h), flags(plain)
+    assert {k: v for k, v in f.items() if k in p} == p                 # every regular flag unchanged
+    assert f["ILSet_BMS_CELLTEMP1"].startswith("(il_Rx_DataChanged_Flag[IL_MUX_MSG_OFFSET_ID + 0] |= (CAN_UINT8) (0x1))")
+    assert f["ILSet_BMS_CELLVOLTAGE1"].startswith("(il_Rx_DataChanged_Flag[IL_MUX_MSG_OFFSET_ID + 4] |= (CAN_UINT8) (0x1))")
+    assert f["ILSet_BMS_CELLTEMP_INDEX"].startswith("(il_Rx_DataChanged_Flag[IL_MUX_MSG_OFFSET_ID + 16] |= (CAN_UINT8) (0x1))")
+    assert f["ILSet_BMS_CELLVOLTAGE_INDEX"].startswith("(il_Rx_DataChanged_Flag[IL_MUX_MSG_OFFSET_ID + 16] |= (CAN_UINT8) (0x2))")
+
+
+def test_macros_and_prototypes_after_the_regular_ones(both):
+    h = both[True]["nw_il_par.h"]
+    assert "#define ILRxPut_BMS_CELLTEMP_INDEX(data)    BMS19_100.bms19_100.BMS_CELLTEMP_INDEX= data" in h
+    assert "#define ILRxPut_BMS_CELLVOLTAGE_INDEX(data)    " \
+           "BMS20_100.bms20_100.bms_cellvoltage_index_0.BMS_CELLVOLTAGE_INDEX= data" in h
+    put = h.index("#define ILRxPut_BMS_CELLTEMP_INDEX(data)")
+    assert h.index("#define ILRxPut_TIME_TO_CHARGE(data)") < put < h.index("Receive Signal Rx Get Macros")
+    assert "#define IlRxGetBMS_CELLTEMP_INDEX() \t\tBMS19_100.bms19_100.BMS_CELLTEMP_INDEX" in h
+    assert "void ILRxPut_BMS_CELLVOLTAGE1(CAN_UINT16 data);" in h and "CAN_UINT16 IlRxGetBMS_CELLTEMP1(void);" in h
+    assert h.index("void ILRxPut_RESERVED_WLC(") < h.index("void ILRxPut_BMS_CELLTEMP1(CAN_UINT16 data);")
+    assert h.count("void ILRxPut_BMS_CELLTEMP1(") == 1 and h.count("#define ILSet_BMS_CELLTEMP1_DataChanged") == 1
+    assert "VNIM_RX_BMS_CELLTEMP1" not in h and "VNIM_RX_BMS_CELLTEMP_INDEX" not in h
