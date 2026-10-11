@@ -204,3 +204,62 @@ def test_exe_new_pages_open(tmp_path):
             cdp.close()
         app.kill()
         os.environ.pop("QTWEBENGINE_REMOTE_DEBUGGING", None)
+
+
+def test_exe_save_and_back_pressed_while_the_signal_page_loads(tmp_path):
+    """Packaged exe: "Save and Back" pressed on the signal page (3.4 MB, the button is at its top) before the
+    page has loaded saves and returns to the home page instead of showing ERR_FILE_NOT_FOUND."""
+    if not (EXE_DIR / "CoGeNT.exe").exists():
+        pytest.skip("build first: pyinstaller CoGeNT.spec --distpath dist_py3 --workpath build_py3")
+    home = tmp_path / "CoGeNT exe copy"
+    shutil.copytree(EXE_DIR, home)
+    fx = load_fixture("s2xx_40024")
+    shutil.rmtree(home / "data")
+    shutil.copytree(fx.data_dir, home / "data")
+    port = _free_port()
+    os.environ["QTWEBENGINE_REMOTE_DEBUGGING"] = f"127.0.0.1:{port}"
+    os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--disable-gpu"
+    app = Application(backend="uia").start(f'"{home / "CoGeNT.exe"}"', work_dir=str(home), timeout=60)
+    cdp = None
+    try:
+        win = app.window(title="CoGeNT")
+        win.wait("visible ready", timeout=120)
+        cdp = Cdp(port)
+        _on_page(cdp, "Tool_Index_Page.html")
+        cdp.eval(f"document.getElementById('file_path').value={json.dumps(fx.dbc.as_posix())};"
+                 f"document.getElementById('ch0_node_name').value={json.dumps(fx.node)};"
+                 "document.getElementById('form_submit').click(); true")
+        _dismiss_alert(win, "Database loaded successfully")
+        _on_page(cdp, "Tool_Index_Page.html")
+        cdp.eval("document.querySelector('a[href=\"BackEnd.Can_dbc0_msg\"]').click(); true")
+        _on_page(cdp, "CAN_DBC_msg.html")                # the signal page needs the saved message page
+        cdp.eval("document.getElementById('form_submit').click(); true")
+        _on_page(cdp, "Tool_Index_Page.html")
+        cdp.eval("document.querySelector('a[href=\"BackEnd.Can_dbc0_sig\"]').click(); true")
+        # the click runs right after this evaluation has answered (a native submit would navigate away)
+        press = ("(function () { if (!location.href.endsWith('/CAN_DBC_sig.html')) { return null; }"
+                 " var b = document.getElementById('form_submit'); if (!b) { return null; }"
+                 " setTimeout(function () { b.click(); }, 0); return document.readyState; })()")
+        deadline, state = time.time() + 300, None
+        while state is None and time.time() < deadline:
+            try:
+                state = cdp.eval(press)
+            except Exception:
+                pass
+        assert state == "loading", f"Save and Back was pressed with readyState {state!r}"
+        deadline, where = time.time() + 180, None
+        while time.time() < deadline:
+            try:
+                where = cdp.eval("location.href + ' ' + document.readyState")
+            except Exception:
+                pass
+            if where and (where.endswith("/Tool_Index_Page.html complete") or "BackEnd." in where
+                          or not where.startswith("file:")):
+                break
+            time.sleep(0.5)
+        assert where and where.endswith("/Tool_Index_Page.html complete"), f"after Save and Back: {where}"
+    finally:
+        if cdp:
+            cdp.close()
+        app.kill()
+        os.environ.pop("QTWEBENGINE_REMOTE_DEBUGGING", None)

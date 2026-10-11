@@ -40,16 +40,46 @@
     return function () { window[parts[0]][parts[1]].apply(null, arguments); };
   }
 
-  function linkBind(e) {
+  // Clicks and submits are handled at document level from the moment the document is created: a large
+  // page (the signal page is several MB) is shown and clickable long before it has loaded, and a click
+  // that reached the browser's default action would navigate to "BackEnd.<slot>" (ERR_FILE_NOT_FOUND).
+  var pendingForms = [];
+
+  function pageLoaded() {
+    return document.readyState === "complete";
+  }
+
+  window.addEventListener("load", function () {
+    // after every load handler (the pages fill their forms in onload), send what was submitted early
+    setTimeout(function () {
+      var forms = pendingForms; pendingForms = [];
+      forms.forEach(sendForm);
+    }, 0);
+  });
+
+  document.addEventListener("click", function (e) {
+    var anchor = e.target && e.target.closest ? e.target.closest("a") : null;
+    if (!anchor) { return; }
     e.preventDefault();
-    var anchor = e.currentTarget;
-    if (anchor.getAttribute("data-bind") !== "true") { return true; }
+    e.stopPropagation();
+    if (anchor.getAttribute("data-bind") !== "true") { return; }
     var slot = resolveSlot(anchor.getAttribute("href"));
-    if (!slot) { return false; }
+    if (!slot) { return; }
     var params = anchor.getAttribute("data-params");
     if (params !== null) { slot(params); } else { slot(); }
-    return false;
-  }
+  }, true);
+
+  document.addEventListener("submit", function (e) {
+    var form = e.target;
+    e.preventDefault();
+    e.stopPropagation();
+    if (!form || form.getAttribute("data-bind") !== "true") { return; }
+    if (pageLoaded()) {
+      sendForm(form);
+    } else if (pendingForms.indexOf(form) < 0) {
+      pendingForms.push(form);          // sent once, after the page has filled in its values
+    }
+  }, true);
 
   // QtWebKit (Qt 4.8), which the legacy tool ran on, returned checked ? "on" : "" for a
   // checkbox/radio without a value attribute; Chromium always returns "on". The saved
@@ -61,12 +91,9 @@
     return input.value;
   }
 
-  function formBind(e) {
-    e.preventDefault();
-    var form = e.currentTarget;
-    if (form.getAttribute("data-bind") !== "true") { return true; }
+  function sendForm(form) {
     var slot = resolveSlot(form.getAttribute("action"));
-    if (!slot) { return false; }
+    if (!slot) { return; }
     var formdata = {};
     for (var i = 0, ii = form.length; i < ii; ++i) {
       var input = form[i];
@@ -74,29 +101,9 @@
     }
     var params = form.getAttribute("data-params");
     if (params !== null) { slot(JSON.stringify(formdata), params); } else { slot(JSON.stringify(formdata)); }
-    return false;
-  }
-
-  function bindAll() {
-    var anchors = document.getElementsByTagName("a");
-    for (var i = anchors.length - 1; i >= 0; i--) {
-      if (!anchors[i].classList.contains("htmlpy-activated")) {
-        anchors[i].onclick = linkBind;
-        anchors[i].classList.add("htmlpy-activated");
-      }
-    }
-    var forms = document.getElementsByTagName("form");
-    for (var f = forms.length - 1; f >= 0; f--) {
-      if (!forms[f].classList.contains("htmlpy-activated")) {
-        forms[f].onsubmit = formBind;
-        forms[f].classList.add("htmlpy-activated");
-      }
-    }
   }
 
   document.addEventListener("DOMContentLoaded", function () {
-    bindAll();
-    new MutationObserver(bindAll).observe(document.body, { childList: true, subtree: true });
     document.body.classList.add("htmlPy-active");
   });
 })();
