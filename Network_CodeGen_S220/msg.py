@@ -1,6 +1,7 @@
 import sys,json
 import os
 from cogent_io import open_output, close_output
+import cogent_mux
 from py2compat import py2_print as print, Py2Dict  # Python 2 print/dict-order semantics
 dbc=None
 
@@ -61,6 +62,8 @@ def message_structure_generation(Dbc_Msg):
   vnim_cfg_file = open(msg_data_dir+"CanDbcMsgConfiguration.data",'r',encoding='utf-8')
   vnim_msg_cfg_data = json.loads(vnim_cfg_file.read())
   vnim_cfg_file.close()
+  # indexed multiplexed messages (cogent_mux): printed after the legacy multiplexed types
+  indexed = cogent_mux.layouts([m for m in Dbc_Msg if m.get('DIR') == 'rx'], vnim_msg_cfg_data)
   
   # function used to create a layout for each messages 
   structt=[]
@@ -193,10 +196,12 @@ def message_structure_generation(Dbc_Msg):
                   zero_occur=0
 
           structt.append(ms)    #structt is list contains the signal layout 
-        else:
+        elif mes['Msg_name'].upper() not in indexed:
           msg_struct_gen_multiplex(mes)
         
       
+  for lay in indexed.values():
+    print(cogent_mux.types(lay))
   cl=0
   struct_intel=[]
   l=[]
@@ -290,8 +295,8 @@ def _enable_key(mes, cfg):
   return None
 
 def find_unsupported_multiplex(dbc_obj, cfg):
-  """First enabled multiplexed message that msg_struct_gen_multiplex cannot generate:
-  (msg_name, multiplexor, problem), else None. Missing settings are left to the generator."""
+  """First enabled multiplexed message that CoGeNT cannot generate (neither the VCU5_500 layout nor
+  cogent_mux): (msg_name, multiplexor, problem), else None. Missing settings are left to the generator."""
   for direction in ('tx', 'rx'):
     for mes in sorted(dbc_obj.get_msg_type(all_parser, direction), key=lambda x: x['Msg_name']):
       if mes.get('Multiplex') != 'YES':
@@ -302,10 +307,10 @@ def find_unsupported_multiplex(dbc_obj, cfg):
           continue
       except KeyError:
         continue
-      mul_msg = dbc_obj.get_multiplex(mes['id'])
-      problem = multiplex_layout_problem(mes, mul_msg)
-      if problem:
-        return mes['Msg_name'], (mul_msg or {}).get('Multiplexor'), problem
+      try:
+        cogent_mux.classify(mes)            # legacy (VCU5_500 layout) or indexed: both are generated
+      except cogent_mux.OutOfScope as exc:
+        return mes['Msg_name'], exc.multiplexor, exc.problem
   return None
 
 def msg_struct_gen_multiplex(mes):

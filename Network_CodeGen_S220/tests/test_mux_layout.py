@@ -116,3 +116,14 @@ def test_flag_area_order_multiplexors_last():
     assert area[0] == ("BMS_CELLTEMP1", 0, 0x1) and area[7] == ("BMS_CELLTEMP8", 0, 0x80)
     assert area[8] == ("BMS_CELLVOLTAGE1", 1, 0x1)
     assert area[-2:] == [("BMS_CELLTEMP_INDEX", 2, 0x10), ("BMS_CELLVOLTAGE_INDEX", 2, 0x20)]
+
+
+def test_types_text_of_bms19():
+    from cogent_mux import types
+    text = types(layout(TEMPS))
+    assert "typedef struct {\n  CAN_UINT8 BMS_CELLTEMP1_0:8;" in text
+    assert "}BMS_CELLTEMP_INDEX_0_sigType;" in text
+    assert "typedef union \n{\n   CAN_UINT8          sig_buffer[6];\n   BMS_CELLTEMP_INDEX_0_sigType  " \
+           "bms_celltemp_index_0;" in text
+    assert "/* BMS19_100 */\ntypedef struct {\n  CAN_UINT8 BMS_CELLTEMP_INDEX:8;\n  CAN_UINT8 unused1:8;\n" \
+           "  BMS_CELLTEMP_DATA_Sigbuf  bms_celltemp_data;\n}BMS19_100_msgType;" in text

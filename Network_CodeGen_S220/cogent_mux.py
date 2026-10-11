@@ -112,18 +112,20 @@ def _fields(items, first, last):
 
 
 def _signals(mes):
+    roots = [n for n, d in mes['Sig_List'].items() if d.get('Mul_order') == 'root']
+    root = roots[0] if roots else None
+    if len(roots) > 1:
+        raise OutOfScope(mes['Msg_name'], root, 'it has more than one multiplexor (%s)' % ', '.join(roots))
     mux, sigs = None, []
     for name, d in mes['Sig_List'].items():
         order = d.get('Mul_order')
         if d['Order'] != 'Intel':
-            raise OutOfScope(mes['Msg_name'], None, 'signal %s is Motorola (big-endian); only Intel multiplexed '
+            raise OutOfScope(mes['Msg_name'], root, 'signal %s is Motorola (big-endian); only Intel multiplexed '
                              'messages are supported' % name)
         if order == 'root':
-            if mux is not None:
-                raise OutOfScope(mes['Msg_name'], mux.name, 'it has more than one multiplexor')
             mux = Signal(name, None, int(d['Endbit']), int(d['Len']))
         elif order is not None and not str(order).isdigit():
-            raise OutOfScope(mes['Msg_name'], None, 'it uses extended multiplexing (signal %s is multiplexed '
+            raise OutOfScope(mes['Msg_name'], root, 'it uses extended multiplexing (signal %s is multiplexed '
                              'and a multiplexor)' % name)
         else:
             sigs.append(Signal(name, int(order) if order is not None else None, int(d['Endbit']), int(d['Len'])))
@@ -249,3 +251,29 @@ def flag_area(lays):
     names = [s.name for lay in lays.values() for s in lay.signals if s is not lay.multiplexor] + \
         [lay.multiplexor.name for lay in lays.values()]
     return [(n, k // 8, 1 << (k % 8)) for k, n in enumerate(names)]
+
+
+# ---- nw_il_msg.h --------------------------------------------------------------------------------------
+def _struct(fields, type_name):
+    return ['typedef struct {'] + ['  CAN_UINT8 %s:%d;' % (f.name, f.width) for f in fields] + \
+        ['}%s;' % type_name, '']
+
+
+def types(lay):
+    """Index structs, the data union or frame union, and <MSG>_msgType."""
+    mux = lay.multiplexor.name
+    out = []
+    for i in lay.indexes:
+        out += _struct(lay.structs[i], '%s_%d_sigType' % (mux, i))
+    members = ['%s_%d_sigType  %s_%d;' % (mux, i, lay.mux_lower, i) for i in lay.indexes]
+    if lay.kind == 'data':
+        out += ['typedef union ', '{', '   CAN_UINT8          sig_buffer[%d];' % (lay.region[1] - lay.region[0] + 1)]
+        out += ['   ' + m for m in members] + ['}%s_Sigbuf;' % lay.group, '']
+        out += ['/* %s */' % lay.name, 'typedef struct {']
+        out += ['  %s_Sigbuf  %s;' % (lay.group, lay.group_lower) if f is None else
+                '  CAN_UINT8 %s:%d;' % (f.name, f.width) for f in lay.outer]
+    else:
+        out += ['/* %s */' % lay.name, 'typedef union {', '  CAN_UINT8 msgBuffer[%d];' % lay.dlc]
+        out += ['  ' + m for m in members]
+    out += ['}%s_msgType;' % lay.name, '']
+    return '\n'.join(out) + '\n'

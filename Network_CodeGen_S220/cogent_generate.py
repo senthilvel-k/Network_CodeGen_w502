@@ -180,9 +180,9 @@ def _check_inputs(dbc, node):
 def multiplex_error(msg_name, multiplexor, problem):
     return CogentError(
         "Code generation",
-        "message %s is multiplexed (multiplexor %s) and %s. CoGeNT can only generate multiplexed messages "
-        "laid out like VCU5_500: every multiplexed signal starts at bit 0 and the multiplexor is in byte 7"
-        % (msg_name, multiplexor, problem),
+        "message %s is multiplexed (multiplexor %s) and %s. CoGeNT generates multiplexed receive messages "
+        "with Intel signals of up to 32 bits, one multiplexor and a DLC of at most 8, and the VCU5_500 layout"
+        % (msg_name, multiplexor or "none", problem),
         item="generating nw_il_msg.h",
         hint="Untick the Rx enable box of %s in '%s' and press 'Save and Back', then press Generate code again. "
              "Generating this multiplex layout needs a generator extension (contact the tool maintainer)."

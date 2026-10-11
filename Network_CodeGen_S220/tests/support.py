@@ -68,6 +68,28 @@ def run_file(home, name):
     return latest_run(home) / cogent_generate.output_relpath(name)
 
 
+def enable_indexed(home, dbc, node="SMART_CORE", names=("BMS19_100", "BMS20_100"), notify="200ms_Delay_g1"):
+    """Enable receive messages and give their signals the settings the TX/RX signals page saves for new
+    signals (init value = DBC start value), with the notification group of the S2XX BMS signals."""
+    import sys
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    from Dbc_Parser import dbc_parser
+    data = Path(home) / "data"
+    msg_cfg = json.loads((data / "CanDbcMsgConfiguration.data").read_text(encoding="utf-8"))
+    sig_cfg = json.loads((data / "CanDbcSigConfiguration.data").read_text(encoding="utf-8"))
+    for mes in dbc_parser(str(dbc), node).get_msg_type("ALL", "rx"):
+        if mes["Msg_name"] in names:
+            msg_cfg[mes["Msg_name"] + "_rx_enable"] = "on"
+            for sig, d in mes["Sig_List"].items():
+                start = d.get("GenSigStartValue") or "0"
+                sig_cfg.update({sig + "_green_drive": "", sig + "_os_notify_no_of_events": notify,
+                                sig + "_rx_init_value": "0x%X" % int(float(start)),
+                                sig + "_signal_content": "", sig + "_signal_fault_id": ""})
+    (data / "CanDbcMsgConfiguration.data").write_text(json.dumps(msg_cfg), encoding="utf-8")
+    (data / "CanDbcSigConfiguration.data").write_text(json.dumps(sig_cfg), encoding="utf-8")
+
+
 def run_folder_count(home):
     import cogent_generate
     return len(cogent_generate.run_folders(str(Path(home) / "CODE_GEN")))

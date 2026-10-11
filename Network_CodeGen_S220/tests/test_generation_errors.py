@@ -80,7 +80,25 @@ def test_repeat_generation_gives_identical_files(home):
         assert normalize_date_by(run_file(home, f).read_bytes()) == normalize_date_by(first[f]), f
 
 
-def test_unsupported_multiplex_layout_is_explained_before_any_file_is_written(home):
+def test_unsupported_multiplexed_message_is_explained_before_any_file_is_written(home, tmp_path):
+    from cogent_errors import CogentError
+    _previous_outputs(home)
+    _edit(home, "CanDbcMsgConfiguration.data", lambda d: d.__setitem__("BMS19_100_rx_enable", "on"))
+    text = load_fixture(FIXTURE).dbc.read_text(encoding="latin-1")
+    dbc = tmp_path / "motorola" / load_fixture(FIXTURE).dbc.name
+    dbc.parent.mkdir()
+    dbc.write_text(text.replace("BMS_CellTemp9 m2 : 48|16@1+", "BMS_CellTemp9 m2 : 55|16@0+"), encoding="latin-1")
+    with pytest.raises(CogentError) as exc:
+        _generate(dbc)
+    text = exc.value.user_message()
+    _assert_user_friendly(text)
+    assert "BMS19_100" in text and "multiplex" in text.lower()
+    assert "BMS_CELLTEMP9" in text and "Motorola" in text
+    assert "TX/RX messages" in text and "VCU5_500" in text
+    _assert_previous_outputs_untouched(home)
+
+
+def test_enabled_multiplexed_message_without_signal_settings_names_the_setting(home):
     from cogent_errors import CogentError
     _previous_outputs(home)
     _edit(home, "CanDbcMsgConfiguration.data", lambda d: d.__setitem__("BMS19_100_rx_enable", "on"))
@@ -88,9 +106,7 @@ def test_unsupported_multiplex_layout_is_explained_before_any_file_is_written(ho
         _generate()
     text = exc.value.user_message()
     _assert_user_friendly(text)
-    assert "BMS19_100" in text and "multiplex" in text.lower()
-    assert "BMS_CELLTEMP" in text and "bit 16" in text
-    assert "TX/RX messages" in text
+    assert "BMS_CELLTEMP" in text and "TX/RX signals" in text
     _assert_previous_outputs_untouched(home)
 
 
