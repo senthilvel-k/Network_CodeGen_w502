@@ -1809,7 +1809,9 @@ def message_precopy():
 ''')
 
   for mes in il_sorted_mes_rx:
-    if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON'] and mes['Msg_name'].upper() not in indexed:
+    if mes['Msg_name'].upper() in indexed:      # printed after the loop (the closing braces below too)
+      continue
+    if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON']:
       sig_list =[]
       if mes['Multiplex'] == 'YES':
         mul_msg=dbc.get_multiplex(mes['id'])

@@ -141,3 +141,35 @@ def test_no_message_loss_case_for_indexed_messages(both):
     assert "VNIM_MSG_LOSS,VNIM_BMS19_100_MSGID" not in loss and "case VNIM_BMS20_100_MSGID:" not in loss
     assert "VNIM_MSG_LOSS,VNIM_BMS1_10_MSGID" in loss               # the other BMS messages keep theirs
     assert "VNIM_MSG_GAIN,VNIM_BMS19_100_MSGID" in v
+
+
+def _code(text):
+    """C text without comments, string and character literals."""
+    text = re.sub(r"/\*.*?\*/", " ", text, flags=re.S)
+    text = re.sub(r"//[^\n]*", " ", text)
+    return re.sub(r'"(?:\\.|[^"\\\n])*"|' + r"'(?:\\.|[^'\\\n])*'", " ", text)
+
+
+@pytest.mark.parametrize("name", ["nw_il_msg.h", "nw_il_par.h", "nw_il_par.c", "nw_vnim_app_signals_par.c",
+                                  "nw_vnim_app_signals_par.h", "nw_can_dll.h", "nw_nm_par.h"])
+def test_generated_code_has_balanced_braces(both, name):
+    for enable in (False, True):
+        code = _code(both[enable][name])
+        assert code.count("{") == code.count("}"), (name, enable, code.count("{"), code.count("}"))
+        assert code.count("(") == code.count(")"), (name, enable)
+
+
+def test_enabling_bms_keeps_every_other_function_unchanged(both):
+    """Every PreCopy / put / get function of the plain generation is in the BMS generation unchanged."""
+    def functions(text):
+        out, lines = {}, text.replace("\r", "").split("\n")
+        for i, line in enumerate(lines):
+            if re.match(r"^(void|CAN_UINT\d+) \w+ ?\((void|CAN_UINT\d+ data|CAN_UINT8 \* pData|"
+                        r"CAN_UINT8 const \* const pData)\)\s*$", line):
+                j = i + 1
+                while lines[j].rstrip() != "}":
+                    j += 1
+                out[line.strip()] = [l.strip() for l in lines[i:j + 1]]
+        return out
+    plain, bms = functions(both[False]["nw_il_par.c"]), functions(both[True]["nw_il_par.c"])
+    assert plain and all(bms.get(k) == v for k, v in plain.items())
