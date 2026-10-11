@@ -299,6 +299,66 @@ def preselect(plan_fn, config, candidates):
     return chosen, False
 
 
+def _dll_text(path):
+    with open(path, encoding='latin-1') as fh:
+        return fh.read().replace('\r', '')
+
+
+# ---- nw_can_dll.c dispatch code (hand-written; checked against the merged ID blocks) -----------
+def _blocks(groups_or_plan):
+    blocks = []
+    for g in groups_or_plan:
+        if isinstance(g, dict):   # fifo_plan.json entry
+            blocks.append((int(g["base"], 16), int(g["mask"], 16),
+                           {int(m["id"], 16): m["vnim_handle"] for m in g["members"]}))
+        else:                     # cogent_fifo.MergedGroup
+            blocks.append((g.base, g.block.mask,
+                           {int(m["id"]): "VNIM_%s_MESSAGE" % m["Msg_name"].upper() for m in g.members}))
+    return blocks
+
+
+def _region(text, start):
+    """Text of the brace block that starts after position start."""
+    i = text.find("{", start)
+    depth = 0
+    for j in range(i, len(text)):
+        depth += {"{": 1, "}": -1}.get(text[j], 0)
+        if depth == 0:
+            return text[i:j + 1]
+    return text[i:]
+
+
+def check_dispatch_code(nw_can_dll_c, groups_or_plan):
+    """Findings (strings) where DllDispatchReceivedMessage does not map every merged ID to its handle."""
+    text = re.sub(r"//[^\n]*", "", _dll_text(nw_can_dll_c))
+    findings = []
+    for base, mask, expected in _blocks(groups_or_plan):
+        cond = re.search(r"\(\s*\(\s*pRmd->Identifier\.I32\s*&\s*0x%Xu?\s*\)\s*==\s*0x%Xu?\s*\)" % (mask, base), text, re.I)
+        if not cond:
+            findings.append("0x%03X/0x%03X: no dispatch branch for this merged block in %s (expected a check "
+                            "'(pRmd->Identifier.I32 & 0x%03Xu) == 0x%03Xu')" % (base, mask, nw_can_dll_c, mask, base))
+            continue
+        region = _region(text, cond.end())
+        mapped = {}
+        for case_id, if_id, handle in re.findall(
+                r"(?:case\s*(0x[0-9A-Fa-f]+)u?\s*:|Identifier\.I32\s*==\s*(0x[0-9A-Fa-f]+)u?\s*\))\s*canFrameHandle\s*=\s*(\w+)", region):
+            mapped[int(case_id or if_id, 16)] = handle
+        default = re.search(r"\belse\s+canFrameHandle\s*=\s*(\w+)", region)
+        unmapped = [i for i in sorted(expected) if i not in mapped]
+        if default and len(unmapped) == 1:
+            mapped[unmapped[0]] = default.group(1)
+            unmapped = []
+        for i in unmapped:
+            findings.append("0x%03X/0x%03X: ID 0x%03X (%s) is not mapped in the dispatch branch" % (base, mask, i, expected[i]))
+        for i, handle in sorted(mapped.items()):
+            if i in expected and handle != expected[i]:
+                findings.append("0x%03X/0x%03X: ID 0x%03X is mapped to %s, expected %s" % (base, mask, i, handle, expected[i]))
+            elif i not in expected:
+                findings.append("0x%03X/0x%03X: ID 0x%03X is mapped to %s but is not received in this configuration"
+                                % (base, mask, i, handle))
+    return findings
+
+
 def dispatch_snippet(group):
     """C code for DllDispatchReceivedMessage (nw_can_dll.c) mapping every ID of a merged block."""
     base = group.base
@@ -393,10 +453,12 @@ def _entry(status, title, location, current, change, why, dependencies, steps, v
     return lines
 
 
-def manual_actions(plan, config, dbc_name, node, disabled_additional=(), generated_dir="CODE_GEN"):
+def manual_actions(plan, config, dbc_name, node, disabled_additional=(), generated_dir="CODE_GEN", dispatch=None):
     """(Markdown text, number of entries that need the user). No time stamps: the same inputs give
     the same file. disabled_additional: additional_rx_messages whose Rx enable is off on the page;
-    generated_dir: the run folder, named in the commands."""
+    generated_dir: the run folder, named in the commands; dispatch: (path, {block label: findings}) of the
+    nw_can_dll.c in your workspace (folder of the Re-apply edits page), None when it is not known."""
+    dll_path, dll_findings = dispatch or (None, {})
     CHECK = CHECK_COMMAND.format(gen=generated_dir)
     CARRY = CARRY_COMMAND.format(gen=generated_dir)
     counts = plan.fifo_counts()
@@ -415,16 +477,23 @@ def manual_actions(plan, config, dbc_name, node, disabled_additional=(), generat
         auto.append("- nw_can_dll.h: one dispatch entry for the block (0x%03X %s); entries of %s removed"
                     % (int(g.representative['id']), g.representative['Msg_name'],
                        ", ".join(m['Msg_name'] for m in g.members[1:]) or "no other message"))
+        if dll_path and dll_findings.get(g.block.label()) == []:
+            auto.append("- nw_can_dll.c of your workspace (`%s`) already maps every ID of the block %s to its VNIM "
+                        "handle: nothing to do" % (dll_path, g.block.label()))
     for name in config.additional_rx_messages:
         auto.append("- can_rxrule.cfg / nw_can_dll.h: receive rule and dispatch entry for %s (additional_rx_messages)" % name)
     actions = []
     for g in plan.groups:
+        findings = dll_findings.get(g.block.label()) if dll_path else None
+        if findings == []:
+            continue                                   # already correct in the workspace (AUTOMATIC list)
         ids = ", ".join("0x%03X %s" % (int(m['id']), m['Msg_name']) for m in g.members)
         actions += _entry(
             "MANUAL", "nw_can_dll.c dispatch for the merged block %s" % g.block.label(),
             "`nw_can_dll.c` (hand-written driver file, not generated), function `DllDispatchReceivedMessage`, "
             "inside the loop over `pRxDispatch[]`, before the generic identifier compare",
-            "not visible to CoGeNT (the file is in your workspace); tools\\compare_reference.py checks it",
+            ("not visible to CoGeNT (the file is in your workspace); tools\\compare_reference.py checks it"
+             if findings is None else "`%s` (your workspace, Re-apply edits page): %s" % (dll_path, "; ".join(findings))),
             ["every received ID of the block must select its own VNIM handle (%s). The dispatch table has only the "
              "entry for 0x%03X, so without this branch all of them would be handled as %s:"
              % (ids, int(g.representative['id']), g.representative['Msg_name']),
@@ -479,14 +548,17 @@ def manual_actions(plan, config, dbc_name, node, disabled_additional=(), generat
             "vnim.txrx.resource, nw_host_mgr_txrx.resource" % (name, name.upper()),
             ("CoGeNT generated no code for %s because its Rx enable is off on 'TX/RX messages'"
              % name) if disabled else ("%s is enabled on the page, so CoGeNT generated its code" % name),
-            ["add your hand-written code for %s to the files above (CoGeNT generates only its receive rule and "
-             "dispatch entry)." % name],
-            "CoGeNT generates multiplexed messages only in the VCU5_500 layout; this message needs a layout "
-            "that has not been specified for the generator.",
+            ["enable the Rx of %s so that CoGeNT generates its code (multiplexed messages included), or add your "
+             "hand-written code for %s to the files above (with the Rx enable off CoGeNT generates only its "
+             "receive rule and dispatch entry)." % (name, name)],
+            "with the Rx enable off CoGeNT does not generate the message; the receive rule is generated because "
+            "additional_rx_messages lists it.",
             "nw_can_dll.h of this generation refers to VNIM_%s_MESSAGE, so the build fails until the handle exists."
             % name.upper(),
-            ["Re-apply your previous hand edits with `%s` (it reports what could not be merged)." % CARRY,
-             "Review the merged files and copy them into your workspace.",
+            ["Recommended: open 'TX/RX messages', tick the Rx enable box of %s and press 'Save and Back'; set its "
+             "signals on 'TX/RX signals' (new signals are marked) and press Generate code again." % name,
+             "Or re-apply your previous hand edits with `%s` (it reports what could not be merged), review the "
+             "merged files and copy them into your workspace." % CARRY,
              "Build the project."],
             "the build succeeds; `%s` shows only the differences you expect." % CHECK)
     entries = sum(1 for line in actions if line.startswith("## "))

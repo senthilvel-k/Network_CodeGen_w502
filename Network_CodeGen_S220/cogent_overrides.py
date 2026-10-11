@@ -154,6 +154,13 @@ def _ms(entry, key, where, fail, minimum):
     return value
 
 
+def save(data_dir, overrides):
+    """Write the settings file (only the settings that are set; {} for none)."""
+    with open(os.path.join(data_dir, CONFIG_FILE), 'w', encoding='utf-8') as fh:
+        json.dump(to_dict(overrides), fh, indent=1)
+        fh.write("\n")
+
+
 def to_dict(overrides):
     """The settings file object of `overrides` (only the keys that are set)."""
     out = {}

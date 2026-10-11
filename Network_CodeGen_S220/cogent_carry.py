@@ -52,7 +52,7 @@ def _read(path):
     return raw.replace("\r\n", "\n"), ("\r\n" if "\r\n" in raw else "\n")
 
 
-def _find(root, name):
+def find_file(root, name):
     root = Path(root)
     if (root / name).is_file():
         return root / name, None
@@ -531,7 +531,7 @@ def dbc_messages(new_dir):
 
 def _hand_added_status(base_dir, edited_root, new_dir):
     """{message: 'now generated' | 'not in the DBC' | 're-applied'} and the region test for the first two."""
-    paths = (generated_path(base_dir, IL_PAR_H), _find(edited_root, IL_PAR_H)[0], generated_path(new_dir, IL_PAR_H))
+    paths = (generated_path(base_dir, IL_PAR_H), find_file(edited_root, IL_PAR_H)[0], generated_path(new_dir, IL_PAR_H))
     if None in paths:
         return {}, None
     base_h, edited_h, new_h = (_read(p)[0] for p in paths)
@@ -581,7 +581,7 @@ def carry_forward(base_dir, edited_root, new_dir, out_dir):
             results.append(res)
             continue
         new, eol = _read(new_path)
-        edited_path, why_edited = _find(edited_root, name)
+        edited_path, why_edited = find_file(edited_root, name)
         base_path = generated_path(base_dir, name)
         res["edited_path"] = str(edited_path) if edited_path else None
         base = edited = None

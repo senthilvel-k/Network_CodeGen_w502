@@ -116,6 +116,30 @@ Back without saving leaves the saved settings unchanged.
 Combined blocks change two generated files: `can_rxrule.cfg` (one rule with mask `0xC00007F0` for a 16-ID
 block) and `nw_can_dll.h` (one dispatch entry per block).
 
+## Code overrides
+
+Some project code is not described by the DBC. Earlier projects added it by hand after every generation; the
+Code overrides page makes CoGeNT generate it. Every section is optional: without rows the generated code is
+unchanged. Press Save; the settings are saved with the project (`data\CanOverrideConfiguration.data`, stored in
+configuration archives). Message names are checked against the loaded DBC when you save and when you generate
+code (an unknown name stops the generation and is named in the message).
+
+| Section | What it changes |
+|---|---|
+| Transmit messages | Attribute: the frame transmission attribute in `nw_il_par.h` (Event: no periodic transmission, the periodic pointer is NULL; empty: from the DBC send type). Period / offset (ms): the message's row of the periodic transmit table. Confirmation: `IL_TX_ATTR_TXC_NOTIFY` and the callbacks `Vnim_<MSG>_Conf` / `Vnim_<MSG>_PreCopy` with their extern declarations, as for a debounced signal; the function code is yours |
+| Receive timeouts | A timeout (ms) for a receive message the DBC gives no cycle time; it acts as the cycle time (receive timeout count, VNIM message loss and gain) |
+| NM transmit table | The entries of `NM_TX_MSG_DATA_STRUCT` in `nw_nm_par.h`, in order (comment, message ID, data buffer; handles `DLL_NUM_IL_TX_FRAMES+1`, `+2`, ...) |
+| Host forwarding | Receive messages whose name starts with the prefix call the function with their index (`VNIM_<MSG>`, defined in an "R E M M A C R O S" block of `nw_vnim_app_signals_par.c`) instead of `os_notify` when a signal changes |
+| Numeric order | For the name prefixes listed, numbered messages get their receive handles (`nw_il_par.h`) and VNIM message IDs (`nw_vnim_app_signals_par.h`) in numeric order (REM_MSG_2 before REM_MSG_10); every other list keeps the name order |
+
+The S2XX project uses: EX_SUMMARY_RESPONSE_0..3 Event with period and offset 0; MCM_SP Event with offset 0;
+MCM_WAKEUP Event; REM_ACK_MSG Periodic+Event; confirmation for IC10_200, IC11_500 and MCM4_1000; TC_NSM
+timeout 100; the NM entries MCM_WAKEUP (comment MCM_WAKEUP_REASON, buffer Nm_wakeup_buffer),
+IC_ACTIVE, MCM_ACTIVE, IS_ACTIVE and MCM_SLEEP (buffer Nm_msg_buffer); host forwarding REM_MSG_ to
+host_update_msg; numeric order REM_MSG_.
+
+Loading a configuration archive without Code overrides keeps your current ones (a note says so).
+
 ## Generate code
 
 Press Generate code on Home. CoGeNT checks the inputs, plans the receive rules and runs the generators into a

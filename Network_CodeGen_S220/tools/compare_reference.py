@@ -59,59 +59,8 @@ def normalized_lines(path):
     return [re.sub(r"\s+", " ", line).strip() for line in text.split("\n") if line.strip()]
 
 
-# ---- nw_can_dll.c dispatch code ------------------------------------------------------------------
-def _blocks(groups_or_plan):
-    blocks = []
-    for g in groups_or_plan:
-        if isinstance(g, dict):   # fifo_plan.json entry
-            blocks.append((int(g["base"], 16), int(g["mask"], 16),
-                           {int(m["id"], 16): m["vnim_handle"] for m in g["members"]}))
-        else:                     # cogent_fifo.MergedGroup
-            blocks.append((g.base, g.block.mask,
-                           {int(m["id"]): "VNIM_%s_MESSAGE" % m["Msg_name"].upper() for m in g.members}))
-    return blocks
-
-
-def _region(text, start):
-    """Text of the brace block that starts after position start."""
-    i = text.find("{", start)
-    depth = 0
-    for j in range(i, len(text)):
-        depth += {"{": 1, "}": -1}.get(text[j], 0)
-        if depth == 0:
-            return text[i:j + 1]
-    return text[i:]
-
-
-def check_dispatch_code(nw_can_dll_c, groups_or_plan):
-    """Findings (strings) where DllDispatchReceivedMessage does not map every merged ID to its handle."""
-    text = re.sub(r"//[^\n]*", "", _text(nw_can_dll_c))
-    findings = []
-    for base, mask, expected in _blocks(groups_or_plan):
-        cond = re.search(r"\(\s*\(\s*pRmd->Identifier\.I32\s*&\s*0x%Xu?\s*\)\s*==\s*0x%Xu?\s*\)" % (mask, base), text, re.I)
-        if not cond:
-            findings.append("0x%03X/0x%03X: no dispatch branch for this merged block in %s (expected a check "
-                            "'(pRmd->Identifier.I32 & 0x%03Xu) == 0x%03Xu')" % (base, mask, nw_can_dll_c, mask, base))
-            continue
-        region = _region(text, cond.end())
-        mapped = {}
-        for case_id, if_id, handle in re.findall(
-                r"(?:case\s*(0x[0-9A-Fa-f]+)u?\s*:|Identifier\.I32\s*==\s*(0x[0-9A-Fa-f]+)u?\s*\))\s*canFrameHandle\s*=\s*(\w+)", region):
-            mapped[int(case_id or if_id, 16)] = handle
-        default = re.search(r"\belse\s+canFrameHandle\s*=\s*(\w+)", region)
-        unmapped = [i for i in sorted(expected) if i not in mapped]
-        if default and len(unmapped) == 1:
-            mapped[unmapped[0]] = default.group(1)
-            unmapped = []
-        for i in unmapped:
-            findings.append("0x%03X/0x%03X: ID 0x%03X (%s) is not mapped in the dispatch branch" % (base, mask, i, expected[i]))
-        for i, handle in sorted(mapped.items()):
-            if i in expected and handle != expected[i]:
-                findings.append("0x%03X/0x%03X: ID 0x%03X is mapped to %s, expected %s" % (base, mask, i, handle, expected[i]))
-            elif i not in expected:
-                findings.append("0x%03X/0x%03X: ID 0x%03X is mapped to %s but is not received in this configuration"
-                                % (base, mask, i, handle))
-    return findings
+# ---- nw_can_dll.c dispatch code (in cogent_fifo, also used for MANUAL_ACTIONS.md) -----------------
+from cogent_fifo import check_dispatch_code  # noqa: E402,F401
 
 
 # ---- report ----------------------------------------------------------------------------------------

@@ -146,3 +146,11 @@ def test_receive_timeout_acts_as_the_dbc_cycle_time():
     co.activate(co.from_dict({"rx": {"tc_nsm": {"timeout": 100}, "TC_NSM_TX": {"timeout": 5}}}))
     co.apply_messages(messages)
     assert [messages[k]["GenMsgCycleTime"] for k in "123"] == ["100", "0", "10"]
+
+
+def test_save_writes_only_the_settings_that_are_set(tmp_path):
+    co.save(str(tmp_path), co.from_dict(FULL))
+    assert co.load(str(tmp_path)) == co.from_dict(FULL)
+    co.save(str(tmp_path), co.Overrides())
+    assert json.loads((tmp_path / co.CONFIG_FILE).read_text(encoding="utf-8")) == {}
+    assert co.load(str(tmp_path)).empty()

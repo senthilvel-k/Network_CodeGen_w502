@@ -10,6 +10,7 @@ import cogent_carry
 import cogent_fifo
 import cogent_generate
 import cogent_help
+import cogent_overrides
 import cogent_project
 from cogent_errors import CogentError, MSG_PAGE, SIG_PAGE, log_failure
 
@@ -32,6 +33,15 @@ def _fifo_note(archive_names):
     if 'data/' + cogent_fifo.CONFIG_FILE in archive_names or not os.path.isfile(current):
         return ""
     return "This archive has no Receive FIFO settings; your current Receive FIFO settings were kept.\n"
+
+
+def _overrides_note(archive_names):
+    """Archives without Code overrides keep the current ones (they belong to the project, like the
+    Receive FIFO settings). Returns a note for the user."""
+    current = os.path.join('.', 'data', cogent_overrides.CONFIG_FILE)
+    if 'data/' + cogent_overrides.CONFIG_FILE in archive_names or not os.path.isfile(current):
+        return ""
+    return "This archive has no Code overrides; your current Code overrides were kept.\n"
 
 
 STYL_LINK = """<link rel="stylesheet" href="{{'styl.css'|staticfile }}">"""
@@ -170,7 +180,7 @@ class BackEnd(htmlPy.Object):
                     raise CogentError(op, "%s is a zip archive but not a CoGeNT configuration archive (data/dbc_details.data is missing)" % file_val,
                                       item=item, hint=hint)
                 dbc_details = json.loads(zip1.read('data/dbc_details.data').decode('utf-8'))
-                fifo_note = _fifo_note(zip1.namelist())
+                fifo_note = _fifo_note(zip1.namelist()) + _overrides_note(zip1.namelist())
                 zip1.extractall()
         except CogentError as err:
             self._fail(op, err)
@@ -308,7 +318,7 @@ class BackEnd(htmlPy.Object):
         self._alert("Database loaded successfully")
 
     # ---- Re-apply edits ----------------------------------------------------------------------------
-    REAPPLY_FILE = 'ReapplyEdits.data'
+    REAPPLY_FILE = cogent_generate.REAPPLY_SETTINGS
 
     def _reapply_paths(self):
         saved = {}
@@ -436,6 +446,55 @@ class BackEnd(htmlPy.Object):
         self.default_page()
         return ""
 
+
+    # ---- Code overrides ----------------------------------------------------------------------------
+    def _message_names(self):
+        dbc = cogent_project.cached_dbc(self.__dbc, self.__node)
+        return {d: sorted(m['Msg_name'].upper() for m in dbc.get_msg_type('ALL', d)) for d in ('tx', 'rx')}
+
+    def _overrides_render(self, settings=None, error=None, saved=False):
+        ctx = self._context("overrides")
+        if settings is None:
+            try:
+                settings = cogent_overrides.to_dict(cogent_overrides.load(self.__data_dir))
+            except cogent_overrides.OverrideConfigError as exc:
+                settings, error = {}, "The saved Code overrides could not be read (%s). Save writes new settings." % exc
+        names = self._message_names()
+        ctx.update(settings_json=script_json(settings if isinstance(settings, dict) else {}),
+                   tx_json=script_json(names['tx']), rx_json=script_json(names['rx']), error=error, saved=saved)
+        app.template = ("Overrides.html", ctx)
+
+    @htmlPy.Slot()
+    def overrides_page(self):
+        if self.__load != 0:
+            self._not_loaded("Opening the Code overrides page")
+            return
+        try:
+            self._overrides_render()
+        except Exception as exc:
+            self._fail("Opening the Code overrides page", exc, item="reading the messages of the loaded DBC",
+                       hint="Press 'Load DBC' again; if it persists, send logs\\cogent.log to the tool maintainer.")
+
+    @htmlPy.Slot(str, result=str)
+    def overrides_save(self, json_data):
+        raw = None
+        try:
+            raw = json.loads(json_data)
+            overrides = cogent_overrides.from_dict(raw, "Code overrides page")
+            names = self._message_names()
+            problems = cogent_overrides.check_names(overrides, set(names['tx']), set(names['rx']))
+            if problems:
+                raise cogent_overrides.OverrideConfigError("; ".join(problems))
+            cogent_overrides.save(self.__data_dir, overrides)
+        except ValueError as exc:            # OverrideConfigError and JSON errors: name the entry, keep the page
+            self._overrides_render(raw, error="Nothing was saved: %s." % str(exc).replace("Code overrides page: ", "").rstrip("."))
+            return ""
+        except OSError as exc:
+            self._fail("Saving the Code overrides", exc, item="writing data\\" + cogent_overrides.CONFIG_FILE,
+                       hint="Check that the data folder of the tool is writable, then press Save again.")
+            return ""
+        self._overrides_render(saved=True)
+        return ""
 
     #code generate button callback
     @htmlPy.Slot()

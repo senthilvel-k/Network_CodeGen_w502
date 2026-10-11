@@ -183,6 +183,14 @@ def test_loading_an_archive_without_fifo_settings_keeps_the_current_ones(home):
     assert not (home / "data" / "CanFifoConfiguration.data.previous").exists()
 
 
+def test_loading_an_archive_without_code_overrides_keeps_the_current_ones(home):
+    import back_end
+    assert back_end._overrides_note(["data/dbc_details.data"]) == ""          # none saved: nothing to say
+    (home / "data" / "CanOverrideConfiguration.data").write_text('{"numeric_order": ["REM_MSG_"]}', encoding="utf-8")
+    assert "Code overrides were kept" in back_end._overrides_note(["data/dbc_details.data"])
+    assert back_end._overrides_note(["data/dbc_details.data", "data/CanOverrideConfiguration.data"]) == ""
+
+
 def test_loading_an_archive_with_fifo_settings_needs_no_note(home):
     import back_end
     _fifo_config(home, REFERENCE_CONFIG)
@@ -199,3 +207,51 @@ def test_enabled_additional_message_needs_no_manual_action(home):
     assert "interaction-layer and VNIM code for BMS19_100" not in report
     assert "## REVIEW: additional_rx_messages lists BMS19_100" in report
     assert result.fifo_counts == (64, 64, 56)        # the same rules as through additional_rx_messages
+
+
+def _report(home):
+    return (latest_run(home) / "MANUAL_ACTIONS.md").read_text(encoding="utf-8")
+
+
+def _entry_of(report, heading):
+    start = report.index(heading)
+    return report[start:report.index("\n## ", start + 4)]
+
+
+def test_disabled_additional_message_says_how_to_generate_it(home):
+    _fifo_config(home, REFERENCE_CONFIG)
+    _generate()
+    entry = _entry_of(_report(home), "## MANUAL: interaction-layer and VNIM code for BMS19_100")
+    assert "VCU5_500" not in entry
+    assert "tick the Rx enable box of BMS19_100" in entry and "generates its code" in entry
+
+
+def _workspace_dll(home, text):
+    """A workspace folder with nw_can_dll.c, chosen as 'Your workspace' on the Re-apply edits page."""
+    ws = home.parent / "workspace"
+    (ws / "src").mkdir(parents=True, exist_ok=True)
+    (ws / "src" / "nw_can_dll.c").write_text(text, encoding="latin-1")
+    (home / "data" / "ReapplyEdits.data").write_text(json.dumps({"base": "", "edited": str(ws)}), encoding="utf-8")
+    return ws / "src" / "nw_can_dll.c"
+
+
+def test_dispatch_of_the_workspace_is_checked(home):
+    import re
+    _fifo_config(home, REFERENCE_CONFIG)
+    first = _generate()
+    snippets = re.findall(r"```c\n(.*?)\n```", _report(home), re.S)
+    assert len(snippets) == 2
+    dll = _workspace_dll(home, "void DllDispatchReceivedMessage(void)\n{\n" + "\n".join(snippets) + "\n}\n")
+    second = _generate()
+    report = _report(home)
+    assert second.manual_actions == first.manual_actions - 2
+    assert "## MANUAL: nw_can_dll.c dispatch" not in report
+    assert report.count("already maps every ID of the block") == 2 and str(dll) in report
+    dll.write_text(dll.read_text(encoding="latin-1").replace(
+        "case 0x3D2u: canFrameHandle = VNIM_BMS11_100_MESSAGE; break;", ""), encoding="latin-1")
+    third = _generate()
+    report = _report(home)
+    assert third.manual_actions == first.manual_actions - 1
+    entry = _entry_of(report, "## MANUAL: nw_can_dll.c dispatch for the merged block 0x3D0-0x3DF")
+    assert "ID 0x3D2 (VNIM_BMS11_100_MESSAGE) is not mapped" in entry and str(dll) in entry
+    assert report.count("already maps every ID of the block") == 1

@@ -49,6 +49,7 @@ PLAN = [
 GENERATED_FILES = [f for _, funcs in PLAN for _, files in funcs for f in files]
 FIFO_PLAN = "fifo_plan.json"
 MANUAL_ACTIONS = "MANUAL_ACTIONS.md"
+REAPPLY_SETTINGS = "ReapplyEdits.data"     # folders of the Re-apply edits page (data folder)
 REPORT_FILES = [FIFO_PLAN, MANUAL_ACTIONS]
 
 # Where each file lives in the S2XX repository (dc.app.scl.vehiclecomm), relative to its root.
@@ -280,11 +281,32 @@ def _dbc_messages(dbc, node):
     return sorted({m['Msg_name'] for direction in ('rx', 'tx') for m in parser.get_msg_type('ALL', direction)})
 
 
+def _workspace_dispatch(plan):
+    """(path, {block label: findings}) for the nw_can_dll.c of the workspace folder chosen on the Re-apply
+    edits page, checked against the merged ID blocks; None when there is none."""
+    import cogent_carry
+    try:
+        with open(os.path.join(DATA_DIR, REAPPLY_SETTINGS), encoding='utf-8') as fh:
+            folder = json.load(fh).get('edited') or ''
+    except (OSError, ValueError, AttributeError):
+        return None
+    if not plan.groups or not os.path.isdir(folder):
+        return None
+    path = cogent_carry.find_file(folder, 'nw_can_dll.c')[0]
+    if path is None:
+        return None
+    try:
+        return str(path), {g.block.label(): cogent_fifo.check_dispatch_code(path, [g]) for g in plan.groups}
+    except OSError:
+        return None
+
+
 def _write_reports(plan, config, dbc, node, msg_cfg, run_dir):
     """fifo_plan.json and MANUAL_ACTIONS.md of the run (staged with the generated files)."""
     disabled = [n for n in config.additional_rx_messages
                 if msg_cfg.get(n.upper() + '_rx_enable') not in ('on', 'ON', 'On', 1, '1')]
-    text, entries = cogent_fifo.manual_actions(plan, config, os.path.basename(dbc), node, disabled, run_dir)
+    text, entries = cogent_fifo.manual_actions(plan, config, os.path.basename(dbc), node, disabled, run_dir,
+                                               _workspace_dispatch(plan))
     with open(os.path.join(STAGING_DIR, MANUAL_ACTIONS), 'w', encoding='utf-8') as fh:
         fh.write(text)
     with open(os.path.join(STAGING_DIR, FIFO_PLAN), 'w', encoding='utf-8') as fh:
