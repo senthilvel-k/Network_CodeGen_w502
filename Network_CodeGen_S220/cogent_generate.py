@@ -247,6 +247,12 @@ def _check_generated_rules(plan):
                                "CODE_GEN\\errorlog.txt to the tool maintainer.")
 
 
+def _dbc_messages(dbc, node):
+    from Dbc_Parser import dbc_parser
+    parser = dbc_parser(dbc, node)
+    return sorted({m['Msg_name'] for direction in ('rx', 'tx') for m in parser.get_msg_type('ALL', direction)})
+
+
 def _write_reports(plan, config, dbc, node, msg_cfg, run_dir):
     """fifo_plan.json and MANUAL_ACTIONS.md of the run (staged with the generated files)."""
     disabled = [n for n in config.additional_rx_messages
@@ -255,7 +261,9 @@ def _write_reports(plan, config, dbc, node, msg_cfg, run_dir):
     with open(os.path.join(STAGING_DIR, MANUAL_ACTIONS), 'w', encoding='utf-8') as fh:
         fh.write(text)
     with open(os.path.join(STAGING_DIR, FIFO_PLAN), 'w', encoding='utf-8') as fh:
-        json.dump(cogent_fifo.plan_summary(plan, config), fh, indent=1)
+        summary = cogent_fifo.plan_summary(plan, config)
+        summary["dbc_messages"] = _dbc_messages(dbc, node)      # read by Re-apply edits
+        json.dump(summary, fh, indent=1)
         fh.write("\n")
     return entries
 
