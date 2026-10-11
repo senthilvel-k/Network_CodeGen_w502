@@ -110,6 +110,25 @@ S2XX_OVERRIDES = {
 }
 
 
+S2XX_FIFO = {"merge_blocks": [{"base": "0x3D0", "mask": "0x7F0"}, {"base": "0x4F0", "mask": "0x7F0"}],
+             "additional_rx_messages": ["BMS19_100", "BMS20_100"]}
+
+
+def s2xx_max_match(home, dbc, node="SMART_CORE"):
+    """Settings that reproduce the S2XX workspace: BMS19_100 / BMS20_100 enabled (cell temperatures typed as
+    0x1F4, as in the workspace), Tx debounce on REMOTE_HV_CONNECT_REQ_TGU instead of CHARGING_ON_OFF_REQ,
+    the Receive FIFO blocks (when none are saved) and the Code overrides."""
+    enable_indexed(home, dbc, node)
+    data = Path(home) / "data"
+    sig = json.loads((data / "CanDbcSigConfiguration.data").read_text(encoding="utf-8"))
+    sig.update({"BMS_CELLTEMP%d_rx_init_value" % k: "0x1F4" for k in range(1, 33)})
+    sig.update({"CHARGING_ON_OFF_REQ_tx_debounce": "", "REMOTE_HV_CONNECT_REQ_TGU_tx_debounce": "on"})
+    (data / "CanDbcSigConfiguration.data").write_text(json.dumps(sig), encoding="utf-8")
+    if not (data / "CanFifoConfiguration.data").exists():
+        (data / "CanFifoConfiguration.data").write_text(json.dumps(S2XX_FIFO, indent=1), encoding="utf-8")
+    (data / "CanOverrideConfiguration.data").write_text(json.dumps(S2XX_OVERRIDES, indent=1), encoding="utf-8")
+
+
 def run_folder_count(home):
     import cogent_generate
     return len(cogent_generate.run_folders(str(Path(home) / "CODE_GEN")))
