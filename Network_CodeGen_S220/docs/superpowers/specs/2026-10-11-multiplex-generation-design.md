@@ -172,8 +172,8 @@ Generating the 40024 configuration with BMS19_100 and BMS20_100 enabled reproduc
 4. BMS20_100 signals are in the on-fail initialisation list (missing in the hand code).
 5. `ILRxPut_BMS_CELLVOLTAGE26` / `32` store the upper 8 bits shifted by 2 (the signal starts at bit 14:
    2 + 8 bits); the hand code shifts by 3 (found while implementing).
-6. Message-loss cases for BMS19_100 / BMS20_100 (node timeout flag, on-fail values, `VNIM_MSG_LOSS`), as
-   for every other message; the hand code has only the message-gain cases (found while implementing).
+6. (Removed at the user's request, 2026-10-11: indexed messages get no message-loss case, as in the hand
+   code; they keep the message-gain case.)
 7. The all-frames IPCL case (`ALL_RX_FRAME_IPCL_INDEX`) sets the BMS19_100 / BMS20_100 multiplexor flags, as
    for every other message (missing in the hand code; found while implementing).
 8. `vnim_msg_byte_position` / `vnim_msg_bit_mask` have one entry per message (hand code: 192 for 193).

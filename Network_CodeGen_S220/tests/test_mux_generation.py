@@ -131,3 +131,13 @@ def test_init_list_appended_multiplexor_first(both):
 def test_no_per_signal_application_macros(both):
     assert "VNIM_IS_BMS_CELLTEMP1_MISSING" not in both[True]["nw_vnim_app_signals_par.h"]
     assert "VNIM_IS_BMS_CELLTEMP1_MISSING" not in both[True]["nw_vnim_app_signals_par.c"]
+
+
+def test_no_message_loss_case_for_indexed_messages(both):
+    """As in the S2XX hand code (user decision 2026-10-11): BMS19_100/BMS20_100 keep the message-gain case
+    but get no message-loss case."""
+    v = both[True]["nw_vnim_app_signals_par.c"]
+    loss = _function(v, "static void vnim_message_loss(unsigned8 msg_id)")
+    assert "VNIM_MSG_LOSS,VNIM_BMS19_100_MSGID" not in loss and "case VNIM_BMS20_100_MSGID:" not in loss
+    assert "VNIM_MSG_LOSS,VNIM_BMS1_10_MSGID" in loss               # the other BMS messages keep theirs
+    assert "VNIM_MSG_GAIN,VNIM_BMS19_100_MSGID" in v

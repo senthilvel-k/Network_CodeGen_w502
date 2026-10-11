@@ -1027,7 +1027,9 @@ void vnim_message_monitoring_periodic(void)
       if mes.upper() != rx_node_cfg[node].upper():
         if timeout_msg[mes] == 'YES':
           indexCount += 1;
-          print('      case VNIM_'+mes.upper()+'_MSGID:')            
+          if mes.upper() in indexed:      # indexed multiplexed messages: no message-loss case (S2XX hand code)
+            continue
+          print('      case VNIM_'+mes.upper()+'_MSGID:')
           print('         if(('+node+'_node_cfg_st == CF_OPT_'+node+'_PRSNT) && ('+mes.upper()+'_FC_cfg_st == TRUE))')
           print('         {')
           if timeout_msg_cnt[node] <=8:

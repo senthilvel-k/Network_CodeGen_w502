@@ -45,10 +45,6 @@ INTENDED = {
         ("extra", r"ILSet_BMS_CELLVOLTAGE_INDEX_DataChanged\(\);", 2, "3, 7 all-frames case"),
         ("extra", r"NM_MSG_MISSING\(VNIM_BMS20_100_MSGID\);", 1, "3"),
         ("missing", r"NM_MSG_MISSING\(VNIM_BMS19_100_MSGID\);", 1, "3"),
-        ("extra", r"Vnim_BMS_Timeout_flag\|=\(unsigned32\)VNIM_BMS(19|20)_100_MSGID_BIT;", 2, "6 message loss"),
-        ("extra", r"caseVNIM_BMS(19|20)_100_MSGID:", 2, "6"),
-        ("extra", r"if\(\(BMS_node_cfg_st==CF_OPT_BMS_PRSNT\)&&\(BMS(19|20)_100_FC_cfg_st==TRUE\)\)", 2, "6"),
-        ("extra", r"vnim_dtc_log\(NM_BMS_NODE,VNIM_MSG_LOSS,VNIM_BMS(19|20)_100_MSGID\);", 2, "6"),
     ],
 }
 
