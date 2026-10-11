@@ -204,3 +204,28 @@ multiplexed signal overlapping a fixed signal.
   guarded by the golden tests.
 - The hand code may contain a message-level item the generator adds or lacks; the reference test finds it,
   and it is handled under section 9.
+
+## 14. Re-apply edits once the messages are generated (added 2026-10-11 on request)
+
+Request: "make sure these hand edits won't ruin the generated code ... if the DBC doesn't have BMS19 or 20
+no need to have them".
+
+- A *hand-added message* is a receive message with a `VNIM_<MSG>_MESSAGE` handle in the edited
+  `nw_il_par.h` but not in the previous generation (today BMS19_100, BMS20_100).
+- New generation has the message (it is enabled and generated): its hand code is not re-applied - the
+  generated code is kept. Edit regions that only concern such a message (its name, its signals, the
+  multiplex flag area) are left out of the merge; `IL_RX_NUM_*` keeps the new value plus only the user's
+  other changes (the message is not counted twice); `IL_MUX_MSG_OFFSET_ID` and
+  `IL_NUM_OF_RX_DATA_CHANGED_FLAG` come from the new generation. Report: "now generated".
+- The new DBC does not contain the message: its hand code is not re-applied. Report: "not in the DBC".
+- The new DBC contains it but its Rx enable is off: re-applied as today; the report says that enabling it
+  lets CoGeNT generate it.
+- All other hand edits (NM transmit table, Tx overrides, Tx confirmation callbacks, REM order and macros,
+  TC_NSM, CRANK_COUNT) are re-applied as today.
+- Checks after the merge: no definition doubled or missing, no reference to a message without a handle,
+  table sizes, handle order (existing checks), plus: every hand-added message is either generated, left
+  out, or re-applied - never two copies.
+- Test with the real case (local): previous generation `CODE_GEN\DBC_40024`, the workspace, new generation
+  41490 with BMS19_100/BMS20_100 enabled: the result contains the generated BMS code once (section 9
+  corrections included), all other hand edits, and passes every check. And 41490 with a DBC copy without
+  BMS19_100/BMS20_100: no BMS code at all.
