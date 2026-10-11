@@ -5,7 +5,8 @@ import sys
 
 import pytest
 
-from support import CODE_FILES, LEGACY_REFS, ROOT, load_fixture, normalize_date_by, normalize_header
+from support import (CODE_FILES, LEGACY_REFS, ROOT, load_fixture, normalize_date_by, normalize_header,
+                     run_file, run_folder_count)
 
 sys.path.insert(0, str(ROOT))
 
@@ -49,6 +50,7 @@ def _assert_previous_outputs_untouched(home):
     for f in CODE_FILES:
         assert (home / "CODE_GEN" / f).read_text(encoding="utf-8") == "previous " + f, f
     assert not (home / "CODE_GEN" / ".staging").exists()
+    assert run_folder_count(home) == 0                            # a failed run creates no run folder
 
 
 def _assert_user_friendly(text):
@@ -64,17 +66,18 @@ def test_generation_writes_all_files_identical_to_legacy_run(home):
     assert written.fifo_counts == (64, 64, 81) and written.manual_actions == 0
     legacy = LEGACY_REFS[FIXTURE][0]
     for f in CODE_FILES:
-        assert normalize_header((home / "CODE_GEN" / f).read_bytes()) == normalize_header((legacy / f).read_bytes()), f
+        assert normalize_header(run_file(home, f).read_bytes()) == normalize_header((legacy / f).read_bytes()), f
     assert not (home / "CODE_GEN" / "errorlog.txt").exists()      # stale log removed after success
     assert not (home / "CODE_GEN" / ".staging").exists()
 
 
 def test_repeat_generation_gives_identical_files(home):
     _generate()
-    first = {f: (home / "CODE_GEN" / f).read_bytes() for f in CODE_FILES}
+    first = {f: run_file(home, f).read_bytes() for f in CODE_FILES}
     _generate()
+    assert run_folder_count(home) == 2                            # the second run gets its own folder
     for f in CODE_FILES:
-        assert normalize_date_by((home / "CODE_GEN" / f).read_bytes()) == normalize_date_by(first[f]), f
+        assert normalize_date_by(run_file(home, f).read_bytes()) == normalize_date_by(first[f]), f
 
 
 def test_unsupported_multiplex_layout_is_explained_before_any_file_is_written(home):
@@ -148,14 +151,18 @@ def test_missing_dbc_file_is_named(home):
     assert "DBC file not found" in text and str(missing) in text
 
 
-def test_output_file_locked_by_another_program_is_named(home):
+def test_run_folder_that_cannot_be_created_is_explained(home, monkeypatch):
     from cogent_errors import CogentError
-    _generate()
-    with open(home / "CODE_GEN" / "nw_il_par.c", "rb"):         # e.g. open in an editor that locks it
-        with pytest.raises(CogentError) as exc:
-            _generate()
+    import cogent_generate
+
+    def denied(target):
+        raise PermissionError(13, "Access is denied", target)
+    monkeypatch.setattr(cogent_generate, "write_config_archive", denied)
+    with pytest.raises(CogentError) as exc:
+        _generate()
     text = exc.value.user_message()
-    assert "nw_il_par.c" in text and "close" in text.lower()
+    assert "could not be created" in text and "CODE_GEN" in text and "writable" in text
+    assert run_folder_count(home) == 0
 
 
 def test_unexpected_error_is_reported_without_traceback_and_logged(home, monkeypatch):

@@ -360,7 +360,7 @@ def overflow_hint(plan, config):
     if candidates:
         lines.append("- Receive an aligned ID block through one rule: add it to merge_blocks in data\\%s, e.g. %s. "
                      "Candidates (same layer and DLC): %s. Each merged block needs matching dispatch code in "
-                     "nw_can_dll.c; CoGeNT writes it to CODE_GEN\\MANUAL_ACTIONS.md."
+                     "nw_can_dll.c; CoGeNT writes it to MANUAL_ACTIONS.md of the generation."
                      % (CONFIG_FILE,
                         json.dumps({"merge_blocks": [{"base": "0x%03X" % g.base, "mask": "0x%03X" % g.block.mask}
                                                      for g in candidates[:2]]}),
@@ -373,10 +373,10 @@ def overflow_hint(plan, config):
 
 
 # ---- Manual Action Required report (CODE_GEN/MANUAL_ACTIONS.md) -----------------------------------
-CHECK_COMMAND = (r".venv\Scripts\python.exe tools\compare_reference.py --generated CODE_GEN "
-                 r"--reference <your workspace> --plan CODE_GEN\fifo_plan.json")
+CHECK_COMMAND = (r".venv\Scripts\python.exe tools\compare_reference.py --generated {gen} "
+                 r"--reference <your workspace> --plan {gen}\fifo_plan.json")
 CARRY_COMMAND = (r".venv\Scripts\python.exe tools\carry_forward.py --base <generated files your edits started from> "
-                 r"--edited <your workspace> --new CODE_GEN --out <new folder>")
+                 r"--edited <your workspace> --new {gen} --out <new folder>")
 
 
 def _entry(status, title, location, current, change, why, dependencies, steps, verification):
@@ -393,9 +393,12 @@ def _entry(status, title, location, current, change, why, dependencies, steps, v
     return lines
 
 
-def manual_actions(plan, config, dbc_name, node, disabled_additional=()):
+def manual_actions(plan, config, dbc_name, node, disabled_additional=(), generated_dir="CODE_GEN"):
     """(Markdown text, number of entries that need the user). No time stamps: the same inputs give
-    the same file. disabled_additional: additional_rx_messages whose Rx enable is off on the page."""
+    the same file. disabled_additional: additional_rx_messages whose Rx enable is off on the page;
+    generated_dir: the run folder, named in the commands."""
+    CHECK = CHECK_COMMAND.format(gen=generated_dir)
+    CARRY = CARRY_COMMAND.format(gen=generated_dir)
     counts = plan.fifo_counts()
     out = ["# Manual actions after code generation", "",
            "DBC: `%s`  " % dbc_name, "Node: `%s`  " % node,
@@ -435,7 +438,7 @@ def manual_actions(plan, config, dbc_name, node, disabled_additional=()):
              "Keep the `default:` branch: frames the merged rule accepts but no message uses must not be dispatched.",
              "Build the project."],
             "`%s` reports \"All merged IDs are mapped correctly\"; on the target, send each ID once and check that its "
-            "VNIM message (not %s) is updated." % (CHECK_COMMAND, g.representative['Msg_name']))
+            "VNIM message (not %s) is updated." % (CHECK, g.representative['Msg_name']))
     for g in plan.groups:
         extra = [m for b, m in plan.unreceived_in_blocks if b == g.block]
         known = {int(m['id']) for m in g.members} | {int(m['id']) for m in extra}
@@ -470,10 +473,10 @@ def manual_actions(plan, config, dbc_name, node, disabled_additional=()):
             "that has not been specified for the generator.",
             "nw_can_dll.h of this generation refers to VNIM_%s_MESSAGE, so the build fails until the handle exists."
             % name.upper(),
-            ["Re-apply your previous hand edits with `%s` (it reports what could not be merged)." % CARRY_COMMAND,
+            ["Re-apply your previous hand edits with `%s` (it reports what could not be merged)." % CARRY,
              "Review the merged files and copy them into your workspace.",
              "Build the project."],
-            "the build succeeds; `%s` shows only the differences you expect." % CHECK_COMMAND)
+            "the build succeeds; `%s` shows only the differences you expect." % CHECK)
     entries = sum(1 for line in actions if line.startswith("## "))
     if entries == 0:
         out += ["No manual action is required for the receive rules.", ""]
@@ -482,7 +485,7 @@ def manual_actions(plan, config, dbc_name, node, disabled_additional=()):
     out += [""] + actions
     out += ["## Other hand edits", "",
             "CoGeNT only knows the edits listed above. To re-apply every other edit you made to earlier generated "
-            "files (for example code for messages CoGeNT cannot generate), run:", "", "```", CARRY_COMMAND, "```", "",
+            "files (for example code for messages CoGeNT cannot generate), run:", "", "```", CARRY, "```", "",
             "It merges your edits into the new files, writes the result only to the new folder, and lists every "
             "place it could not merge.", ""]
     return "\n".join(out), entries

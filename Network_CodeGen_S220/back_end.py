@@ -139,13 +139,7 @@ class BackEnd(htmlPy.Object):
         try:
             if not os.path.exists(dir):
               os.mkdir(dir)
-            with zipfile.ZipFile(cfg_name,'w',compression=zipfile.ZIP_DEFLATED) as zip1:
-                for files in glob.glob(r'.\html\*.html'):
-                    zip1.write(files)
-                for files in glob.glob(r'.\data\*.data'):
-                    zip1.write(files)
-                for files in glob.glob(r'.\js\*.js'):
-                    zip1.write(files)
+            cogent_generate.write_config_archive(cfg_name)
         except OSError as exc:
             if os.path.isfile(cfg_name):
                 os.remove(cfg_name)  # never leave a half-written archive
@@ -235,8 +229,11 @@ class BackEnd(htmlPy.Object):
 
     def _context(self, active):
         """Template context for the pages with the sidebar: FIFO view and new items of the loaded DBC."""
+        latest = cogent_generate.latest_run()
         ctx = {"active": active, "dbc_name": os.path.basename(self.__dbc or ''), "fifo": None, "fifo_error": None,
-               "new": None, "config_error": None}
+               "new": None, "config_error": None,
+               "last_run": os.path.join("CODE_GEN", os.path.basename(latest)) if latest else None,
+               "last_run_path": os.path.abspath(latest) if latest else ""}
         if self.__load != 0:
             return ctx
         try:
@@ -321,8 +318,9 @@ class BackEnd(htmlPy.Object):
             pass                                       # damaged: start from the defaults
         stem = os.path.splitext(os.path.basename(self.__dbc or 'CODE_GEN'))[0]
         stamp = datetime.datetime.now().strftime('%Y-%m-%d_%H%M')
+        latest = cogent_generate.latest_run()
         return {"base": saved.get("base", ""), "edited": saved.get("edited", ""),
-                "new": saved.get("new") or os.path.abspath(cogent_generate.OUTPUT_DIR),
+                "new": os.path.abspath(latest or cogent_generate.OUTPUT_DIR),
                 "out": os.path.join(os.path.abspath('MERGED'), "%s_%s" % (stem, stamp))}
 
     def _reapply_render(self, paths, error=None, results=None, out=None):
@@ -360,7 +358,7 @@ class BackEnd(htmlPy.Object):
             return ""
         try:
             with open(self.__data_dir + self.REAPPLY_FILE, 'w', encoding='utf-8') as fh:
-                json.dump({k: paths[k] for k in ("base", "edited", "new")}, fh, indent=1)
+                json.dump({k: paths[k] for k in ("base", "edited")}, fh, indent=1)
         except OSError as exc:
             log_failure("Remembering the Re-apply edits folders", exc)
         try:
@@ -379,29 +377,9 @@ class BackEnd(htmlPy.Object):
         return ""
 
     @htmlPy.Slot(str)
-    def reapply_open(self, folder):
+    def open_folder(self, folder):
         if folder and os.path.isdir(folder):
             os.startfile(folder)
-
-    @htmlPy.Slot()
-    def keep_codegen_copy(self):
-        op = "Keeping a copy of CODE_GEN"
-        files = [f for f in cogent_generate.GENERATED_FILES + cogent_generate.REPORT_FILES
-                 if os.path.isfile(os.path.join(cogent_generate.OUTPUT_DIR, f))]
-        if not files:
-            self._alert(CogentError(op, "CODE_GEN has no generated files", hint="Press Generate code first.").user_message())
-            return
-        stem = os.path.splitext(os.path.basename(self.__dbc or 'CODE_GEN'))[0]
-        target = os.path.join(cogent_generate.OUTPUT_DIR, "%s_%s" % (stem, datetime.datetime.now().strftime('%Y-%m-%d_%H%M%S')))
-        try:
-            os.makedirs(target)
-            for f in files:
-                shutil.copy2(os.path.join(cogent_generate.OUTPUT_DIR, f), target)
-        except OSError as exc:
-            self._fail(op, exc, item="copying to " + target, hint="Check that CODE_GEN is writable.")
-            return
-        self._alert("Copy of CODE_GEN saved\n%s\nUse it as 'Previous generation' when you re-apply your edits to the next "
-                    "generation." % os.path.abspath(target))
 
     @htmlPy.Slot()
     def help_page(self):
@@ -483,12 +461,14 @@ class BackEnd(htmlPy.Object):
                 self._fail(op, exc, item="preparing the code generation",
                            hint="Please send logs\\cogent.log to the tool maintainer.")
             else:
-                text = ("Code Generated in CODE_GEN folder\n%d files written to %s\nCAN receive rules: %d of %d (FIFO 0/1/2: %s)"
-                        % (len(result.files), os.path.abspath(cogent_generate.OUTPUT_DIR), sum(result.fifo_counts),
+                run = os.path.join("CODE_GEN", os.path.basename(result.folder))
+                text = ("Code generated in %s\n%d files in the repository folders (app.nos.arch3, app.vnim.arch3, "
+                        "app.host.manager); configuration saved as %s\nCAN receive rules: %d of %d (FIFO 0/1/2: %s)"
+                        % (run, len(result.files), result.config_archive, sum(result.fifo_counts),
                            result.max_rx_rules, "/".join(str(c) for c in result.fifo_counts)))
                 if result.manual_actions:
-                    text += ("\nManual action required: %d item(s), see CODE_GEN\\%s"
-                             % (result.manual_actions, cogent_generate.MANUAL_ACTIONS))
+                    text += ("\nManual action required: %d item(s), see %s"
+                             % (result.manual_actions, os.path.join(run, cogent_generate.MANUAL_ACTIONS)))
                 self._alert(text)
         self.default_page()
 

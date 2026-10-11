@@ -23,8 +23,8 @@ An orange badge next to an entry tells you something needs attention there ("2 n
 3. TX/RX messages: review the green (new) rows, press Save and Back.
 4. TX/RX signals: review the green rows, press Save and Back.
 5. Receive FIFO: if the card says the rules are over the limit, apply the pre-selected ID blocks.
-6. Home: press Generate code. The files are written to `CODE_GEN`.
-7. Read `CODE_GEN\MANUAL_ACTIONS.md`.
+6. Home: press Generate code. The files are written to a new folder `CODE_GEN\<date_time>`.
+7. Read `MANUAL_ACTIONS.md` in that folder.
 8. Re-apply edits: re-apply your hand edits from your workspace to the new files.
 9. Home: press Save configuration to keep all settings for next time.
 
@@ -69,7 +69,7 @@ turns red.
 An aligned block of IDs (for example 0x4F0 to 0x4FF) can be received through one rule instead
 ("FIFO multiplexing"). The lowest-ID message of the block keeps the rule and the dispatch entry, and your
 hand-written `nw_can_dll.c` must hand each ID to its own message. CoGeNT writes that C code to
-`CODE_GEN\MANUAL_ACTIONS.md`. A block can only be combined when all its received messages use the same
+`MANUAL_ACTIONS.md` of the generation. A block can only be combined when all its received messages use the same
 layer (application, NM or Diag) and the same DLC.
 
 The Receive FIFO page shows:
@@ -92,9 +92,22 @@ block) and `nw_can_dll.h` (one dispatch entry per block).
 
 ## Generate code
 
-Press Generate code on Home. CoGeNT checks the inputs, plans the receive rules, runs the generators into a
-staging folder and replaces the files in `CODE_GEN` only when everything succeeded, so a failed run never
-leaves a mix of old and new files.
+Press Generate code on Home. CoGeNT checks the inputs, plans the receive rules and runs the generators into a
+staging folder. Only when everything succeeded it becomes a new folder `CODE_GEN\<date_time>` (for example
+`CODE_GEN\11-10-2026_15-34-54`), so a failed run leaves nothing behind and earlier runs are never changed.
+Home shows the last generation with an Open folder button.
+
+Each run folder is laid out like your repository, so you can copy its folders over the repository root
+(`dc.app.scl.vehiclecomm`) or compare them file by file:
+
+| In the run folder | Content |
+|---|---|
+| `<date_time>.cfg` | The configuration of this run (as Save configuration writes it); Load configuration restores it |
+| `MANUAL_ACTIONS.md`, `fifo_plan.json` | Reports (below) |
+| `app.nos.arch3\src\` | `can_rxrule.cfg`, `nw_can_dll.h`, `nw_il_msg.h`, `nw_il_par.h`, `nw_il_par.c`, `nw_nm_par.h` |
+| `app.vnim.arch3\src\` | `nw_vnim_app_signals_par.c` |
+| `app.vnim.arch3\` | `nw_vnim_app_signals_par.h`, `vnim.msg.resource`, `vnim.txrx.resource` |
+| `app.host.manager\` | `nw_host_mgr_txrx.resource` |
 
 | File | Content |
 |---|---|
@@ -118,9 +131,9 @@ into a new generation. It needs Git for Windows.
 
 | Folder | What to choose |
 |---|---|
-| Previous generation | The generated files your workspace edits started from, for example `CODE_GEN\DBC_40024` |
+| Previous generation | The run folder your workspace edits started from, for example `CODE_GEN\26-02-2026_12-10-10` (older flat folders such as `CODE_GEN\DBC_40024` work too) |
 | Your workspace | Your project folder; each generated file is found there by its name |
-| New generation | Normally `CODE_GEN` |
+| New generation | Normally the latest run folder (filled in for you) |
 | Output folder | A new folder (default `MERGED\<DBC>_<date>`); it must not be inside the other three |
 
 Press Re-apply my edits. The three input folders are only read. For each file, your changes (previous
@@ -144,8 +157,8 @@ each item in full. Typical items:
 - "your file comes from another generation": your file was generated from an older DBC; check that its
   differences are edits you want to keep.
 
-Keep a copy of CODE_GEN saves the current generation as `CODE_GEN\<DBC>_<date>`. Do this when you take a
-generation into your workspace: that copy is the Previous generation next time.
+The result is written in the same folders as your repository. Every run folder stays in `CODE_GEN`, so the
+generation you took into your workspace is the Previous generation next time.
 
 ## Save and load configurations
 
@@ -161,7 +174,7 @@ generate. Loading an older archive that has no Receive FIFO settings keeps your 
 4. Generate code and work through `MANUAL_ACTIONS.md`.
 5. Re-apply edits with the previous generation and your workspace; resolve the listed items.
 6. Copy the result into your workspace, build and test on the target (one frame per combined ID).
-7. Keep a copy of CODE_GEN and save the configuration.
+7. Note the run folder you took into your workspace (the Previous generation next time) and save the configuration.
 
 ## Error messages
 
@@ -174,7 +187,7 @@ Every error says what failed, why, and what to do. Details for the tool maintain
 | Merge block ... no enabled received message / different DLC / mixes message layers | Open Receive FIFO and remove or change the block marked "Not applied" |
 | The saved configuration has no setting for message/signal X | Open the page named in the message, press Save and Back, generate again |
 | Message X is multiplexed ... | CoGeNT generates only the VCU5_500 multiplex layout; untick the message's Rx enable (or add it as a receive-only message if you write its code by hand) |
-| CODE_GEN\file could not be replaced | Close the file in the program that has it open, generate again |
+| CODE_GEN\<date_time> could not be created | Check that CODE_GEN is writable and not locked by another program, generate again |
 | Node is not defined in the DBC | Use one of the nodes the message lists |
 | Re-apply: output folder is inside ... / is not empty | Choose a new output folder |
 | Git is needed for re-applying edits | Install Git for Windows |
@@ -184,8 +197,8 @@ Every error says what failed, why, and what to do. Details for the tool maintain
 From `Network_CodeGen_S220` with the project's Python:
 
 ```
-.venv\Scripts\python.exe tools\compare_reference.py --generated CODE_GEN --reference <workspace> --plan CODE_GEN\fifo_plan.json --report compare.md
-.venv\Scripts\python.exe tools\carry_forward.py --base CODE_GEN\DBC_40024 --edited <workspace> --new CODE_GEN --out <new folder>
+.venv\Scripts\python.exe tools\compare_reference.py --generated CODE_GEN\<date_time> --reference <workspace> --plan CODE_GEN\<date_time>\fifo_plan.json --report compare.md
+.venv\Scripts\python.exe tools\carry_forward.py --base CODE_GEN\<earlier run> --edited <workspace> --new CODE_GEN\<date_time> --out <new folder>
 ```
 
 compare_reference lists, per file, whether the generated file matches your workspace (exactly, apart from white
@@ -198,6 +211,6 @@ space and revision notes, or not), compares the receive rules and dispatch entri
 |---|---|
 | `data\*.data` | The saved settings of the loaded project (pages, Receive FIFO, Re-apply folders) |
 | `Config\*.cfg` | Saved configuration archives |
-| `CODE_GEN` | Generated files of the last run, plus your copies `CODE_GEN\<DBC>_<date>` |
+| `CODE_GEN\<date_time>` | One folder per Generate code run: configuration, reports, generated files in the repository folders |
 | `MERGED` | Default output of Re-apply edits |
 | `logs\cogent.log` | Technical details of failures |

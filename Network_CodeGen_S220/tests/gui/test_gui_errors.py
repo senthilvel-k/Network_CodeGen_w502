@@ -9,7 +9,7 @@ import zipfile
 import pytest
 
 from gui_support import js, navigate, settle, start_app_copy, wait_alert
-from support import CODE_FILES, LEGACY_REFS, normalize_header
+from support import CODE_FILES, LEGACY_REFS, latest_run, normalize_header, run_file
 
 pytestmark = pytest.mark.gui
 FIXTURE = "s2xx_40024"
@@ -30,6 +30,12 @@ def app(tmp_path_factory):
     (home / "data" / FIFO_FILE).write_text(json.dumps(LEGACY_LIMITS), encoding="utf-8")
     yield back_end, home, fx, dbc
     restore()
+
+
+def code_gen_snapshot(home):
+    """Every file under CODE_GEN except the failure log: a failed run must not change any of them."""
+    return {p.relative_to(home).as_posix(): p.read_bytes() for p in (home / "CODE_GEN").rglob("*")
+            if p.is_file() and p.name != "errorlog.txt"}
 
 
 def fill_and_load(qtbot, gui, dbc_text, node):
@@ -140,11 +146,11 @@ def test_code_gen_matches_legacy_and_keeps_path_with_apostrophe(qtbot, app):
     gui = back_end.app
     gui.alerts.clear()
     navigate(qtbot, gui, CODE_GEN_BTN)
-    text = wait_alert(qtbot, gui, "Code Generated in CODE_GEN folder")
-    assert "11 files" in text
+    text = wait_alert(qtbot, gui, "Code generated in CODE_GEN")
+    assert "11 files" in text and ".cfg" in text
     legacy = LEGACY_REFS[FIXTURE][0]
     for name in CODE_FILES:
-        assert normalize_header((home / "CODE_GEN" / name).read_bytes()) == \
+        assert normalize_header(run_file(home, name).read_bytes()) == \
             normalize_header((legacy / name).read_bytes()), name
     assert js(qtbot, gui, "document.getElementById('file_path').value") == dbc.as_posix()
     assert js(qtbot, gui, "document.getElementById('ch0_node_name').value") == "SMART_CORE"
@@ -154,7 +160,7 @@ def test_code_gen_matches_legacy_and_keeps_path_with_apostrophe(qtbot, app):
 def test_code_gen_failure_explains_and_keeps_previous_files(qtbot, app):
     back_end, home, fx, dbc = app
     gui = back_end.app
-    before = {n: (home / "CODE_GEN" / n).read_bytes() for n in CODE_FILES}
+    before = code_gen_snapshot(home)
     data = json.loads((fx.data_dir / "CanDbcMsgConfiguration.data").read_text(encoding="utf-8"))
     data["BMS19_100_rx_enable"] = "on"
     navigate(qtbot, gui, "BackEnd.Can_dbc_msg_SaveButton(%s)" % json.dumps(json.dumps(data)))
@@ -165,7 +171,7 @@ def test_code_gen_failure_explains_and_keeps_previous_files(qtbot, app):
     text = gui.alerts[0]
     assert text.startswith("Code generation failed") and "BMS19_100" in text and "Traceback" not in text
     assert "errorlog.txt" in text
-    assert {n: (home / "CODE_GEN" / n).read_bytes() for n in CODE_FILES} == before
+    assert code_gen_snapshot(home) == before
     assert "Traceback" in (home / "CODE_GEN" / "errorlog.txt").read_text(encoding="utf-8")
     original = (fx.data_dir / "CanDbcMsgConfiguration.data").read_text(encoding="utf-8")
     navigate(qtbot, gui, "BackEnd.Can_dbc_msg_SaveButton(%s)" % json.dumps(original))
@@ -175,7 +181,7 @@ def test_code_gen_failure_explains_and_keeps_previous_files(qtbot, app):
 def test_code_gen_overflow_popup_names_rules_messages_and_candidates(qtbot, app):
     back_end, home, fx, dbc = app
     gui = back_end.app
-    before = {n: (home / "CODE_GEN" / n).read_bytes() for n in CODE_FILES}
+    before = code_gen_snapshot(home)
     (home / "data" / FIFO_FILE).unlink()                     # platform defaults: 192 rules, 64 per FIFO
     gui.alerts.clear()
     navigate(qtbot, gui, CODE_GEN_BTN)
@@ -185,7 +191,7 @@ def test_code_gen_overflow_popup_names_rules_messages_and_candidates(qtbot, app)
     assert text.startswith("Code generation failed.") and len(text) < 500
     assert "209 CAN receive rules are needed, but the controller accepts 192" in text
     assert "Receive FIFO" in text and "Traceback" not in text
-    assert {n: (home / "CODE_GEN" / n).read_bytes() for n in CODE_FILES} == before
+    assert code_gen_snapshot(home) == before
     gui.alerts.clear()
 
 
@@ -195,12 +201,12 @@ def test_code_gen_with_merged_blocks_reports_rules_and_manual_actions(qtbot, app
     (home / "data" / FIFO_FILE).write_text(json.dumps(REFERENCE_CONFIG), encoding="utf-8")
     gui.alerts.clear()
     navigate(qtbot, gui, CODE_GEN_BTN)
-    text = wait_alert(qtbot, gui, "Code Generated in CODE_GEN folder")
+    text = wait_alert(qtbot, gui, "Code generated in CODE_GEN")
     assert "CAN receive rules: 184 of 192 (FIFO 0/1/2: 64/64/56)" in text
-    assert "Manual action required: 5 item(s), see CODE_GEN\\MANUAL_ACTIONS.md" in text
-    report = (home / "CODE_GEN" / "MANUAL_ACTIONS.md").read_text(encoding="utf-8")
+    assert ("Manual action required: 5 item(s), see CODE_GEN\\%s\\MANUAL_ACTIONS.md" % latest_run(home).name) in text
+    report = (latest_run(home) / "MANUAL_ACTIONS.md").read_text(encoding="utf-8")
     assert "nw_can_dll.c dispatch for the merged block 0x3D0-0x3DF" in report
-    assert json.loads((home / "CODE_GEN" / "fifo_plan.json").read_text(encoding="utf-8"))["total_rules"] == 184
+    assert json.loads((latest_run(home) / "fifo_plan.json").read_text(encoding="utf-8"))["total_rules"] == 184
     settle(qtbot, gui)
     gui.alerts.clear()
 

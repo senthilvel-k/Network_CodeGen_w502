@@ -17,7 +17,7 @@ import urllib.request
 
 import pytest
 
-from support import CODE_FILES, LEGACY_REFS, ROOT, load_fixture, normalize_header
+from support import CODE_FILES, LEGACY_REFS, ROOT, latest_run, load_fixture, normalize_header, run_file
 
 pywinauto = pytest.importorskip("pywinauto")
 websocket = pytest.importorskip("websocket")
@@ -99,7 +99,9 @@ def _dismiss_alert(main_window, text, timeout=300):
 
 
 def _on_page(cdp, page_name):
-    cdp.wait(f"location.href.endsWith('/{page_name}') && window.__cogentReady === true")
+    # readyState 'complete': the page's own load() ran and bridge.js bound the forms (the bridge can be
+    # ready before a multi-MB page is parsed; a click then would submit the form natively)
+    cdp.wait(f"location.href.endsWith('/{page_name}') && window.__cogentReady === true && document.readyState === 'complete'")
 
 
 @pytest.mark.parametrize("fixture_name", FIXTURES)
@@ -140,18 +142,18 @@ def test_exe_generates_code_like_legacy(tmp_path, fixture_name):
             _on_page(cdp, "Tool_Index_Page.html")
 
         cdp.eval("document.querySelector('input[name=code_generate]').click(); true")
-        _dismiss_alert(win, "Code Generated in CODE_GEN folder")
+        _dismiss_alert(win, "Code generated in CODE_GEN")
         assert not (home / "CODE_GEN" / "errorlog.txt").exists()
         legacy_dir = LEGACY_REFS[fixture_name][0]
         for name in CODE_FILES:
-            assert (home / "CODE_GEN" / name).stat().st_size > 0, name
+            assert run_file(home, name).stat().st_size > 0, name
             if fixture_name in FIFO_CONFIGS and name in FIFO_FILES:
                 continue                            # merged ID blocks: checked against the plan below
-            assert normalize_header((home / "CODE_GEN" / name).read_bytes()) == \
+            assert normalize_header(run_file(home, name).read_bytes()) == \
                 normalize_header((legacy_dir / name).read_bytes()), name
-        plan = json.loads((home / "CODE_GEN" / "fifo_plan.json").read_text(encoding="utf-8"))
+        plan = json.loads((latest_run(home) / "fifo_plan.json").read_text(encoding="utf-8"))
         assert plan["total_rules"] <= 192
-        assert (home / "CODE_GEN" / "MANUAL_ACTIONS.md").exists()
+        assert (latest_run(home) / "MANUAL_ACTIONS.md").exists() and list(latest_run(home).glob("*.cfg"))
         if fixture_name in FIFO_CONFIGS:
             assert plan["fifo_counts"] == [64, 64, 56]
     finally:
@@ -197,6 +199,65 @@ def test_exe_new_pages_open(tmp_path):
         cdp.eval("document.querySelector('a[href=\"BackEnd.reapply_page\"]').click(); true")
         _on_page(cdp, "Reapply.html")
         assert cdp.eval("document.getElementById('reapply-new').value").endswith("CODE_GEN")
+    finally:
+        if cdp:
+            cdp.close()
+        app.kill()
+        os.environ.pop("QTWEBENGINE_REMOTE_DEBUGGING", None)
+
+
+def test_exe_save_and_back_pressed_while_the_signal_page_loads(tmp_path):
+    """Packaged exe: "Save and Back" pressed on the signal page (3.4 MB, the button is at its top) before the
+    page has loaded saves and returns to the home page instead of showing ERR_FILE_NOT_FOUND."""
+    if not (EXE_DIR / "CoGeNT.exe").exists():
+        pytest.skip("build first: pyinstaller CoGeNT.spec --distpath dist_py3 --workpath build_py3")
+    home = tmp_path / "CoGeNT exe copy"
+    shutil.copytree(EXE_DIR, home)
+    fx = load_fixture("s2xx_40024")
+    shutil.rmtree(home / "data")
+    shutil.copytree(fx.data_dir, home / "data")
+    port = _free_port()
+    os.environ["QTWEBENGINE_REMOTE_DEBUGGING"] = f"127.0.0.1:{port}"
+    os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--disable-gpu"
+    app = Application(backend="uia").start(f'"{home / "CoGeNT.exe"}"', work_dir=str(home), timeout=60)
+    cdp = None
+    try:
+        win = app.window(title="CoGeNT")
+        win.wait("visible ready", timeout=120)
+        cdp = Cdp(port)
+        _on_page(cdp, "Tool_Index_Page.html")
+        cdp.eval(f"document.getElementById('file_path').value={json.dumps(fx.dbc.as_posix())};"
+                 f"document.getElementById('ch0_node_name').value={json.dumps(fx.node)};"
+                 "document.getElementById('form_submit').click(); true")
+        _dismiss_alert(win, "Database loaded successfully")
+        _on_page(cdp, "Tool_Index_Page.html")
+        cdp.eval("document.querySelector('a[href=\"BackEnd.Can_dbc0_msg\"]').click(); true")
+        _on_page(cdp, "CAN_DBC_msg.html")                # the signal page needs the saved message page
+        cdp.eval("document.getElementById('form_submit').click(); true")
+        _on_page(cdp, "Tool_Index_Page.html")
+        cdp.eval("document.querySelector('a[href=\"BackEnd.Can_dbc0_sig\"]').click(); true")
+        # the click runs right after this evaluation has answered (a native submit would navigate away)
+        press = ("(function () { if (!location.href.endsWith('/CAN_DBC_sig.html')) { return null; }"
+                 " var b = document.getElementById('form_submit'); if (!b) { return null; }"
+                 " setTimeout(function () { b.click(); }, 0); return document.readyState; })()")
+        deadline, state = time.time() + 300, None
+        while state is None and time.time() < deadline:
+            try:
+                state = cdp.eval(press)
+            except Exception:
+                pass
+        assert state == "loading", f"Save and Back was pressed with readyState {state!r}"
+        deadline, where = time.time() + 180, None
+        while time.time() < deadline:
+            try:
+                where = cdp.eval("location.href + ' ' + document.readyState")
+            except Exception:
+                pass
+            if where and (where.endswith("/Tool_Index_Page.html complete") or "BackEnd." in where
+                          or not where.startswith("file:")):
+                break
+            time.sleep(0.5)
+        assert where and where.endswith("/Tool_Index_Page.html complete"), f"after Save and Back: {where}"
     finally:
         if cdp:
             cdp.close()

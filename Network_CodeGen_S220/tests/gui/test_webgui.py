@@ -144,3 +144,32 @@ def test_staticfile_filter_points_to_static_path(qtbot, gui):
     (gui.tmp / "s.css").write_text("#m{width:123px}", encoding="utf-8")
     show(qtbot, gui, "f.html", '<link rel="stylesheet" href="{{\'s.css\'|staticfile}}"><body><div id="m"></div></body>')
     assert js(qtbot, gui, "getComputedStyle(document.getElementById('m')).width") == "123px"
+
+
+EARLY_FILLER = "<p>" + "padding " * 20000 + "</p>"   # keeps the parser busy after the click
+
+
+def test_form_submitted_while_the_page_is_loading_is_sent_once_after_loading(qtbot, gui):
+    """A large page is visible before it has loaded; a click on its submit button must not submit the
+    form natively (ERR_FILE_NOT_FOUND) and must send the values the page's onload filled in."""
+    (gui.tmp / "early.html").write_text(
+        '<body onload="document.getElementById(\'p\').value=\'loaded\'">'
+        '<form id="f" action="Probe.got" data-bind="true"><input name="v" id="p" value="initial">'
+        '<input type="submit" id="s"></form><script>document.getElementById("s").click();</script>'
+        + EARLY_FILLER + "</body>", encoding="utf-8")
+    gui.template = ("early.html", {})
+    qtbot.waitUntil(lambda: any(c[0] == "got" for c in gui.probe.calls), timeout=20000)
+    qtbot.wait(1500)
+    assert [c for c in gui.probe.calls if c[0] == "got"] == [("got", '{"v":"loaded"}')]
+    assert js(qtbot, gui, "location.href").endswith("/early.html")
+
+
+def test_link_clicked_while_the_page_is_loading_calls_the_slot(qtbot, gui):
+    (gui.tmp / "early_link.html").write_text(
+        '<body><a id="l" href="Probe.got" data-bind="true" data-params="x2">go</a>'
+        '<script>document.getElementById("l").click();</script>' + EARLY_FILLER + "</body>", encoding="utf-8")
+    gui.template = ("early_link.html", {})
+    qtbot.waitUntil(lambda: ("got", "x2") in gui.probe.calls, timeout=20000)
+    qtbot.wait(1500)
+    assert gui.probe.calls.count(("got", "x2")) == 1
+    assert js(qtbot, gui, "location.href").endswith("/early_link.html")

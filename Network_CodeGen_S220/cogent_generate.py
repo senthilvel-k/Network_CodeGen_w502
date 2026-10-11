@@ -1,20 +1,27 @@
 """Code generation for the GUI's 'code gen' button.
 
-Runs the generators in the legacy order into CODE_GEN/.staging and replaces the files in
-CODE_GEN only when every generator succeeded, so a failed run never leaves a mix of new and
-old files. Failures are raised as CogentError with a user-facing explanation; the traceback
-goes to CODE_GEN/errorlog.txt and logs/cogent.log.
+Runs the generators in the legacy order into CODE_GEN/.staging. Only when every generator succeeded
+the staging folder becomes the run folder CODE_GEN/<dd-mm-yyyy_hh-mm-ss>/, so a failed run leaves
+nothing behind and earlier runs are never changed. The run folder holds the configuration archive of
+the run (<run>.cfg, as 'Save configuration' writes it), MANUAL_ACTIONS.md, fifo_plan.json and the
+generated files in the folders of the S2XX repository (OUTPUT_LAYOUT), ready to copy over it.
+Failures are raised as CogentError with a user-facing explanation; the traceback goes to
+CODE_GEN/errorlog.txt and logs/cogent.log.
 
 The CAN receive rules are planned and checked against the controller limits (cogent_fifo,
 data/CanFifoConfiguration.data) before any generator runs, and the generated can_rxrule.cfg and
 nw_can_dll.h are checked against that plan before they are published. Every run also writes
 CODE_GEN/fifo_plan.json and CODE_GEN/MANUAL_ACTIONS.md."""
+import datetime
+import glob
 import importlib
 import json
 import os
+import re
 import shutil
 import sys
-from dataclasses import dataclass
+import zipfile
+from dataclasses import dataclass, field
 
 import cogent_fifo
 import cogent_io
@@ -43,27 +50,83 @@ FIFO_PLAN = "fifo_plan.json"
 MANUAL_ACTIONS = "MANUAL_ACTIONS.md"
 REPORT_FILES = [FIFO_PLAN, MANUAL_ACTIONS]
 
+# Where each file lives in the S2XX repository (dc.app.scl.vehiclecomm), relative to its root.
+OUTPUT_LAYOUT = {
+    "can_rxrule.cfg": os.path.join("app.nos.arch3", "src"),
+    "nw_can_dll.h": os.path.join("app.nos.arch3", "src"),
+    "nw_il_msg.h": os.path.join("app.nos.arch3", "src"),
+    "nw_il_par.h": os.path.join("app.nos.arch3", "src"),
+    "nw_il_par.c": os.path.join("app.nos.arch3", "src"),
+    "nw_nm_par.h": os.path.join("app.nos.arch3", "src"),
+    "nw_vnim_app_signals_par.c": os.path.join("app.vnim.arch3", "src"),
+    "nw_vnim_app_signals_par.h": "app.vnim.arch3",
+    "vnim.msg.resource": "app.vnim.arch3",
+    "vnim.txrx.resource": "app.vnim.arch3",
+    "nw_host_mgr_txrx.resource": "app.host.manager",
+}
+RUN_FOLDER = re.compile(r"^(\d{2})-(\d{2})-(\d{4})_(\d{2})-(\d{2})-(\d{2})(?:_(\d+))?$")
+ARCHIVE_SOURCES = (('html', '*.html'), ('data', '*.data'), ('js', '*.js'))
+
 
 @dataclass
 class GenerationResult:
-    files: list            # generated source files now in CODE_GEN
+    files: list            # generated source files (names)
     reports: list          # REPORT_FILES
     manual_actions: int    # entries of MANUAL_ACTIONS.md that need the user
     fifo_counts: tuple     # receive rules per FIFO
     max_rx_rules: int
+    folder: str = ""       # the run folder CODE_GEN/<date_time>
+    paths: list = field(default_factory=list)   # generated files relative to the run folder
+    config_archive: str = ""                    # <date_time>.cfg in the run folder
+
+
+def output_relpath(name):
+    """Path of a generated file inside a run folder (the S2XX repository layout)."""
+    return os.path.join(OUTPUT_LAYOUT.get(name, ""), name)
+
+
+def _run_stamp():
+    return datetime.datetime.now().strftime('%d-%m-%Y_%H-%M-%S')
+
+
+def run_folders(output_dir=OUTPUT_DIR):
+    """Run folders in output_dir, oldest first."""
+    def key(name):
+        d, mo, y, h, mi, s, n = RUN_FOLDER.match(name).groups()
+        return (y, mo, d, h, mi, s, int(n or 1))
+    if not os.path.isdir(output_dir):
+        return []
+    names = [n for n in os.listdir(output_dir) if RUN_FOLDER.match(n) and os.path.isdir(os.path.join(output_dir, n))]
+    return [os.path.join(output_dir, n) for n in sorted(names, key=key)]
+
+
+def latest_run(output_dir=OUTPUT_DIR):
+    folders = run_folders(output_dir)
+    return folders[-1] if folders else None
+
+
+def write_config_archive(target):
+    """Configuration archive of the current settings (html/*.html, data/*.data, js/*.js of the working
+    folder), as 'Save configuration' writes it."""
+    with zipfile.ZipFile(target, 'w', compression=zipfile.ZIP_DEFLATED) as archive:
+        for folder, pattern in ARCHIVE_SOURCES:
+            for path in sorted(glob.glob(os.path.join('.', folder, pattern))):
+                archive.write(path, folder + '/' + os.path.basename(path))
 
 
 def run_code_generation(dbc, node, time_str):
-    """Generate all files for `dbc`/`node` into ./CODE_GEN. Returns a GenerationResult."""
+    """Generate all files for `dbc`/`node` into a new run folder CODE_GEN/<date_time>. Returns a GenerationResult."""
     context = {"DBC file": dbc, "Node": node, "Working folder": os.getcwd()}
     try:
+        _check_output_dir()
+        run = _new_run_name()
         msg_cfg = _check_inputs(dbc, node)
         _check_multiplex(dbc, node, msg_cfg)
         plan, fifo_config = _check_fifo(dbc, node, msg_cfg)
         _run_generators(dbc, node, time_str)
         _check_generated_rules(plan)
-        manual = _write_reports(plan, fifo_config, dbc, node, msg_cfg)
-        _publish()
+        manual = _write_reports(plan, fifo_config, dbc, node, msg_cfg, os.path.join("CODE_GEN", run))
+        folder = _publish(run)
     except CogentError as err:
         err.log_path = log_failure("Code generation", err, context, extra_file=ERROR_LOG)
         raise
@@ -72,7 +135,24 @@ def run_code_generation(dbc, node, time_str):
     if os.path.exists(ERROR_LOG):
         os.remove(ERROR_LOG)  # the last run succeeded; an old failure log would mislead
     return GenerationResult(list(GENERATED_FILES), list(REPORT_FILES), manual, plan.fifo_counts(),
-                            fifo_config.max_rx_rules)
+                            fifo_config.max_rx_rules, folder, [output_relpath(f) for f in GENERATED_FILES],
+                            run + ".cfg")
+
+
+def _check_output_dir():
+    if os.path.exists(OUTPUT_DIR) and not os.path.isdir(OUTPUT_DIR):
+        raise CogentError("Code generation", "CODE_GEN next to the tool is a file, not a folder",
+                          item="preparing the output folder",
+                          hint="Rename or remove the file CODE_GEN, then press Generate code again.")
+
+
+def _new_run_name():
+    stamp, n = _run_stamp(), 1
+    name = stamp
+    while os.path.exists(os.path.join(OUTPUT_DIR, name)):
+        n += 1
+        name = "%s_%d" % (stamp, n)
+    return name
 
 
 def _check_inputs(dbc, node):
@@ -167,11 +247,11 @@ def _check_generated_rules(plan):
                                "CODE_GEN\\errorlog.txt to the tool maintainer.")
 
 
-def _write_reports(plan, config, dbc, node, msg_cfg):
-    """CODE_GEN/fifo_plan.json and CODE_GEN/MANUAL_ACTIONS.md (staged with the generated files)."""
+def _write_reports(plan, config, dbc, node, msg_cfg, run_dir):
+    """fifo_plan.json and MANUAL_ACTIONS.md of the run (staged with the generated files)."""
     disabled = [n for n in config.additional_rx_messages
                 if msg_cfg.get(n.upper() + '_rx_enable') not in ('on', 'ON', 'On', 1, '1')]
-    text, entries = cogent_fifo.manual_actions(plan, config, os.path.basename(dbc), node, disabled)
+    text, entries = cogent_fifo.manual_actions(plan, config, os.path.basename(dbc), node, disabled, run_dir)
     with open(os.path.join(STAGING_DIR, MANUAL_ACTIONS), 'w', encoding='utf-8') as fh:
         fh.write(text)
     with open(os.path.join(STAGING_DIR, FIFO_PLAN), 'w', encoding='utf-8') as fh:
@@ -233,17 +313,21 @@ def _explain(exc, output):
                             "CODE_GEN\\errorlog.txt to the tool maintainer.")
 
 
-def _publish():
-    """Move the staged files into CODE_GEN."""
-    replaced = []
-    for name in GENERATED_FILES + REPORT_FILES:
-        target = os.path.join(OUTPUT_DIR, name)
-        try:
-            os.replace(os.path.join(STAGING_DIR, name), target)
-        except PermissionError as exc:
-            done = (" Already updated: %s." % ", ".join(replaced)) if replaced else " No file was updated."
-            raise CogentError("Code generation", "CODE_GEN\\%s could not be replaced (%s)" % (name, exc.strerror),
-                              item="saving the generated files",
-                              hint="Close CODE_GEN\\%s in any program that has it open (editor, compare tool) and "
-                                   "press Generate code again.%s" % (name, done)) from exc
-        replaced.append(name)
+def _publish(run):
+    """Arrange the staged files in the repository layout, add the configuration archive and turn the
+    staging folder into CODE_GEN/<run>. Returns the run folder."""
+    target = os.path.join(OUTPUT_DIR, run)
+    try:
+        for name in GENERATED_FILES:
+            dest = os.path.join(STAGING_DIR, output_relpath(name))
+            os.makedirs(os.path.dirname(dest), exist_ok=True)
+            os.replace(os.path.join(STAGING_DIR, name), dest)
+        write_config_archive(os.path.join(STAGING_DIR, run + ".cfg"))
+        os.replace(STAGING_DIR, target)
+    except OSError as exc:
+        raise CogentError("Code generation", "CODE_GEN\\%s could not be created (%s)" % (run, exc.strerror or exc),
+                          item="saving the generated files",
+                          hint="Check that CODE_GEN is writable and not open in a program that locks it (for "
+                               "example a compare tool), then press Generate code again. Earlier runs were not "
+                               "changed.") from exc
+    return os.path.abspath(target)

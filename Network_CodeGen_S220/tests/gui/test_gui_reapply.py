@@ -1,5 +1,5 @@
-"""Re-apply edits page: folders, run, results and Manual Action Required list, safety, keep a copy of
-CODE_GEN. Synthetic generated files; tests share one app and run in file order."""
+"""Re-apply edits page: folders, run, results and Manual Action Required list, safety.
+Synthetic generated files; tests share one app and run in file order."""
 import json
 
 import pytest
@@ -58,7 +58,7 @@ def test_run_shows_results_and_writes_the_report(qtbot, app):
     navigate(qtbot, gui, RUN)
     rows = js(qtbot, gui, "document.getElementById('reapply-results').innerText")
     assert "nw_il_par.c" in rows and "merged" in rows
-    merged = (root / "result 1" / "nw_il_par.c").read_text(encoding="latin-1")
+    merged = (root / "result 1" / "app.nos.arch3" / "src" / "nw_il_par.c").read_text(encoding="latin-1")
     assert "int b = 20;   /* mine */" in merged and "int g = 70;" in merged
     assert (root / "result 1" / "CARRY_FORWARD.md").exists()
     saved = json.loads((home / "data" / "ReapplyEdits.data").read_text(encoding="utf-8"))
@@ -96,18 +96,3 @@ def test_open_result_folder(qtbot, app, monkeypatch):
     navigate(qtbot, gui, RUN)
     js(qtbot, gui, "document.getElementById('reapply-open').click(); 1")
     qtbot.waitUntil(lambda: opened == [str(root / "result 3")], timeout=10000)
-
-
-def test_keep_a_copy_of_code_gen(qtbot, app):
-    back_end, home, root = app
-    gui = back_end.app
-    (home / "CODE_GEN").mkdir(exist_ok=True)
-    for name in back_end.cogent_generate.GENERATED_FILES:
-        (home / "CODE_GEN" / name).write_text("generated " + name, encoding="utf-8")
-    gui.alerts.clear()
-    js(qtbot, gui, "document.getElementById('keep-copy').click(); 1")
-    text = wait_alert(qtbot, gui, "Copy of CODE_GEN saved")
-    copies = [p for p in (home / "CODE_GEN").iterdir() if p.is_dir()]
-    assert len(copies) == 1 and copies[0].name in text
-    assert sorted(p.name for p in copies[0].iterdir()) == sorted(back_end.cogent_generate.GENERATED_FILES)
-    settle(qtbot, gui)

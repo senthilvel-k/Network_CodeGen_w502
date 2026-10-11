@@ -40,5 +40,5 @@ Candidates: aligned 16-ID blocks with at least two single-ID rules of one layer 
 1. Before any generator runs: the plan must fit the limits (`check_limits`), otherwise a short error points to
    the Receive FIFO page and the details (overflowing messages, candidates) go to the log.
 2. After generation: the staged `can_rxrule.cfg` and `nw_can_dll.h` must contain exactly the planned rules
-   (`read_rule_table`, `read_dispatch_counts`) before they replace the files in `CODE_GEN`.
-3. Every run writes `CODE_GEN/fifo_plan.json` and `CODE_GEN/MANUAL_ACTIONS.md`.
+   (`read_rule_table`, `read_dispatch_counts`) before the run folder `CODE_GEN/<date_time>` is created.
+3. Every run folder holds `fifo_plan.json` and `MANUAL_ACTIONS.md`.
