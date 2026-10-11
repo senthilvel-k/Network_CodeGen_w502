@@ -187,3 +187,15 @@ def test_loading_an_archive_with_fifo_settings_needs_no_note(home):
     import back_end
     _fifo_config(home, REFERENCE_CONFIG)
     assert back_end._fifo_note(["data/dbc_details.data", "data/CanFifoConfiguration.data"]) == ""
+
+
+def test_enabled_additional_message_needs_no_manual_action(home):
+    from support import enable_indexed
+    fx = load_fixture(FIXTURE)
+    _fifo_config(home, REFERENCE_CONFIG)
+    enable_indexed(home, fx.dbc, fx.node)
+    result = _generate()
+    report = (latest_run(home) / "MANUAL_ACTIONS.md").read_text(encoding="utf-8")
+    assert "interaction-layer and VNIM code for BMS19_100" not in report
+    assert "## REVIEW: additional_rx_messages lists BMS19_100" in report
+    assert result.fifo_counts == (64, 64, 56)        # the same rules as through additional_rx_messages

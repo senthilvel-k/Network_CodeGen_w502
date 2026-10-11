@@ -186,3 +186,9 @@ def test_parser_reads_start_values_of_mixed_case_signals():
     sigs = {m["Msg_name"]: m["Sig_List"] for m in dbc_parser(str(fx.dbc), fx.node).get_msg_type("ALL", "rx")}
     assert sigs["BMS19_100"]["BMS_CELLTEMP1"]["GenSigStartValue"] == "500"
     assert sigs["BMS19_100"]["BMS_CELLTEMP_INDEX"]["GenSigStartValue"] == "0"
+
+
+def test_signal_page_init_value_default_is_upper_case_hex():
+    from Can_dbc_gen import init_value_default
+    assert init_value_default("500") == "0x1F4"
+    assert init_value_default("0") == "0x0" and init_value_default("") == "0x0" and init_value_default(None) == "0x0"

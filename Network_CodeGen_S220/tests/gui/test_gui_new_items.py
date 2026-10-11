@@ -70,6 +70,15 @@ def test_signal_page_banner(qtbot, app):
     assert js(qtbot, gui, "document.querySelector('tr.cogent-current').id") == NEW_SIGNAL
 
 
+def test_signal_page_applies_the_notification_to_new_rows(qtbot, app):
+    gui = app[0].app                                      # still on the signal page of the test above
+    before = js(qtbot, gui, "document.getElementById('VIN_INDEX_os_notify_no_of_events').value")
+    js(qtbot, gui, "document.getElementById('cogent-new-notify').value = '200ms_Delay_g2';"
+                   "document.getElementById('cogent-apply-notify').click(); 1")
+    assert js(qtbot, gui, "document.getElementById('%s_os_notify_no_of_events').value" % NEW_SIGNAL) == "200ms_Delay_g2"
+    assert js(qtbot, gui, "document.getElementById('VIN_INDEX_os_notify_no_of_events').value") == before
+
+
 def test_saving_clears_the_announcement(qtbot, app):
     back_end, home, fx, dbc = app
     gui = back_end.app

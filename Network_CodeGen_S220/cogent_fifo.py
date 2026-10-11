@@ -460,6 +460,18 @@ def manual_actions(plan, config, dbc_name, node, disabled_additional=(), generat
             "the FIFO overrun counters stay at 0 in a full-load bus test.")
     for name in config.additional_rx_messages:
         disabled = name.upper() in {n.upper() for n in disabled_additional}
+        if not disabled:
+            actions += _entry(
+                "REVIEW", "additional_rx_messages lists %s" % name,
+                "`data\\%s`, additional_rx_messages (page Receive FIFO)" % CONFIG_FILE,
+                "%s is listed there and its Rx enable is on on 'TX/RX messages'" % name,
+                ["nothing is required: CoGeNT generates the receive rule, the dispatch entry and the code of %s "
+                 "because its Rx enable is on; the additional_rx_messages entry is no longer needed." % name],
+                "the entry is your setting; CoGeNT does not remove it.",
+                "none",
+                ["Open Receive FIFO and remove %s from the additional receive messages (optional)." % name],
+                "the next generation has the same receive rules (%s is received because its Rx enable is on)." % name)
+            continue
         actions += _entry(
             "MANUAL", "interaction-layer and VNIM code for %s" % name,
             "nw_il_msg.h (%s_msgType), nw_il_par.h / nw_il_par.c (receive frame table, IL_RX_NUM_*), "
