@@ -5,7 +5,7 @@ import sys
 
 import pytest
 
-from support import CODE_FILES, ROOT, load_fixture, normalize_date_by
+from support import CODE_FILES, ROOT, latest_run, load_fixture, normalize_date_by, run_file, run_folder_count
 
 sys.path.insert(0, str(ROOT))
 
@@ -16,6 +16,12 @@ REFERENCE_CONFIG = {               # what the manual edits of the S2XX workspace
     "additional_rx_messages": ["BMS19_100", "BMS20_100"],
 }
 REPORTS = ["fifo_plan.json", "MANUAL_ACTIONS.md"]
+
+
+def sorted_runs(home):
+    import cogent_generate
+    from pathlib import Path
+    return [Path(p) for p in cogent_generate.run_folders(str(home / "CODE_GEN"))]
 
 
 @pytest.fixture
@@ -46,11 +52,12 @@ def _assert_previous_outputs_untouched(home):
     for f in CODE_FILES + REPORTS:
         assert (home / "CODE_GEN" / f).read_text(encoding="utf-8") == "previous " + f, f
     assert not (home / "CODE_GEN" / ".staging").exists()
+    assert run_folder_count(home) == 0                            # a failed run creates no run folder
 
 
 def _rules(home):
     from cogent_fifo import read_rule_table
-    return read_rule_table((home / "CODE_GEN" / "can_rxrule.cfg").read_text(encoding="latin-1"))
+    return read_rule_table(run_file(home, "can_rxrule.cfg").read_text(encoding="latin-1"))
 
 
 # ---- overflow is detected before any file is written ------------------------------------------------
@@ -128,11 +135,11 @@ def test_reference_configuration_generates_184_rules_and_reports(home):
     assert (0x3D0, 0xC00007F0, 0x200) in rules and (0x4F0, 0xC00007F0, 0x200) in rules
     assert not [r for r in rules if 0x3D1 <= r[0] <= 0x3DF or 0x4F1 <= r[0] <= 0x4FF]
     assert (0x3EB, 0xC00007FF, 0x100) in rules and (0x3EC, 0xC00007FF, 0x100) in rules   # BMS19_100, BMS20_100
-    plan = json.loads((home / "CODE_GEN" / "fifo_plan.json").read_text(encoding="utf-8"))
+    plan = json.loads((latest_run(home) / "fifo_plan.json").read_text(encoding="utf-8"))
     assert plan["total_rules"] == 184 and plan["fifo_counts"] == [64, 64, 56]
     assert [b["block"] for b in plan["merged_blocks"]] == ["0x3D0-0x3DF", "0x4F0-0x4FF"]
     assert [len(b["members"]) for b in plan["merged_blocks"]] == [13, 16]
-    report = (home / "CODE_GEN" / "MANUAL_ACTIONS.md").read_text(encoding="utf-8")
+    report = (latest_run(home) / "MANUAL_ACTIONS.md").read_text(encoding="utf-8")
     assert "## MANUAL: nw_can_dll.c dispatch for the merged block 0x3D0-0x3DF" in report
     assert "case 0x3D2u: canFrameHandle = VNIM_BMS11_100_MESSAGE; break;" in report
     assert "case 0x4FFu: canFrameHandle = VNIM_REM_MSG_15_MESSAGE; break;" in report
@@ -147,19 +154,21 @@ def test_reference_configuration_generates_184_rules_and_reports(home):
 def test_repeated_generation_is_identical_including_reports(home):
     _fifo_config(home, REFERENCE_CONFIG)
     _generate()
-    first = {f: (home / "CODE_GEN" / f).read_bytes() for f in CODE_FILES + REPORTS}
+    first = {f: run_file(home, f).read_bytes() for f in CODE_FILES}
+    first.update({f: (latest_run(home) / f).read_bytes() for f in REPORTS})
     _generate()
     for f in CODE_FILES:
-        assert normalize_date_by((home / "CODE_GEN" / f).read_bytes()) == normalize_date_by(first[f]), f
-    for f in REPORTS:
-        assert (home / "CODE_GEN" / f).read_bytes() == first[f], f
+        assert normalize_date_by(run_file(home, f).read_bytes()) == normalize_date_by(first[f]), f
+    for f in REPORTS:                                             # the reports name the run folder: compare without it
+        assert (latest_run(home) / f).read_bytes().decode("utf-8").replace(latest_run(home).name, "RUN") == \
+            first[f].decode("utf-8").replace(sorted_runs(home)[0].name, "RUN"), f
 
 
 def test_without_merging_or_overflow_the_report_says_no_action(home):
     _fifo_config(home, {"max_rx_rules": 256, "max_rules_per_fifo": 128})
     result = _generate()
     assert result.manual_actions == 0
-    report = (home / "CODE_GEN" / "MANUAL_ACTIONS.md").read_text(encoding="utf-8")
+    report = (latest_run(home) / "MANUAL_ACTIONS.md").read_text(encoding="utf-8")
     assert "No manual action is required for the receive rules." in report
     assert "tools\\carry_forward.py" in report
 

@@ -107,9 +107,23 @@ def test_generate_code_after_apply(qtbot, app):
         navigate(qtbot, gui, "%s(%s)" % (save, json.dumps((fx.data_dir / name).read_text(encoding="utf-8"))))
     gui.alerts.clear()
     navigate(qtbot, gui, CODE_GEN_BTN)
-    text = wait_alert(qtbot, gui, "Code Generated in CODE_GEN folder")
+    text = wait_alert(qtbot, gui, "Code generated in CODE_GEN")
     assert "182 of 192" in text and "Manual action required" in text
     settle(qtbot, gui)
+
+
+def test_home_shows_the_last_generation_and_opens_it(qtbot, app, monkeypatch):
+    from support import latest_run
+    back_end, home, fx, dbc = app
+    gui = back_end.app
+    run = latest_run(home)
+    assert (run / (run.name + ".cfg")).is_file() and (run / "app.host.manager" / "nw_host_mgr_txrx.resource").is_file()
+    navigate(qtbot, gui, "BackEnd.default_page()")
+    assert ("CODE_GEN\\" + run.name) in js(qtbot, gui, "document.getElementById('last-run').innerText")
+    opened = []
+    monkeypatch.setattr(back_end.os, "startfile", opened.append, raising=False)
+    js(qtbot, gui, "document.getElementById('open-last-run').click(); 1")
+    qtbot.waitUntil(lambda: opened == [str(run)], timeout=10000)
 
 
 def test_overflow_at_code_gen_is_short_and_points_to_receive_fifo(qtbot, app):

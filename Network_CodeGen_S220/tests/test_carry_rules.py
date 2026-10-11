@@ -7,6 +7,7 @@ import pytest
 from support import ROOT
 
 sys.path.insert(0, str(ROOT))
+from cogent_generate import output_relpath as rel  # generated files are written in the repository layout
 
 
 def write(folder, name, text, eol="\r\n"):
@@ -70,7 +71,7 @@ def run(scenario):
 
 def test_receive_counts_get_your_delta_and_the_safe_multiplex_offset(scenario):
     results, out = run(scenario)
-    text = read(out / "nw_il_par.h")
+    text = read(out / rel("nw_il_par.h"))
     assert "#define IL_RX_NUM_PERIODIC   5\n" in text and "#define IL_RX_NUM_MESSAGES   5 \n" in text
     assert "#define IL_NUM_OF_RX_DATA_CHANGED_FLAG   (11 + 3) \n" in text
     assert "#define IL_MUX_MSG_OFFSET_ID   11 \n" in text                   # first flag byte after the generated ones
@@ -79,13 +80,13 @@ def test_receive_counts_get_your_delta_and_the_safe_multiplex_offset(scenario):
 
 def test_handle_numbers_follow_the_merged_message_order(scenario):
     results, out = run(scenario)
-    assert handles(["A", "AA", "B", "C", "D", "IS_DIAG_REQ", "NM1"], width=24) in read(out / "nw_il_par.h")
+    assert handles(["A", "AA", "B", "C", "D", "IS_DIAG_REQ", "NM1"], width=24) in read(out / rel("nw_il_par.h"))
     assert any("handle" in r for r in results["nw_il_par.h"]["rules_applied"])
 
 
 def test_per_message_arrays_have_one_entry_per_message(scenario):
     results, out = run(scenario)
-    text = read(out / "nw_vnim_app_signals_par.c")
+    text = read(out / rel("nw_vnim_app_signals_par.c"))
     assert "{\n    0,0,0,0,0\n};" in text and "{\n    0x1,0x2,0x4,0x8,0x10\n};" in text
     assert any("array" in r for r in results["nw_vnim_app_signals_par.c"]["rules_applied"])
 
@@ -101,7 +102,7 @@ def test_receive_rule_files_come_from_the_new_generation(tmp_path):
     write(tmp_path / "ws", "nw_can_dll.h", "a\nB-mine\nc\n")
     write(tmp_path / "new", "nw_can_dll.h", "a\nb-new\nc\nd\n")
     res = {r["file"]: r for r in cogent_carry.carry_forward(tmp_path / "base", tmp_path / "ws", tmp_path / "new", tmp_path / "out")}
-    assert read(tmp_path / "out" / "nw_can_dll.h") == "a\nb-new\nc\nd\n"
+    assert read(tmp_path / "out" / rel("nw_can_dll.h")) == "a\nb-new\nc\nd\n"
     assert res["nw_can_dll.h"]["status"] == "new generation taken" and "Receive FIFO" in res["nw_can_dll.h"]["detail"]
 
 

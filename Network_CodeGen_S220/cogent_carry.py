@@ -1,9 +1,9 @@
 """Re-apply hand edits of generated files to a new generation (three-way merge), for the GUI page
 'Re-apply edits' and tools/carry_forward.py.
 
-  base   the generated files the edits started from (e.g. CODE_GEN/DBC_40024)
+  base   the generation the edits started from (a run folder CODE_GEN/<date_time> or a flat folder)
   edited the workspace (each generated file is found by its name and must be unique there)
-  new    the new generation (normally CODE_GEN)
+  new    the new generation (normally the latest run folder)
   out    a new or empty folder, not inside the other three (they are only read)
 
 For every generated file the changes base -> edited are applied to the new file (git merge-file,
@@ -24,6 +24,8 @@ import subprocess
 import tempfile
 from collections import Counter
 from pathlib import Path
+
+from cogent_generate import output_relpath
 
 GENERATED_FILES = ["can_rxrule.cfg", "nw_can_dll.h", "nw_il_msg.h", "nw_il_par.h", "nw_il_par.c",
                    "nw_vnim_app_signals_par.c", "nw_vnim_app_signals_par.h", "vnim.msg.resource",
@@ -53,6 +55,15 @@ def _find(root, name):
         return hits[0], None
     return None, ("not found in %s" % root) if not hits else ("%d files named %s in %s: %s" % (
         len(hits), name, root, ", ".join(str(h.relative_to(root)) for h in hits)))
+
+
+def generated_path(folder, name):
+    """A generated file in a generation folder: flat (older CODE_GEN copies) or in the repository layout
+    (run folders CODE_GEN/<date_time>). None when it is not there."""
+    for path in (Path(folder) / name, Path(folder) / output_relpath(name)):
+        if path.is_file():
+            return path
+    return None
 
 
 def _inside(path, folder):
@@ -369,20 +380,20 @@ def carry_forward(base_dir, edited_root, new_dir, out_dir):
     for name in GENERATED_FILES:
         res = {"file": name, "status": "", "detail": "", "conflicts": [], "edits": 0, "auto": {}, "origin": None,
                "edited_path": None, "rules_applied": [], "checks": []}
-        new_path = Path(new_dir) / name
-        if not new_path.is_file():
+        new_path = generated_path(new_dir, name)
+        if new_path is None:
             res.update(status="skipped", detail="not in the new generation")
             results.append(res)
             continue
         new, eol = _read(new_path)
         edited_path, why_edited = _find(edited_root, name)
-        base_path = Path(base_dir) / name
+        base_path = generated_path(base_dir, name)
         res["edited_path"] = str(edited_path) if edited_path else None
         base = edited = None
         if edited_path is None:
             merged = new
             res.update(status="new file taken", detail="your file: " + why_edited)
-        elif not base_path.is_file():
+        elif base_path is None:
             merged = new
             res.update(status="new file taken", detail="no %s in the previous generation, so your edits are unknown" % name)
         else:
@@ -436,7 +447,9 @@ def carry_forward(base_dir, edited_root, new_dir, out_dir):
             r["status"] = "CONFLICTS"
         elif not r["status"]:
             r["status"] = "merged" if r["edits"] else "no hand edits"
-        with open(Path(out_dir) / r["file"], "w", encoding="latin-1", newline=t["eol"]) as fh:
+        target = Path(out_dir) / output_relpath(r["file"])
+        target.parent.mkdir(parents=True, exist_ok=True)
+        with open(target, "w", encoding="latin-1", newline=t["eol"]) as fh:
             fh.write(t["merged"])
     return results
 
@@ -465,7 +478,7 @@ def report(results, base_dir, edited_root, new_dir, out_dir):
         for problem in r["checks"]:
             n += 1
             lines += ["### %d. %s: check failed" % (n, r["file"]), "",
-                      "- **File and location:** %s" % os.path.join(out_dir, r["file"]),
+                      "- **File and location:** %s" % os.path.join(out_dir, output_relpath(r["file"])),
                       "- **Current value:** %s" % problem,
                       "- **Required change:** correct the file so the check passes",
                       "- **Why not automatic:** the merge result does not match the structure of the generated file",
@@ -484,7 +497,7 @@ def report(results, base_dir, edited_root, new_dir, out_dir):
                       "- **Why not automatic:** an old generated line cannot be told apart from a hand edit",
                       "- **Dependencies:** the other files of the same generation",
                       "- **Steps:** compare your file with the generated file of `%s` and remove differences you do not "
-                      "want from %s" % (mine, os.path.join(out_dir, r["file"])),
+                      "want from %s" % (mine, os.path.join(out_dir, output_relpath(r["file"]))),
                       "- **Verification:** tools/compare_reference.py --generated <result> --reference <workspace> shows "
                       "only intended differences", ""]
         if r["status"] in ("new file taken", "skipped") and not r["conflicts"]:
@@ -493,7 +506,7 @@ def report(results, base_dir, edited_root, new_dir, out_dir):
                       "- **File and location:** %s (whole file)" % r["file"],
                       "- **Current value:** %s" % r["detail"],
                       "- **Required change:** if you edited this file by hand, apply those edits to %s again"
-                      % os.path.join(out_dir, r["file"]),
+                      % os.path.join(out_dir, output_relpath(r["file"])),
                       "- **Why not automatic:** without the previous generated file and your edited file no edit can be derived",
                       "- **Dependencies:** none known",
                       "- **Steps:** choose folders that contain the file, or edit by hand",
@@ -501,7 +514,7 @@ def report(results, base_dir, edited_root, new_dir, out_dir):
         for line, new, base, edited in r["conflicts"]:
             n += 1
             lines += ["### %d. %s line %d: the new generation changed lines you edited" % (n, r["file"], line), "",
-                      "- **File and location:** %s, conflict starting at line %d" % (os.path.join(out_dir, r["file"]), line),
+                      "- **File and location:** %s, conflict starting at line %d" % (os.path.join(out_dir, output_relpath(r["file"])), line),
                       "- **Current value (new generation):**", "", "```", *(new or ["(nothing)"]), "```", "",
                       "- **Previous generation (your edit was based on this):**", "", "```", *(base or ["(nothing)"]), "```", "",
                       "- **Your edit:**", "", "```", *(edited or ["(nothing)"]), "```", "",

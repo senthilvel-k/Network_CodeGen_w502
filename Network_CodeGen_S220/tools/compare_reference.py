@@ -1,8 +1,8 @@
 """Compare generated CoGeNT files with a manually modified reference workspace.
 
 Usage (from Network_CodeGen_S220):
-  .venv/Scripts/python.exe tools/compare_reference.py --generated CODE_GEN --reference <workspace>
-        [--plan CODE_GEN/fifo_plan.json] [--report report.md] [--patch-dir patches]
+  .venv/Scripts/python.exe tools/compare_reference.py --generated CODE_GEN/<date_time> --reference <workspace>
+        [--plan CODE_GEN/<date_time>/fifo_plan.json] [--report report.md] [--patch-dir patches]
 
 For every generated file the workspace file with the same name is located (it must be unique).
 can_rxrule.cfg and nw_can_dll.h are also compared structurally (rules / dispatch entries). With
@@ -16,6 +16,9 @@ import os
 import re
 import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from cogent_carry import generated_path  # noqa: E402
 
 GENERATED_FILES = ["can_rxrule.cfg", "nw_can_dll.h", "nw_il_msg.h", "nw_il_par.h", "nw_il_par.c",
                    "nw_vnim_app_signals_par.c", "nw_vnim_app_signals_par.h", "vnim.msg.resource",
@@ -140,8 +143,8 @@ def find_reference(workspace, name):
 def build_report(generated, reference, plan_path=None, patch_dir=None):
     rows, details, ok = [], [], True
     for name in GENERATED_FILES:
-        gen = Path(generated) / name
-        if not gen.is_file():
+        gen = generated_path(generated, name)          # flat or a run folder CODE_GEN/<date_time>
+        if gen is None:
             continue
         ref = find_reference(reference, name)
         if ref is None:

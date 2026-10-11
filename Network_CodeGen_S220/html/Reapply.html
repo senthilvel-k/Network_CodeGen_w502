@@ -20,7 +20,7 @@
       applied to the new generation. The three input folders are only read; the result goes to the output folder.</p>
     <div class="cg-form">
       <label for="reapply-base">Previous generation</label>
-      <input class="cg-input" id="reapply-base" value="{{ paths.base }}" placeholder="the generated files your workspace edits started from, e.g. CODE_GEN\DBC_40024">
+      <input class="cg-input" id="reapply-base" value="{{ paths.base }}" placeholder="the generation your workspace edits started from, e.g. CODE_GEN\26-02-2026_12-10-10">
       <input type="button" class="cg-btn" value="Browse" onclick="BackEnd.reapply_browse('reapply-base')">
       <label for="reapply-edited">Your workspace</label>
       <input class="cg-input" id="reapply-edited" value="{{ paths.edited }}" placeholder="e.g. D:\networkgen\dc.app.scl.vehiclecomm">
@@ -34,8 +34,6 @@
     </div>
     <div class="cg-actions" style="margin-top:12px">
       <input type="button" class="cg-btn cg-btn-primary" id="reapply-run" value="Re-apply my edits" onclick="run()">
-      <input type="button" class="cg-btn" id="keep-copy" value="Keep a copy of CODE_GEN" onclick="BackEnd.keep_codegen_copy()"
-             title="Copies the generated files to CODE_GEN\<DBC>_<date>; use that copy as 'Previous generation' next time">
     </div>
     <p class="cg-muted cg-small">Needs Git for Windows (git merge-file). can_rxrule.cfg and nw_can_dll.h are taken from the new
       generation because the Receive FIFO settings produce them.</p>
@@ -44,7 +42,7 @@
   {% if results %}
   <section class="cg-card">
     <div class="cg-head"><h2>Result</h2>
-      <button type="button" class="cg-linkbtn" id="reapply-open" style="margin-left:auto" data-out="{{ out }}" onclick="BackEnd.reapply_open(this.dataset.out)">Open result folder</button></div>
+      <button type="button" class="cg-linkbtn" id="reapply-open" style="margin-left:auto" data-out="{{ out }}" onclick="BackEnd.open_folder(this.dataset.out)">Open result folder</button></div>
     <p class="cg-muted cg-small">{{ out }} - full report: CARRY_FORWARD.md in that folder.</p>
     <table class="cg-table" id="reapply-results">
       <tr><th>File</th><th>Result</th><th>Your edit regions</th><th>Conflicts</th><th>Note</th></tr>

@@ -25,6 +25,8 @@ FIFO_CONFIG = {
 }
 
 sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT))
+from cogent_generate import output_relpath  # noqa: E402
 
 
 def reference(name):
@@ -95,10 +97,10 @@ def test_carrying_hand_edits_forward_reproduces_the_reference_except_the_header_
     arrays = re.compile(r"(vnim_msg_byte_position|vnim_msg_bit_mask)\[NUM_VNIM_MESSAGES\]\s*=\s*\n\{\n(.*?)\n\};", re.S)
     stamp = re.compile(r"^(Date|By|Traceability)\s*:")
     for r in results:
-        got_text = (out / r["file"]).read_text(encoding="latin-1")
+        got_text = (out / output_relpath(r["file"])).read_text(encoding="latin-1")
         want_text = reference(r["file"]).read_text(encoding="latin-1").replace("\r", "")
         if r["file"] in cogent_carry.FIFO_FILES:              # generated from the FIFO settings: only your padding differs
-            assert normalized(out / r["file"]) == normalized(reference(r["file"])), r["file"]
+            assert normalized(out / output_relpath(r["file"])) == normalized(reference(r["file"])), r["file"]
             continue
         if r["file"] == cogent_carry.VNIM_C:                  # your arrays have 192 entries for 193 messages: rebuilt
             assert [len(re.split(r"[,\s\\]+", body.strip())) for _, body in arrays.findall(got_text)] == [193, 193]
@@ -139,7 +141,7 @@ def test_re_applying_the_40024_edits_to_41490_needs_no_manual_conflict_resolutio
     assert _digest(REFERENCE_WS) == before
     assert {f: len(r["conflicts"]) for f, r in results.items() if r["conflicts"]} == {}
     assert {f: r["checks"] for f, r in results.items() if r["checks"]} == {}
-    il_par = (out / "nw_il_par.h").read_text(encoding="latin-1")
+    il_par = (out / output_relpath("nw_il_par.h")).read_text(encoding="latin-1")
     assert re.search(r"^#define IL_RX_NUM_MESSAGES\s+195\s*$", il_par, re.M)
     assert re.search(r"^#define IL_MUX_MSG_OFFSET_ID\s+163\s*$", il_par, re.M)
     assert re.search(r"^#define IL_NUM_OF_RX_DATA_CHANGED_FLAG\s+\(163 \+ 17\)\s*$", il_par, re.M)

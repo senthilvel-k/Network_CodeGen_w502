@@ -7,6 +7,8 @@ import pytest
 from support import ROOT
 
 sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT))
+from cogent_generate import output_relpath as rel  # generated files are written in the repository layout
 
 GEN = ["/* header */", "Date                : 2026-01-01 10:00", "By                  : someone",
        "Traceability        : OLD.dbc", "int a = 1;", "int b = 2;", "int c = 3;", "int d = 4;", "int e = 5;",
@@ -28,7 +30,7 @@ def run(tmp_path, base, edited, new, name="nw_il_par.c", out="out"):
     write(tmp_path / "ws" / "app" / "src", name, edited)
     write(tmp_path / "new", name, new)
     results = carry_forward.carry_forward(tmp_path / "base", tmp_path / "ws", tmp_path / "new", tmp_path / out)
-    return next(r for r in results if r["file"] == name), tmp_path / out / name
+    return next(r for r in results if r["file"] == name), tmp_path / out / rel(name)
 
 
 def replaced(lines, index, value):
@@ -92,7 +94,7 @@ def test_new_line_style_of_the_new_file_is_kept(tmp_path):
     write(tmp_path / "ws", "nw_il_par.h", replaced(GEN, 5, "int b = 20;"), eol="\n")
     write(tmp_path / "new", "nw_il_par.h", GEN, eol="\r\n")
     carry_forward.carry_forward(tmp_path / "base", tmp_path / "ws", tmp_path / "new", tmp_path / "out")
-    data = (tmp_path / "out" / "nw_il_par.h").read_bytes()
+    data = (tmp_path / "out" / rel("nw_il_par.h")).read_bytes()
     assert b"int b = 20;\r\n" in data and b"\n" not in data.replace(b"\r\n", b"")
 
 
@@ -112,10 +114,10 @@ def test_carrying_forward_is_repeatable_and_idempotent(tmp_path):
     import carry_forward
     res, first = run(tmp_path, GEN, replaced(GEN, 5, "int b = 20;"), replaced(GEN, 9, "int f = 60;"))
     carry_forward.carry_forward(tmp_path / "base", tmp_path / "ws", tmp_path / "new", tmp_path / "out2")
-    assert (tmp_path / "out2" / "nw_il_par.c").read_bytes() == first.read_bytes()
+    assert (tmp_path / "out2" / rel("nw_il_par.c")).read_bytes() == first.read_bytes()
     # merging again onto a result that already contains the edits changes nothing
     carry_forward.carry_forward(tmp_path / "base", tmp_path / "ws", tmp_path / "out", tmp_path / "out3")
-    assert (tmp_path / "out3" / "nw_il_par.c").read_bytes() == first.read_bytes()
+    assert (tmp_path / "out3" / rel("nw_il_par.c")).read_bytes() == first.read_bytes()
 
 
 def test_command_line_exit_codes_and_report(tmp_path):

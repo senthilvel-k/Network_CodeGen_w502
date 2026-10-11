@@ -83,8 +83,15 @@
       <input type="button" class="cg-btn" value="Save configuration" name="save_cofiguration" onclick="BackEnd.save_cfg()">
       <input type="button" class="cg-btn" value="Load configuration" name="load_cofiguration" onclick="BackEnd.load_cfg()">
     </div>
-    <p class="cg-muted cg-small">Generate code writes the files to CODE_GEN. Save configuration stores the page settings and the
-      Receive FIFO settings in the Config folder; Load configuration restores them.</p>
+    {% if last_run %}
+    <p id="last-run">Last generation: <span class="cg-mono">{{ last_run }}</span>
+      <button type="button" class="cg-linkbtn" id="open-last-run" data-path="{{ last_run_path }}"
+              onclick="BackEnd.open_folder(this.dataset.path)">Open folder</button></p>
+    {% endif %}
+    <p class="cg-muted cg-small">Generate code writes a new folder CODE_GEN\&lt;date_time&gt; with the configuration (.cfg), the
+      reports and the files in the folders of your repository (app.nos.arch3, app.vnim.arch3, app.host.manager), ready to copy
+      over it. Save configuration stores the page settings and the Receive FIFO settings in the Config folder; Load
+      configuration restores them.</p>
   </section>
 </main>
 </div>

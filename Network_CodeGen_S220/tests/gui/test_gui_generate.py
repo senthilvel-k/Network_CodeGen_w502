@@ -8,7 +8,7 @@ import sys
 import pytest
 
 from gui_support import js, navigate, start_app_copy, wait_alert, wait_ready
-from support import CODE_FILES, LEGACY_REFS, normalize_header
+from support import CODE_FILES, LEGACY_REFS, normalize_header, run_file
 
 pytestmark = pytest.mark.gui
 FIXTURE = "s237_36144_2"
@@ -44,10 +44,10 @@ def test_full_generate_flow_matches_legacy_run(qtbot, app_copy):
     navigate(qtbot, gui, f"BackEnd.Can_dbc0_sig_SaveButton({json.dumps(sig_data)})")
 
     navigate(qtbot, gui, "document.querySelector('input[name=code_generate]').click()")
-    wait_alert(qtbot, gui, "Code Generated in CODE_GEN folder")
+    wait_alert(qtbot, gui, "Code generated in CODE_GEN")
     legacy_dir = LEGACY_REFS[FIXTURE][0]
     for name in CODE_FILES:
-        assert normalize_header((home / "CODE_GEN" / name).read_bytes()) == \
+        assert normalize_header(run_file(home, name).read_bytes()) == \
             normalize_header((legacy_dir / name).read_bytes()), name
 
 
@@ -66,22 +66,22 @@ def test_real_save_and_back_forms_keep_saved_configuration(qtbot, app_copy):
         assert (home / "data" / data_name).read_bytes() == (fx.data_dir / data_name).read_bytes(), data_name
     gui.alerts.clear()
     navigate(qtbot, gui, "document.querySelector('input[name=code_generate]').click()")
-    wait_alert(qtbot, gui, "Code Generated in CODE_GEN folder")
+    wait_alert(qtbot, gui, "Code generated in CODE_GEN")
     legacy_dir = LEGACY_REFS[FIXTURE][0]
     for name in CODE_FILES:
-        assert normalize_header((home / "CODE_GEN" / name).read_bytes()) == \
+        assert normalize_header(run_file(home, name).read_bytes()) == \
             normalize_header((legacy_dir / name).read_bytes()), name
 
 
 def test_second_generate_in_same_session_gives_identical_files(qtbot, app_copy):
     back_end, home, fx, dbc = app_copy
     gui = back_end.app
-    first = {n: (home / "CODE_GEN" / n).read_bytes() for n in CODE_FILES}
+    first = {n: run_file(home, n).read_bytes() for n in CODE_FILES}
     gui.alerts.clear()
     navigate(qtbot, gui, "document.querySelector('input[name=code_generate]').click()")
-    wait_alert(qtbot, gui, "Code Generated in CODE_GEN folder")
+    wait_alert(qtbot, gui, "Code generated in CODE_GEN")
     for n in CODE_FILES:
-        second = (home / "CODE_GEN" / n).read_bytes()
+        second = run_file(home, n).read_bytes()
         # Only the revision-note "Date" line (minute resolution) may differ between runs.
         assert normalize_header(second) == normalize_header(first[n]), n
         changed = [i for i, (a, b) in enumerate(zip(second.splitlines(), first[n].splitlines())) if a != b]

@@ -54,7 +54,8 @@ CoGeNT.pyw ──> back_end.py ──────────────┐  Ba
                          (cogent_io.open_output/close_output redirect print() into the file)
                       4. checks the staged can_rxrule.cfg / nw_can_dll.h against the plan, writes
                          fifo_plan.json + MANUAL_ACTIONS.md into the staging folder
-                      5. moves the 11 files + 2 reports into CODE_GEN only when all succeeded
+                      5. when all succeeded: arranges the 11 files in the S2XX repository layout, adds
+                         the .cfg archive and renames the staging folder to CODE_GEN/<dd-mm-yyyy_hh-mm-ss>
                       6. on failure: CogentError -> popup; traceback -> CODE_GEN\errorlog.txt + logs\cogent.log
 ```
 

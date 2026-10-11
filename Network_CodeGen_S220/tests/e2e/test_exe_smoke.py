@@ -17,7 +17,7 @@ import urllib.request
 
 import pytest
 
-from support import CODE_FILES, LEGACY_REFS, ROOT, load_fixture, normalize_header
+from support import CODE_FILES, LEGACY_REFS, ROOT, latest_run, load_fixture, normalize_header, run_file
 
 pywinauto = pytest.importorskip("pywinauto")
 websocket = pytest.importorskip("websocket")
@@ -99,7 +99,9 @@ def _dismiss_alert(main_window, text, timeout=300):
 
 
 def _on_page(cdp, page_name):
-    cdp.wait(f"location.href.endsWith('/{page_name}') && window.__cogentReady === true")
+    # readyState 'complete': the page's own load() ran and bridge.js bound the forms (the bridge can be
+    # ready before a multi-MB page is parsed; a click then would submit the form natively)
+    cdp.wait(f"location.href.endsWith('/{page_name}') && window.__cogentReady === true && document.readyState === 'complete'")
 
 
 @pytest.mark.parametrize("fixture_name", FIXTURES)
@@ -140,18 +142,18 @@ def test_exe_generates_code_like_legacy(tmp_path, fixture_name):
             _on_page(cdp, "Tool_Index_Page.html")
 
         cdp.eval("document.querySelector('input[name=code_generate]').click(); true")
-        _dismiss_alert(win, "Code Generated in CODE_GEN folder")
+        _dismiss_alert(win, "Code generated in CODE_GEN")
         assert not (home / "CODE_GEN" / "errorlog.txt").exists()
         legacy_dir = LEGACY_REFS[fixture_name][0]
         for name in CODE_FILES:
-            assert (home / "CODE_GEN" / name).stat().st_size > 0, name
+            assert run_file(home, name).stat().st_size > 0, name
             if fixture_name in FIFO_CONFIGS and name in FIFO_FILES:
                 continue                            # merged ID blocks: checked against the plan below
-            assert normalize_header((home / "CODE_GEN" / name).read_bytes()) == \
+            assert normalize_header(run_file(home, name).read_bytes()) == \
                 normalize_header((legacy_dir / name).read_bytes()), name
-        plan = json.loads((home / "CODE_GEN" / "fifo_plan.json").read_text(encoding="utf-8"))
+        plan = json.loads((latest_run(home) / "fifo_plan.json").read_text(encoding="utf-8"))
         assert plan["total_rules"] <= 192
-        assert (home / "CODE_GEN" / "MANUAL_ACTIONS.md").exists()
+        assert (latest_run(home) / "MANUAL_ACTIONS.md").exists() and list(latest_run(home).glob("*.cfg"))
         if fixture_name in FIFO_CONFIGS:
             assert plan["fifo_counts"] == [64, 64, 56]
     finally:

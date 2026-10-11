@@ -51,6 +51,28 @@ class Fixture:
     data_dir: Path
 
 
+def latest_run(home):
+    """The newest run folder CODE_GEN/<date_time> of an app folder."""
+    import sys
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    import cogent_generate
+    run = cogent_generate.latest_run(str(Path(home) / "CODE_GEN"))
+    assert run, "no run folder in %s" % (Path(home) / "CODE_GEN")
+    return Path(run)
+
+
+def run_file(home, name):
+    """A generated file of the newest run folder (in the repository layout)."""
+    import cogent_generate
+    return latest_run(home) / cogent_generate.output_relpath(name)
+
+
+def run_folder_count(home):
+    import cogent_generate
+    return len(cogent_generate.run_folders(str(Path(home) / "CODE_GEN")))
+
+
 def fixture_names():
     if not FIXTURES.exists():
         return []
