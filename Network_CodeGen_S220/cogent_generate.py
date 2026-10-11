@@ -68,6 +68,9 @@ OUTPUT_LAYOUT = {
 }
 RUN_FOLDER = re.compile(r"^(\d{2})-(\d{2})-(\d{4})_(\d{2})-(\d{2})-(\d{2})(?:_(\d+))?$")
 ARCHIVE_SOURCES = (('html', '*.html'), ('data', '*.data'), ('js', '*.js'))
+# Pages of the app itself (templates of this version): never archived, never restored from an archive
+APP_PAGES = frozenset({'_sidebar.html', '_page_shell.html', 'Tool_Index_Page.html', 'Fifo.html', 'Help.html',
+                       'Reapply.html', 'Overrides.html'})
 
 
 @dataclass
@@ -113,7 +116,18 @@ def write_config_archive(target):
     with zipfile.ZipFile(target, 'w', compression=zipfile.ZIP_DEFLATED) as archive:
         for folder, pattern in ARCHIVE_SOURCES:
             for path in sorted(glob.glob(os.path.join('.', folder, pattern))):
-                archive.write(path, folder + '/' + os.path.basename(path))
+                if not (folder == 'html' and os.path.basename(path) in APP_PAGES):
+                    archive.write(path, folder + '/' + os.path.basename(path))
+
+
+def extract_config_archive(path):
+    """Restore a configuration archive into the working folder, except the pages of the app (archives of
+    earlier versions contain theirs). Returns the names extracted."""
+    with zipfile.ZipFile(path) as archive:
+        names = [n for n in archive.namelist()
+                 if not (n.startswith('html/') and n[len('html/'):] in APP_PAGES)]
+        archive.extractall(members=names)
+    return names
 
 
 def run_code_generation(dbc, node, time_str):

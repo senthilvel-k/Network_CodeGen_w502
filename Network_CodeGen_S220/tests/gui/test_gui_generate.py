@@ -112,7 +112,8 @@ def test_save_and_load_configuration_round_trip(qtbot, app_copy, monkeypatch):
     with zipfile.ZipFile(saved) as z:
         names = set(z.namelist())
         assert {"data/CanDbcMsgConfiguration.data", "data/CanDbcSigConfiguration.data",
-                "data/dbc_details.data", "html/Tool_Index_Page.html", "js/CanDbcMsgConfiguration.js"} <= names
+                "data/dbc_details.data", "html/CAN_DBC_msg.html", "js/CanDbcMsgConfiguration.js"} <= names
+        assert "html/Tool_Index_Page.html" not in names and "html/_sidebar.html" not in names   # app pages
         assert z.read("data/CanDbcMsgConfiguration.data") == (fx.data_dir / "CanDbcMsgConfiguration.data").read_bytes()
 
     monkeypatch.setattr(back_end.QtWidgets.QFileDialog, "getOpenFileName",

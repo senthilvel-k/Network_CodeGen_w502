@@ -181,7 +181,7 @@ class BackEnd(htmlPy.Object):
                                       item=item, hint=hint)
                 dbc_details = json.loads(zip1.read('data/dbc_details.data').decode('utf-8'))
                 fifo_note = _fifo_note(zip1.namelist()) + _overrides_note(zip1.namelist())
-                zip1.extractall()
+            cogent_generate.extract_config_archive(file_val)
         except CogentError as err:
             self._fail(op, err)
             return
