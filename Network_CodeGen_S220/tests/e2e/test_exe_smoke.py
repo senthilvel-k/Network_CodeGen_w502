@@ -17,7 +17,7 @@ import urllib.request
 
 import pytest
 
-from support import CODE_FILES, LEGACY_REFS, ROOT, latest_run, load_fixture, normalize_header, run_file
+from support import CODE_FILES, LEGACY_REFS, ROOT, latest_run, load_fixture, normalize_header, reference_bytes, run_file
 
 pywinauto = pytest.importorskip("pywinauto")
 websocket = pytest.importorskip("websocket")
@@ -150,7 +150,7 @@ def test_exe_generates_code_like_legacy(tmp_path, fixture_name):
             if fixture_name in FIFO_CONFIGS and name in FIFO_FILES:
                 continue                            # merged ID blocks: checked against the plan below
             assert normalize_header(run_file(home, name).read_bytes()) == \
-                normalize_header((legacy_dir / name).read_bytes()), name
+                normalize_header(reference_bytes(legacy_dir / name)), name
         plan = json.loads((latest_run(home) / "fifo_plan.json").read_text(encoding="utf-8"))
         assert plan["total_rules"] <= 192
         assert (latest_run(home) / "MANUAL_ACTIONS.md").exists() and list(latest_run(home).glob("*.cfg"))

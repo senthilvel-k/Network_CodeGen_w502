@@ -46,5 +46,5 @@ def test_the_user_guide_renders_without_markdown_leftovers():
     for marker in ("**", "```", "|---", "](http"):
         assert marker not in outside_code, marker
     titles = [t for _, t in toc]
-    for section in ("Receive FIFO", "Re-apply edits", "Generate code", "Error messages"):
+    for section in ("Receive FIFO", "Code overrides", "Re-apply edits", "Generate code", "Error messages"):
         assert any(section in t for t in titles), section

@@ -9,7 +9,7 @@ import zipfile
 import pytest
 
 from gui_support import js, navigate, settle, start_app_copy, wait_alert
-from support import CODE_FILES, LEGACY_REFS, latest_run, normalize_header, run_file
+from support import CODE_FILES, LEGACY_REFS, latest_run, normalize_header, reference_bytes, run_file
 
 pytestmark = pytest.mark.gui
 FIXTURE = "s2xx_40024"
@@ -151,7 +151,7 @@ def test_code_gen_matches_legacy_and_keeps_path_with_apostrophe(qtbot, app):
     legacy = LEGACY_REFS[FIXTURE][0]
     for name in CODE_FILES:
         assert normalize_header(run_file(home, name).read_bytes()) == \
-            normalize_header((legacy / name).read_bytes()), name
+            normalize_header(reference_bytes(legacy / name)), name
     assert js(qtbot, gui, "document.getElementById('file_path').value") == dbc.as_posix()
     assert js(qtbot, gui, "document.getElementById('ch0_node_name').value") == "SMART_CORE"
     gui.alerts.clear()
@@ -162,20 +162,22 @@ def test_code_gen_failure_explains_and_keeps_previous_files(qtbot, app):
     gui = back_end.app
     before = code_gen_snapshot(home)
     data = json.loads((fx.data_dir / "CanDbcMsgConfiguration.data").read_text(encoding="utf-8"))
-    data["BMS19_100_rx_enable"] = "on"
+    data["BMS19_100_rx_enable"] = "on"            # enabled, but its 33 signals have no saved settings yet
     navigate(qtbot, gui, "BackEnd.Can_dbc_msg_SaveButton(%s)" % json.dumps(json.dumps(data)))
     gui.alerts.clear()
-    navigate(qtbot, gui, CODE_GEN_BTN)
-    settle(qtbot, gui)
-    assert len(gui.alerts) == 1, gui.alerts
-    text = gui.alerts[0]
-    assert text.startswith("Code generation failed") and "BMS19_100" in text and "Traceback" not in text
-    assert "errorlog.txt" in text
-    assert code_gen_snapshot(home) == before
-    assert "Traceback" in (home / "CODE_GEN" / "errorlog.txt").read_text(encoding="utf-8")
-    original = (fx.data_dir / "CanDbcMsgConfiguration.data").read_text(encoding="utf-8")
-    navigate(qtbot, gui, "BackEnd.Can_dbc_msg_SaveButton(%s)" % json.dumps(original))
-    gui.alerts.clear()
+    try:
+        navigate(qtbot, gui, CODE_GEN_BTN)
+        settle(qtbot, gui)
+        assert len(gui.alerts) == 1, gui.alerts
+        text = gui.alerts[0]
+        assert text.startswith("Code generation failed") and "BMS_CELLTEMP" in text and "Traceback" not in text
+        assert "TX/RX signals" in text and "errorlog.txt" in text
+        assert code_gen_snapshot(home) == before
+        assert "Traceback" in (home / "CODE_GEN" / "errorlog.txt").read_text(encoding="utf-8")
+    finally:                                      # the next tests need the original message settings
+        original = (fx.data_dir / "CanDbcMsgConfiguration.data").read_text(encoding="utf-8")
+        navigate(qtbot, gui, "BackEnd.Can_dbc_msg_SaveButton(%s)" % json.dumps(original))
+        gui.alerts.clear()
 
 
 def test_code_gen_overflow_popup_names_rules_messages_and_candidates(qtbot, app):

@@ -14,6 +14,32 @@ function cogentMarkNew(kind) {
       ' <button type="button" id="cogent-next-new" class="cg-btn cg-btn-small">Next new</button>' +
       ' <button type="button" id="cogent-only-new" class="cg-btn cg-btn-small">Only new</button>';
   }
+  // signal page: set the notification of every new row at once (e.g. the 130 signals of two new BMS messages)
+  if (rows.length && document.querySelector('tr.cogent-new select[id$="_os_notify_no_of_events"]')) {
+    var notify = document.createElement("span");
+    notify.appendChild(document.createTextNode(" Notification for new rows: "));
+    var choice = document.createElement("select");
+    choice.id = "cogent-new-notify";
+    ["No_Delay", "200ms_Delay_g1", "200ms_Delay_g2"].forEach(function (value) {
+      var option = document.createElement("option");
+      option.value = value;
+      option.textContent = value;
+      choice.appendChild(option);
+    });
+    var apply = document.createElement("button");
+    apply.type = "button";
+    apply.id = "cogent-apply-notify";
+    apply.className = "cg-btn cg-btn-small";
+    apply.textContent = "Apply to new rows";
+    apply.onclick = function () {
+      Array.prototype.forEach.call(document.querySelectorAll('tr.cogent-new select[id$="_os_notify_no_of_events"]'),
+        function (select) { select.value = choice.value; });
+    };
+    notify.appendChild(choice);
+    notify.appendChild(document.createTextNode(" "));
+    notify.appendChild(apply);
+    bar.appendChild(notify);
+  }
   var save = document.createElement("button");
   save.type = "button";
   save.id = "cogent-save";

@@ -15,9 +15,15 @@ diff3). Then:
     IL_MUX_MSG_OFFSET_ID / IL_NUM_OF_RX_DATA_CHANGED_FLAG (first flag byte after the generated ones),
     the VNIM_*_MESSAGE handle numbers (enum order, then Diag/NM handles) and the per-message arrays
     vnim_msg_byte_position / vnim_msg_bit_mask;
+  - messages you added by hand (a VNIM_<X>_MESSAGE handle your file has and the previous generation
+    not) that the new generation produces, or that the new DBC (fifo_plan.json) does not have: their hand
+    code is left out before the merge (regions naming them, their signals or the multiplex flag area, and
+    no other message), so the generated code is used once or the message disappears; per-message tables
+    with the wrong entry count are then taken from the new generation;
   - the result is checked (conflict markers, definitions lost or doubled, table sizes and order).
 Everything else that overlaps stays between conflict markers and is listed under Manual Action Required."""
 import difflib
+import json
 import os
 import re
 import subprocess
@@ -46,7 +52,7 @@ def _read(path):
     return raw.replace("\r\n", "\n"), ("\r\n" if "\r\n" in raw else "\n")
 
 
-def _find(root, name):
+def find_file(root, name):
     root = Path(root)
     if (root / name).is_file():
         return root / name, None
@@ -198,7 +204,7 @@ def _flag_count(new_text):
     return int(m.group(1)) if m else None
 
 
-def resolve_counts(new, base, edited, new_text):
+def resolve_counts(new, base, edited, new_text, generated=0):
     """Conflict of the IL_RX_NUM_* / data-changed-flag defines: your change applied to the new values,
     the multiplex flag offset set to the first flag byte after the generated ones. None if not that block."""
     if not any(l.startswith("#define IL_RX_NUM_") for l in edited):
@@ -212,18 +218,31 @@ def resolve_counts(new, base, edited, new_text):
             continue
         prefix, name, gap, value, trail = m.groups()
         extra = re.fullmatch(r"\(\s*\d+\s*\+\s*(\d+)\s*\)", value)
-        if name == "IL_MUX_MSG_OFFSET_ID" and flags is not None:
+        if name in ("IL_MUX_MSG_OFFSET_ID", "IL_NUM_OF_RX_DATA_CHANGED_FLAG") and "IL_MUX_MSG_OFFSET_ID" in nv:
+            value = nv[name]                # the new generation lays out the multiplex flag area itself
+        elif name == "IL_MUX_MSG_OFFSET_ID" and flags is not None:
             value = str(flags)
         elif name == "IL_NUM_OF_RX_DATA_CHANGED_FLAG" and extra and flags is not None:
             value = "(%d + %s)" % (flags, extra.group(1))
         elif value.isdigit() and nv.get(name, "").isdigit() and bv.get(name, "").isdigit():
-            value = str(int(nv[name]) + int(value) - int(bv[name]))
+            value = str(int(nv[name]) + int(value) - int(bv[name]) - (generated if name.startswith("IL_RX_NUM_") else 0))
         elif nv.get(name) == value:
             pass
         else:
             return None
         out.append(prefix + name + gap + value + trail)
     return out
+
+
+RX_COUNT = re.compile(r"^(#define IL_RX_NUM_(?:PERIODIC|MESSAGES|FRAMES)\s+)(\d+)(\s*)$", re.M)
+
+
+def set_receive_counts(text, n):
+    """IL_RX_NUM_PERIODIC / _MESSAGES / _FRAMES = the n messages of the VNIM enum, as the generator writes
+    them (your change and the new generation's can look alike but count different messages).
+    Returns (text, changed)."""
+    new = RX_COUNT.sub(lambda m: m.group(1) + str(n) + m.group(3), text)
+    return new, new != text
 
 
 def _split_handles(lines):
@@ -233,26 +252,26 @@ def _split_handles(lines):
     return lines[:idx[0]], lines[idx[0]:idx[-1] + 1], lines[idx[-1] + 1:]
 
 
-def _resolve_part(new, base, edited, new_text):
+def _resolve_part(new, base, edited, new_text, generated=0):
     if _norm(new) == _norm(edited):
         return edited
     if _norm(edited) == _norm(base):
         return new
     if _norm(new) == _norm(base):
         return edited
-    return resolve_counts(new, base, edited, new_text)
+    return resolve_counts(new, base, edited, new_text, generated)
 
 
-def resolve_il_par_conflict(new, base, edited, new_text):
+def resolve_il_par_conflict(new, base, edited, new_text, generated=0):
     """nw_il_par.h conflict: receive counts recomputed; handle defines kept as placeholders (rebuilt from
     the enum afterwards); anything else in the conflict must be unchanged on one side. None = unresolved."""
     parts = [_split_handles(side) for side in (new, base, edited)]
     if not any(p[1] for p in parts):
-        return resolve_counts(new, base, edited, new_text)
+        return resolve_counts(new, base, edited, new_text, generated)
     if any(l.strip() and not HANDLE.match(l) for p in parts for l in p[1]):
         return None                                   # other lines between handle defines
-    before = _resolve_part(parts[0][0], parts[1][0], parts[2][0], new_text)
-    after = _resolve_part(parts[0][2], parts[1][2], parts[2][2], new_text)
+    before = _resolve_part(parts[0][0], parts[1][0], parts[2][0], new_text, generated)
+    after = _resolve_part(parts[0][2], parts[1][2], parts[2][2], new_text, generated)
     if before is None or after is None:
         return None
     return before + (parts[0][1] or parts[2][1]) + after
@@ -303,6 +322,27 @@ def rebuild_message_arrays(text, n):
         text = text[:m.start(2)] + "\n".join(_array_rows(values)) + text[m.end(2):]
         rebuilt.append(name)
     return text, rebuilt
+
+
+def _table_entries(body):
+    body = re.sub(r"/\*.*?\*/", "", body).replace("\\", " ")
+    return len([x for x in body.split(",") if x.strip()])
+
+
+def rebuild_message_tables(text, new_text, n):
+    """Per-message tables of nw_vnim_app_signals_par.h whose entry count does not fit the n messages are
+    taken from the new generation (e.g. after the hand code of a removed message was left out; entries such
+    as DUMMY_DTC_ID do not say which message they belong to). Returns (text, table names)."""
+    taken = []
+    for name, per in MESSAGE_TABLES.items():
+        pattern = re.compile(r"^#define\s+%s\s*\\\n((?:.*\\\n)*.*)$" % name, re.M)
+        m, nm = pattern.search(text), pattern.search(new_text)
+        if not m or not nm or MARKER.search(m.group(0)) or _table_entries(m.group(1)) == n * per \
+                or _table_entries(nm.group(1)) != n * per:
+            continue
+        text = text[:m.start()] + nm.group(0) + text[m.end():]
+        taken.append(name)
+    return text, taken
 
 
 # ---- checks of the merged result ---------------------------------------------------------------------
@@ -363,6 +403,158 @@ def table_problems(text, filename, order):
     return problems
 
 
+# ---- hand-added messages that the new generation produces or the new DBC does not have -----------------
+IDENTIFIER = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
+SIGNAL_FLAG = re.compile(r"^#define ILSet_(\w+)_DataChanged\(\)", re.M)
+PSEUDO_HANDLES = {"IL_RX"}                       # VNIM_IL_RX_MESSAGE: not a message (and part of il_Rx_...)
+
+
+def handles(text):
+    return [m.group(2) for m in (HANDLE.match(line) for line in text.split("\n")) if m]
+
+
+def hand_added(base_h, edited_h):
+    """Receive messages with a VNIM_<X>_MESSAGE handle in your nw_il_par.h but not in the previous generation."""
+    base = set(handles(base_h))
+    return [n for n in handles(edited_h) if n not in base and n not in PSEUDO_HANDLES]
+
+
+def _segments(identifier):
+    """Every run of '_'-separated parts of an identifier (upper case), also after the IlRxGet prefix that
+    the generator writes without '_' (IlRxGetBMS_CELLTEMP1)."""
+    out = set()
+    up = identifier.upper()
+    for ident in (up, up[len("ILRXGET"):] if up.startswith("ILRXGET") else ""):
+        parts = ident.split("_")
+        out |= {"_".join(parts[i:j]) for i in range(len(parts)) for j in range(i + 1, len(parts) + 1)}
+    return out - {""}
+
+
+def region_kind(lines, owned, foreign):
+    """'owned' when the lines name something of `owned` (a message, a signal, the multiplex flag offset)
+    and nothing of `foreign` (messages and signals of the previous generation); 'foreign' when they name
+    something of `foreign`; 'comment' for comment-only lines; 'neutral' for code that names neither."""
+    names = set()
+    for line in lines:
+        for ident in IDENTIFIER.findall(line):
+            names |= _segments(ident)
+    if names & foreign:
+        return "foreign"
+    if names & owned:
+        return "owned"
+    if any(COMMENT_ONLY.match(line) for line in lines if line.strip()):
+        return "comment"
+    return "neutral"
+
+
+def owned_region(lines, owned, foreign):
+    return region_kind(lines, owned, foreign) == "owned"
+
+
+ONE_LINE = re.compile(r"^\s*(#\s*define\s|extern\s|/\*.*\*/\s*\\?\s*$|//)|.*\);\s*$")
+
+
+def _pieces(lines):
+    """Inserted lines split into independent pieces: paragraphs (blank lines between them), and single
+    lines when a paragraph holds only one-line items (#define, extern, prototypes, comments)."""
+    pieces, para = [], []
+
+    def flush():
+        if para:
+            if all(ONE_LINE.match(line) for line in para):
+                pieces.extend([line] for line in para)
+            else:
+                pieces.append(list(para))
+            para.clear()
+    for line in lines:
+        if line.strip():
+            para.append(line)
+        else:
+            flush()
+            pieces.append([line])
+    flush()
+    return pieces
+
+
+COMMENT_ONLY = re.compile(r"^\s*(/\*.*\*/|//.*|\*.*|/\*.*)\s*\\?\s*$")
+
+
+def merge_without(base_lines, edited_lines, kind):
+    """Your file without the edits that kind(lines) calls 'owned' (a bool predicate works too). Inserted
+    pieces are left out with the blank line after them; an inserted region of owned pieces and neutral code
+    (which names no message or signal: braces, 'typedef union {', the diff may have cut it off a construct
+    that repeats through the file) is left out as a whole. A changed region is put back to the previous
+    generation."""
+    def classify(lines):
+        k = kind(lines)
+        return "owned" if k is True else "foreign" if k is False else k
+    def without_owned(pieces, kinds):
+        kept, left_out = [], False
+        for piece, k in zip(pieces, kinds):
+            if k == "blank":
+                if not left_out:
+                    kept += piece
+                left_out = False
+            elif k == "owned":
+                left_out = True
+            else:
+                left_out = False
+                kept += piece
+        return kept
+
+    out = []
+    for tag, i1, i2, j1, j2 in difflib.SequenceMatcher(None, base_lines, edited_lines, autojunk=False).get_opcodes():
+        if tag == "equal":
+            out += edited_lines[j1:j2]
+            continue
+        if tag != "insert" and classify(base_lines[i1:i2] + edited_lines[j1:j2]) == "owned":
+            out += base_lines[i1:i2]                    # a changed region that only concerns owned names
+            continue
+        pieces = _pieces(edited_lines[j1:j2])
+        kinds = [classify(p) if p[0].strip() else "blank" for p in pieces]
+        if tag == "insert" and "owned" in kinds and set(kinds) <= {"owned", "neutral", "blank"}:
+            continue                                    # owned code and pieces of its constructs only
+        kept = without_owned(pieces, kinds)             # your other changes in the region stay
+        if "owned" in kinds and tag != "insert" and _norm(kept) == _norm(base_lines[i1:i2]):
+            kept = base_lines[i1:i2]                    # only white space left: noise of the hand insertion
+        out += kept
+    return out
+
+
+def dbc_messages(new_dir):
+    """Message names of the DBC of a run folder (fifo_plan.json), None when not known."""
+    try:
+        return set(json.loads((Path(new_dir) / "fifo_plan.json").read_text(encoding="utf-8"))["dbc_messages"])
+    except (OSError, ValueError, KeyError, TypeError):
+        return None
+
+
+def _hand_added_status(base_dir, edited_root, new_dir):
+    """{message: 'now generated' | 'not in the DBC' | 're-applied'} and the region test for the first two."""
+    paths = (generated_path(base_dir, IL_PAR_H), find_file(edited_root, IL_PAR_H)[0], generated_path(new_dir, IL_PAR_H))
+    if None in paths:
+        return {}, None
+    base_h, edited_h, new_h = (_read(p)[0] for p in paths)
+    in_dbc, generated = dbc_messages(new_dir), set(handles(new_h))
+    status = {}
+    for name in hand_added(base_h, edited_h):
+        status[name] = ("now generated" if name in generated else
+                        "not in the DBC" if in_dbc is not None and name not in in_dbc else "re-applied")
+    dropped = {n for n, s in status.items() if s != "re-applied"}
+    if not dropped:
+        return status, None
+    base_signals = set(SIGNAL_FLAG.findall(base_h))
+    added = set(SIGNAL_FLAG.findall(edited_h)) - base_signals
+    generated_signals = added & set(SIGNAL_FLAG.findall(new_h))   # signals of the messages generated now
+    owned = set(dropped) | generated_signals
+    foreign = (set(handles(base_h)) - PSEUDO_HANDLES) | base_signals | (set(status) - dropped)
+    if len(dropped) == len(status):                  # every hand-added signal (and the flag area) is theirs
+        owned |= added | {"IL_MUX_MSG_OFFSET_ID"}
+    else:                                            # the others belong to messages whose hand code stays
+        foreign |= added - generated_signals
+    return status, (lambda lines: region_kind(lines, owned, foreign))
+
+
 # ---- the merge ---------------------------------------------------------------------------------------
 def carry_forward(base_dir, edited_root, new_dir, out_dir):
     """Merge every generated file into out_dir; returns a list of per-file result dicts."""
@@ -376,17 +568,20 @@ def carry_forward(base_dir, edited_root, new_dir, out_dir):
         raise UsageError("the output folder %s is not empty; choose a new folder so no earlier result is "
                          "overwritten" % out_dir)
     os.makedirs(out_dir, exist_ok=True)
+    hand_status, owned = _hand_added_status(base_dir, edited_root, new_dir)
+    generated = sum(1 for s in hand_status.values() if s == "now generated")
     results, texts = [], {}
     for name in GENERATED_FILES:
         res = {"file": name, "status": "", "detail": "", "conflicts": [], "edits": 0, "auto": {}, "origin": None,
-               "edited_path": None, "rules_applied": [], "checks": []}
+               "edited_path": None, "rules_applied": [], "checks": [],
+               "hand_added": sorted(hand_status.items()) if name == IL_PAR_H else []}
         new_path = generated_path(new_dir, name)
         if new_path is None:
             res.update(status="skipped", detail="not in the new generation")
             results.append(res)
             continue
         new, eol = _read(new_path)
-        edited_path, why_edited = _find(edited_root, name)
+        edited_path, why_edited = find_file(edited_root, name)
         base_path = generated_path(base_dir, name)
         res["edited_path"] = str(edited_path) if edited_path else None
         base = edited = None
@@ -399,6 +594,17 @@ def carry_forward(base_dir, edited_root, new_dir, out_dir):
         else:
             base, edited = _read(base_path)[0], _read(edited_path)[0]
             res["edits"] = _edit_count(base, edited)
+            if owned is not None and name not in FIFO_FILES:
+                kept = merge_without(base.split("\n"), edited.split("\n"), owned)
+                if name == IL_PAR_H:                       # handle numbers are rebuilt from the enum
+                    kept = [line for line in kept if not (HANDLE.match(line) and HANDLE.match(line).group(2) in
+                                                          {n for n, s in hand_status.items() if s != "re-applied"})]
+                kept = "\n".join(kept)
+                if kept != edited:
+                    res["rules_applied"].append("hand code of %s not re-applied (%s)" % (
+                        ", ".join(n for n, s in sorted(hand_status.items()) if s != "re-applied"),
+                        "; ".join(sorted({s for s in hand_status.values() if s != "re-applied"}))))
+                edited = kept
             if name in FIFO_FILES:
                 merged = new
                 res.update(status="new generation taken",
@@ -417,14 +623,24 @@ def carry_forward(base_dir, edited_root, new_dir, out_dir):
     order = message_order(texts[ENUM_FILE]["merged"]) if ENUM_FILE in texts else None
     if order is not None and IL_PAR_H in texts and texts[IL_PAR_H]["edited"] is not None:
         t, r = texts[IL_PAR_H], by_name[IL_PAR_H]
-        merged, conflicts = _join(_blocks(t["merged"]), lambda n, b, e: resolve_il_par_conflict(n, b, e, t["new"]))
+        merged, conflicts = _join(_blocks(t["merged"]),
+                                  lambda n, b, e: resolve_il_par_conflict(n, b, e, t["new"], generated))
         if len(conflicts) < len(r["conflicts"]):
             r["rules_applied"].append("receive counts and multiplex flag offset recomputed")
         merged, changed = rebuild_handles(merged, order, t["new"], t["edited"])
         if changed:
             r["rules_applied"].append("VNIM_*_MESSAGE handle numbers rebuilt (%d messages, then Diag/NM)" % len(order))
+        merged, changed = set_receive_counts(merged, len(order))
+        if changed:
+            r["rules_applied"].append("IL_RX_NUM_* set to the %d messages of the VNIM enum" % len(order))
         t["merged"] = merged
         r["conflicts"] = _join(_blocks(merged))[1]
+    if order is not None and ENUM_FILE in texts and texts[ENUM_FILE]["edited"] is not None:
+        t, r = texts[ENUM_FILE], by_name[ENUM_FILE]
+        t["merged"], taken = rebuild_message_tables(t["merged"], t["new"], len(order))
+        if taken:
+            r["rules_applied"].append("per-message tables %s taken from the new generation (%d messages)"
+                                      % (", ".join(taken), len(order)))
     if order is not None and VNIM_C in texts and texts[VNIM_C]["edited"] is not None:
         t, r = texts[VNIM_C], by_name[VNIM_C]
         merged, rebuilt = rebuild_message_arrays(t["merged"], len(order))
@@ -468,8 +684,17 @@ def report(results, base_dir, edited_root, new_dir, out_dir):
         note = "; ".join(x for x in [r.get("detail", "")] + r["rules_applied"] if x)
         lines.append("| %s | %s | %d | %d | %s |" % (r["file"], r["status"], r["edits"], len(r["conflicts"]), note))
     lines += ["", "White-space-only conflicts keep your formatting; header-stamp-only conflicts keep the new "
-              "Date / By / Traceability lines; can_rxrule.cfg and nw_can_dll.h come from the new generation.", "",
-              "## Manual Action Required", ""]
+              "Date / By / Traceability lines; can_rxrule.cfg and nw_can_dll.h come from the new generation.", ""]
+    added = [item for r in results for item in r.get("hand_added", [])]
+    if added:
+        meaning = {"now generated": "CoGeNT generates it now; your hand code was not re-applied, the generated "
+                                    "code is used",
+                   "not in the DBC": "the new DBC does not have it; your hand code was not re-applied",
+                   "re-applied": "your hand code was re-applied (enable its Rx on 'TX/RX messages' to have it "
+                                 "generated)"}
+        lines += ["## Messages you added by hand", ""]
+        lines += ["- %s: %s." % (name, meaning[status]) for name, status in added] + [""]
+    lines += ["## Manual Action Required", ""]
     if not needs_attention(results):
         lines += ["None. Review the result (your edits were applied without conflicts and every check passed), then "
                   "copy the files into your workspace.", ""]

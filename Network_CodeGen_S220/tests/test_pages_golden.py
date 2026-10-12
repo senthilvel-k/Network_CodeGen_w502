@@ -1,4 +1,5 @@
 import json
+import re
 import zipfile
 
 import pytest
@@ -27,6 +28,27 @@ def with_label_fixes(fname, legacy):
         legacy = legacy.replace(old, new)
     return legacy
 
+
+INIT_VALUE = re.compile(rb'(id = "([A-Z0-9_]+)_(?:tx|rx)_init_value" name = "[^"]*" value =")([^"]*)(")')
+
+
+def with_dbc_start_values(name, fname, legacy):
+    """The init value shown for a signal without saved settings is its DBC start value. The legacy parser
+    ignored the start value of signals whose DBC name is not upper case (BMS_CellTemp1 500 -> 0x0); fixed
+    on purpose (multiplex-generation spec, section 6), so the archived page gets the DBC start values."""
+    if fname != "CanDbcSigConfiguration.html":
+        return legacy
+    import sys
+    sys.path.insert(0, str(ROOT))
+    from Can_dbc_gen import init_value_default
+    from Dbc_Parser import dbc_parser
+    fx = load_fixture(name)
+    parser = dbc_parser(str(fx.dbc), fx.node)
+    start = {sig: d.get("GenSigStartValue") for direction in ("tx", "rx")
+             for mes in parser.get_msg_type("ALL", direction) for sig, d in mes["Sig_List"].items()}
+    return INIT_VALUE.sub(lambda m: m.group(1) + init_value_default(start.get(m.group(2).decode())).encode() + m.group(4),
+                          legacy)
+
 def _archived(name, fname):
     meta = json.loads((load_fixture(name).dir / "fixture.json").read_text(encoding="utf-8"))
     member = ("html/" if fname.endswith(".html") else "js/") + fname
@@ -38,7 +60,7 @@ def _archived(name, fname):
 @pytest.mark.parametrize("name", fixture_names())
 def test_page_output_matches_archived_legacy_page(generated, name, fname):
     actual = (generated(name, "pages") / fname).read_bytes()
-    expected = with_label_fixes(fname, _archived(name, fname))
+    expected = with_dbc_start_values(name, fname, with_label_fixes(fname, _archived(name, fname)))
     if actual != expected:
         _fail_with_diff(actual, expected, fname, (name, fname), "archived-in-cfg(py27 run)")
 

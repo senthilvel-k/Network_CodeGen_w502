@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>CoGeNT - Code overrides</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="{{'cogent.css'|staticfile }}">
+</head>
+<body>
+<div class="cg-app">
+{% set active = 'overrides' %}
+{% include '_sidebar.html' %}
+<main class="cg-main">
+  <h1>Code overrides</h1>
+  {% if error %}<div class="cg-banner cg-banner-err" id="ov-error">{{ error }}</div>{% endif %}
+  {% if saved %}<div class="cg-banner cg-banner-ok" id="ov-saved">Saved to data\CanOverrideConfiguration.data. The next
+    Generate code uses these settings.</div>{% endif %}
+
+  <section class="cg-card">
+    <p class="cg-muted cg-small">Settings for code the DBC does not describe (hand edits of earlier projects). Every
+      section is optional; without rows the generated code is unchanged. Message names are checked against the
+      loaded DBC when you save and when you generate.</p>
+    <div class="cg-actions">
+      <input type="button" class="cg-btn cg-btn-primary" id="ov-save" value="Save" onclick="save()">
+      <a class="cg-btn" id="ov-back" href="BackEnd.default_page" data-bind="true" style="text-decoration:none">Back without saving</a>
+    </div>
+  </section>
+
+  <section class="cg-card">
+    <h2>Transmit messages</h2>
+    <p class="cg-muted cg-small">Attribute: the frame transmission attribute (Event: no periodic transmission, the
+      periodic pointer is NULL); empty = from the DBC send type. Period and offset (ms) replace the values of the
+      message's row in the periodic transmit table. Confirmation adds IL_TX_ATTR_TXC_NOTIFY and the callbacks
+      Vnim_&lt;MSG&gt;_Conf / Vnim_&lt;MSG&gt;_PreCopy (their code is yours, as for a debounced signal).</p>
+    <table class="cg-table"><thead><tr><th>Message</th><th>Attribute</th><th>Period (ms)</th><th>Offset (ms)</th>
+      <th>Confirmation</th><th></th></tr></thead><tbody id="tx-rows"></tbody></table>
+    <div class="cg-actions" style="margin-top:8px">
+      <select id="tx-add"></select>
+      <input type="button" class="cg-btn" value="Add" onclick="addTx()">
+    </div>
+  </section>
+
+  <section class="cg-card">
+    <h2>Receive timeouts</h2>
+    <p class="cg-muted cg-small">Timeout (ms) of a receive message that the DBC gives no cycle time: it acts as the
+      cycle time (receive timeout count and the VNIM message loss / gain handling).</p>
+    <table class="cg-table"><thead><tr><th>Message</th><th>Timeout (ms)</th><th></th></tr></thead>
+      <tbody id="rx-rows"></tbody></table>
+    <div class="cg-actions" style="margin-top:8px">
+      <select id="rx-add"></select>
+      <input type="button" class="cg-btn" value="Add" onclick="addRx()">
+    </div>
+  </section>
+
+  <section class="cg-card">
+    <h2>NM transmit table</h2>
+    <p class="cg-muted cg-small">Entries of NM_TX_MSG_DATA_STRUCT in nw_nm_par.h, in this order (transmit handles
+      DLL_NUM_IL_TX_FRAMES+1, +2, ...). Without rows the table has its single generated entry.</p>
+    <table class="cg-table"><thead><tr><th>Message</th><th>Comment</th><th>Data buffer</th><th></th></tr></thead>
+      <tbody id="nm-rows"></tbody></table>
+    <div class="cg-actions" style="margin-top:8px">
+      <select id="nm-add"></select>
+      <input type="button" class="cg-btn" value="Add" onclick="addNm()">
+    </div>
+  </section>
+
+  <section class="cg-card">
+    <h2>Host forwarding</h2>
+    <p class="cg-muted cg-small">Receive messages whose name starts with the prefix call the function with their
+      index (VNIM_&lt;MSG&gt;, defined in a "R E M M A C R O S" block of nw_vnim_app_signals_par.c) instead of
+      os_notify when a signal changes. Leave both empty for none.</p>
+    <div class="cg-actions">
+      <label>Prefix <input class="cg-input" id="host-prefix" style="width:180px" placeholder="REM_MSG_"></label>
+      <label>Function <input class="cg-input" id="host-function" style="width:300px" placeholder="host_update_msg"></label>
+    </div>
+  </section>
+
+  <section class="cg-card">
+    <h2>Numeric order</h2>
+    <p class="cg-muted cg-small">Message name prefixes (comma separated) whose numbered messages get their receive
+      handles and VNIM message IDs in numeric order (REM_MSG_2 before REM_MSG_10).</p>
+    <input class="cg-input" id="numeric-order" style="max-width:420px" placeholder="REM_MSG_">
+  </section>
+</main>
+</div>
+<script>
+var SETTINGS = {{ settings_json|safe }};
+var TX = {{ tx_json|safe }};
+var RX = {{ rx_json|safe }};
+var ATTRIBUTES = ["", "Periodic", "Event", "Periodic+Event"];
+
+function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return {"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]; }); }
+function text(v) { return v === undefined || v === null ? "" : String(v); }
+function options(select, names) {
+  select.innerHTML = names.map(function (n) { return '<option value="' + esc(n) + '">' + esc(n) + '</option>'; }).join("");
+}
+function removeButton() { return '<td><button type="button" class="cg-linkbtn ov-remove" onclick="this.closest(\'tr\').remove()">Remove</button></td>'; }
+
+function txRow(name, o) {
+  var tr = document.createElement("tr");
+  tr.dataset.msg = name;
+  tr.innerHTML = '<td class="cg-mono">' + esc(name) + '</td><td><select class="tx-attr">' +
+    ATTRIBUTES.map(function (a) { return '<option value="' + a + '">' + (a || "from the DBC") + '</option>'; }).join("") +
+    '</select></td><td><input class="cg-input tx-period" style="width:90px"></td>' +
+    '<td><input class="cg-input tx-offset" style="width:90px"></td><td><input type="checkbox" class="tx-conf"></td>' + removeButton();
+  tr.querySelector(".tx-attr").value = text(o.attribute);
+  tr.querySelector(".tx-period").value = text(o.period);
+  tr.querySelector(".tx-offset").value = text(o.offset);
+  tr.querySelector(".tx-conf").checked = o.confirmation === true;
+  document.getElementById("tx-rows").appendChild(tr);
+}
+function rxRow(name, o) {
+  var tr = document.createElement("tr");
+  tr.dataset.msg = name;
+  tr.innerHTML = '<td class="cg-mono">' + esc(name) + '</td><td><input class="cg-input rx-timeout" style="width:90px"></td>' + removeButton();
+  tr.querySelector(".rx-timeout").value = text(o.timeout);
+  document.getElementById("rx-rows").appendChild(tr);
+}
+function nmRow(o) {
+  var tr = document.createElement("tr");
+  tr.dataset.msg = o.message;
+  tr.innerHTML = '<td class="cg-mono">' + esc(o.message) + '</td><td><input class="cg-input nm-label" style="width:220px"></td>' +
+    '<td><input class="cg-input nm-buffer" style="width:260px"></td>' + removeButton();
+  tr.querySelector(".nm-label").value = text(o.label);
+  tr.querySelector(".nm-buffer").value = text(o.buffer);
+  document.getElementById("nm-rows").appendChild(tr);
+}
+function has(table, name) { return document.querySelector("#" + table + ' tr[data-msg="' + name + '"]') !== null; }
+function addTx() { var n = document.getElementById("tx-add").value; if (n && !has("tx-rows", n)) txRow(n, {}); }
+function addRx() { var n = document.getElementById("rx-add").value; if (n && !has("rx-rows", n)) rxRow(n, {}); }
+function addNm() { var n = document.getElementById("nm-add").value; if (n) nmRow({message: n, label: n, buffer: "Nm_msg_buffer"}); }
+
+function number(v) { v = v.trim(); return v === "" ? undefined : (/^\d+$/.test(v) ? parseInt(v, 10) : v); }
+function collect() {
+  var out = {}, tx = {}, rx = {};
+  document.querySelectorAll("#tx-rows tr").forEach(function (tr) {
+    var o = {}, attr = tr.querySelector(".tx-attr").value;
+    if (attr) o.attribute = attr;
+    var period = number(tr.querySelector(".tx-period").value), offset = number(tr.querySelector(".tx-offset").value);
+    if (period !== undefined) o.period = period;
+    if (offset !== undefined) o.offset = offset;
+    if (tr.querySelector(".tx-conf").checked) o.confirmation = true;
+    tx[tr.dataset.msg] = o;
+  });
+  document.querySelectorAll("#rx-rows tr").forEach(function (tr) {
+    rx[tr.dataset.msg] = {timeout: number(tr.querySelector(".rx-timeout").value)};
+  });
+  var nm = Array.from(document.querySelectorAll("#nm-rows tr")).map(function (tr) {
+    return {message: tr.dataset.msg, label: tr.querySelector(".nm-label").value.trim(), buffer: tr.querySelector(".nm-buffer").value.trim()};
+  });
+  if (Object.keys(tx).length) out.tx = tx;
+  if (Object.keys(rx).length) out.rx = rx;
+  if (nm.length) out.nm_tx = nm;
+  var prefix = document.getElementById("host-prefix").value.trim(), fn = document.getElementById("host-function").value.trim();
+  if (prefix || fn) out.host_forward = {prefix: prefix, "function": fn};
+  var order = document.getElementById("numeric-order").value.split(",").map(function (s) { return s.trim(); }).filter(Boolean);
+  if (order.length) out.numeric_order = order;
+  return out;
+}
+function save() { BackEnd.overrides_save(JSON.stringify(collect())); }
+
+options(document.getElementById("tx-add"), TX);
+options(document.getElementById("rx-add"), RX);
+options(document.getElementById("nm-add"), TX);
+Object.keys(SETTINGS.tx || {}).forEach(function (n) { txRow(n, SETTINGS.tx[n] || {}); });
+Object.keys(SETTINGS.rx || {}).forEach(function (n) { rxRow(n, SETTINGS.rx[n] || {}); });
+(SETTINGS.nm_tx || []).forEach(nmRow);
+var host = SETTINGS.host_forward || {};
+document.getElementById("host-prefix").value = text(host.prefix);
+document.getElementById("host-function").value = text(host["function"]);
+document.getElementById("numeric-order").value = (SETTINGS.numeric_order || []).join(", ");
+</script>
+</body>
+</html>

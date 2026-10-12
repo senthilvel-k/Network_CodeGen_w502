@@ -70,7 +70,8 @@ Key modules (all under `Network_CodeGen_S220/`):
 | `cogent_project.py` | GUI view logic without Qt: cached DBC lists, tolerant planning, `fifo_view` (card / Receive FIFO page), `new_items`. |
 | `cogent_carry.py` | Re-apply engine (git merge-file + derived-value rules + checks) for the Re-apply edits page and `tools/carry_forward.py`. |
 | `cogent_help.py` | Renders `USER_GUIDE.md` for the Help page. |
-| `html/Tool_Index_Page.html`, `Fifo.html`, `Reapply.html`, `Help.html`, `_sidebar.html` | New pages (Jinja); `html/_page_shell.html` is the legacy layout the page generators copy (keep it unchanged, the page golden tests compare it); `back_end._themed` swaps it for the new layout when showing a page. |
+| `cogent_overrides.py` | Code overrides (`data/CanOverrideConfiguration.data`, page "Code overrides"): load/check/save, `activate` for one generation, and the generator hooks (Tx attribute/period/offset/confirmation, receive timeout via `Dbc_Parser`, NM transmit table, host forwarding and REM block, `numeric_positions`). |
+| `html/Tool_Index_Page.html`, `Fifo.html`, `Overrides.html`, `Reapply.html`, `Help.html`, `_sidebar.html` | New pages (Jinja); `html/_page_shell.html` is the legacy layout the page generators copy (keep it unchanged, the page golden tests compare it); `back_end._themed` swaps it for the new layout when showing a page. These pages (`cogent_generate.APP_PAGES`) are never written to or restored from configuration archives. |
 | `cogent_fifo.py` | Receive-rule planning: `CanFifoConfiguration.data` (limits, `merge_blocks`, `additional_rx_messages`), merged ID blocks ("FIFO multiplexing"), `check_limits`, `suggest_merge_blocks`, `dispatch_snippet`, `fifo_plan.json`, `MANUAL_ACTIONS.md`. User guide: `FIFO_MULTIPLEXING.md`. |
 | `cogent_errors.py` | `CogentError` (operation / reason / item / hint / log path), `log_failure`, `missing_config_entry`. |
 | `cogent_io.py` | `open_output`, `close_output`, `abort_output`; tracks `current_output` for messages. |
@@ -182,7 +183,37 @@ Done on branch `fifo-multiplexing` (2026-10-10, GUI work; spec
   41490 overflow error on 2026-10-10).
 - `USER_GUIDE.md` (whole tool) shown on the Help page.
 
-Remaining (see section 8 for the ordered list): multiplex layouts beyond VCU5_500, the Python 2.7 oracle
+Done on branch `multiplex-generation` (2026-10-11; spec
+`docs/superpowers/specs/2026-10-11-multiplex-generation-design.md`, plan
+`docs/superpowers/plans/2026-10-11-multiplex-generation.md`):
+- `cogent_mux.py`: received multiplexed messages other than the VCU5_500 layout (BMS19_100, BMS20_100) are
+  generated in the S2XX hand-code layout (data union / frame union, shadow values, index-aware PreCopy,
+  multiplex flag area with a computed `IL_MUX_MSG_OFFSET_ID`, immediate host notification); VCU5_500 and
+  all other output unchanged. `tests/test_mux_reference.py` pins the remaining differences to the workspace
+  (spec section 9: three BMS20 slips, a shift slip, the flag overlap, message-loss cases, format).
+- Re-apply edits leaves out the hand code of messages that are generated now or not in the new DBC.
+- Signals page: DBC start values of mixed-case signals are read (parser fix), "Apply to new rows" for the
+  notification.
+
+Done on branch `multiplex-generation` (2026-10-12; spec `docs/superpowers/specs/2026-10-12-code-overrides-design.md`,
+plan `docs/superpowers/plans/2026-10-12-code-overrides.md`):
+- Code overrides page and `cogent_overrides.py`: the remaining S2XX hand edits are settings (Tx attribute,
+  period/offset and confirmation callbacks, receive timeout, NM transmit table, host forwarding with the
+  REM macros, numeric order of the receive handles and VNIM IDs). Names are checked against the DBC on Save
+  and before generation. Without settings every file is unchanged.
+- PreCopy writes the stray `rValue |= ...` lines (CRANK_COUNT_IBS) commented out, as in the workspace (the
+  legacy references of the golden/GUI/exe tests get the same change, `tests/support.reference_bytes`).
+- `MANUAL_ACTIONS.md`: the `nw_can_dll.c` dispatch of a merged block is reported as done when the workspace
+  file (folder of the Re-apply edits page) maps every ID; a disabled `additional_rx_messages` entry says to
+  enable its Rx. The dispatch check moved from `tools/compare_reference.py` to `cogent_fifo`.
+- Configuration archives no longer contain or restore the app's own pages (an archive of an older version
+  restored the old home page / sidebar).
+- 40024 with the S2XX settings (`tests/support.s2xx_max_match`) equals the workspace except the multiplex
+  corrections (spec 2026-10-11 section 9), the can_rxrule.cfg revision note and the IC2_100 signal order
+  (`tests/test_overrides_reference.py`); remaining white-space-only differences: the workspace's re-aligned
+  receive-handle block, the hand tabs of the BMS code and the can_rxrule.cfg column spacing.
+
+Remaining (see section 8 for the ordered list): the Python 2.7 oracle
 comparison, the optional workflow fixes (load configuration also loads the DBC; working-directory
 independence), a non-blocking UI during code gen, and repository hygiene/cleanup items.
 
@@ -192,7 +223,7 @@ independence), a non-blocking UI during code gen, and repository hygiene/cleanup
 
 | # | Issue | Root cause | Status |
 |---|---|---|---|
-| 1 | Enabling Rx of multiplexed messages such as `BMS19_100` / `BMS20_100` (S2XX 40024 DBC; also enabled in `Config\Test.cfg`) stops code gen. | `msg.msg_struct_gen_multiplex` only supports the VCU5_500 layout: each multiplexed signal starts at bit 0 (one 8x`temp_len` grid per signal), and the multiplexor is in byte 7 (`mul_sig_index = 6`). The BMS cell temperatures start at bit 16+, so the legacy code overflowed the grid (`IndexError`). No correct output for such messages has ever existed. | **Detected before any file is written.** The popup names the message, the signal (e.g. `BMS_CELLTEMP1`, start bit 16, length 16, Intel) and the fix (untick Rx). Real support needs a C-layout decision for the union/struct and a check of the other generators' multiplex handling. |
+| 1 | Enabling Rx of multiplexed messages such as `BMS19_100` / `BMS20_100` (S2XX 40024 DBC; also enabled in `Config\Test.cfg`) stops code gen. | `msg.msg_struct_gen_multiplex` only supports the VCU5_500 layout: each multiplexed signal starts at bit 0 (one 8x`temp_len` grid per signal), and the multiplexor is in byte 7 (`mul_sig_index = 6`). The BMS cell temperatures start at bit 16+, so the legacy code overflowed the grid (`IndexError`). No correct output for such messages has ever existed. | Fixed on `multiplex-generation` (2026-10-11): `cogent_mux.py` generates both S2XX hand layouts; VCU5_500 unchanged. |
 | 2 | 144 tests skipped (`INCOMPLETE: no Python 2.7 oracle output`). | Python 2.7 could not be installed in the migration session (installer and downloaded-runtime execution were blocked). | References used instead: legacy `CODE_GEN` runs from the current source (11/11 identical for `DBC_S237_36144_2`, `DBC_40024`, `DBC_40024_2`) and pages archived inside `.cfg` files. Open item. |
 | 3 | After restarting the app or loading a configuration, code gen asks to **Load DBC** and to save both pages again. | Legacy design: per-session flags `__load`, `__msg_saved`, `__sig_saved`. `load_cfg` restores the DBC path but not `__load`. Load DBC now also resets the saved flags when the DBC or node changes, because saved settings for another DBC cause `KeyError`s. | Popups explain exactly what to do. Optional fix: `load_cfg` validates and loads the DBC (old plan Task 9a). |
 | 4 | Starting the app from another working directory (e.g. a shortcut with a different "Start in") reads and writes the wrong `data/`, `html/` and `CODE_GEN/`. | All paths are CWD-relative (legacy). Templates use `base_dir`, so the UI looks fine. | Open. Fix: `os.chdir(base_dir)` at the top of `CoGeNT.pyw` (Task 9b). The exe started from Explorer is fine (CWD = exe folder). |
@@ -280,6 +311,11 @@ the e2e test needs the built exe.
 | `tests/gui/test_gui_new_items.py` | 5 | home banner and badges, message/signal page banners, Next new, Only new, banner Save |
 | `tests/gui/test_gui_reapply.py` | 6 | Re-apply page: defaults, run, results, conflicts with file and line, unsafe output refused, open folder, keep a copy |
 | `tests/gui/test_gui_labels.py` | 8 | titles and labels of every page, no legacy spellings, CoGeNT layout on the configuration pages, Help page |
+| `tests/test_overrides.py` | 30 | Code overrides file: load, defaults, every invalid entry named, names checked against the DBC, numeric order (groups, key messages), receive timeout hook, save |
+| `tests/test_overrides_generation.py` | 20 | 40024 with the S2XX overrides vs without: empty settings change nothing, TC_NSM timeout and gain/loss cases, numeric handles/frame table/VNIM IDs, Tx attribute/period/offset/confirmation, disabled message ignored, NM table (exact tabs), REM block and host call, PreCopy without stray `rValue`, invalid settings stop generation |
+| `tests/test_overrides_reference.py` | 22 | needs the workspace: every line (counted) and the line order of the 11 files equal the workspace except the documented differences |
+| `tests/test_config_archive.py` | 2 | archives hold no app pages; loading keeps the app pages |
+| `tests/gui/test_gui_overrides.py` | 6 | Code overrides page: needs a DBC, sidebar position, saved rows shown, Save writes the file, invalid entry named and nothing saved, removing every row saves `{}` |
 | `tests/e2e/test_exe_smoke.py` | 2 | packaged exe (36144_2 and 40024): Load DBC, both pages with real Save and Back, code gen, outputs = legacy. Web content driven via Chrome DevTools Protocol (`QTWEBENGINE_REMOTE_DEBUGGING`, 127.0.0.1), native alert dialogs via UI Automation. |
 
 Fixtures (`tests/fixtures/<name>/`, rebuilt by `tools/build_fixtures.py`): `s2xx_40024`
@@ -321,12 +357,9 @@ Test notes:
 
 ## 8. Next steps (in order)
 
-1. **Decide multiplex support** for `BMS19_100`/`BMS20_100`-type messages (issue 1). The user's S2XX
-   workspace has hand-written C for both messages, but in two different layouts (details in the local,
-   uncommitted `local_reports/reference_workspace_analysis.md`). Choose one layout with the user, then extend `msg.msg_struct_gen_multiplex` and
-   `msg.multiplex_layout_problem`, check how `il_par_h/c` and `vnim_app_signals_par` handle multiplexed Rx
-   messages, and add a fixture with BMS19 enabled. Until then they are received via
-   receive-only messages (Receive FIFO page) and their code is re-applied with the Re-apply edits page.
+1. Multiplex support for `BMS19_100`/`BMS20_100`-type messages (issue 1): done on `multiplex-generation`
+   (`cogent_mux.py`; both hand layouts are generated, chosen from the DBC; no message-loss case for them,
+   as in the hand code, user decision 2026-10-11). The other S2XX hand edits are Code overrides (2026-10-12).
 2. **Python 2.7 oracle** (issue 2), if allowed: install 2.7.18, run `tools/make_expected.py`, commit
    `tests/expected/`, re-run the suite (the 144 skipped tests then run).
 3. **Working-directory independence** (issue 4): add `os.chdir(os.path.dirname(os.path.abspath(__file__)))`

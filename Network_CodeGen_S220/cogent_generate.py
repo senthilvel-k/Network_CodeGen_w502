@@ -25,6 +25,7 @@ from dataclasses import dataclass, field
 
 import cogent_fifo
 import cogent_io
+import cogent_overrides
 from cogent_errors import (MSG_DATA_FILE, MSG_PAGE, SIG_DATA_FILE, SIG_PAGE, CogentError, log_failure,
                            missing_config_entry)
 
@@ -48,6 +49,7 @@ PLAN = [
 GENERATED_FILES = [f for _, funcs in PLAN for _, files in funcs for f in files]
 FIFO_PLAN = "fifo_plan.json"
 MANUAL_ACTIONS = "MANUAL_ACTIONS.md"
+REAPPLY_SETTINGS = "ReapplyEdits.data"     # folders of the Re-apply edits page (data folder)
 REPORT_FILES = [FIFO_PLAN, MANUAL_ACTIONS]
 
 # Where each file lives in the S2XX repository (dc.app.scl.vehiclecomm), relative to its root.
@@ -66,6 +68,9 @@ OUTPUT_LAYOUT = {
 }
 RUN_FOLDER = re.compile(r"^(\d{2})-(\d{2})-(\d{4})_(\d{2})-(\d{2})-(\d{2})(?:_(\d+))?$")
 ARCHIVE_SOURCES = (('html', '*.html'), ('data', '*.data'), ('js', '*.js'))
+# Pages of the app itself (templates of this version): never archived, never restored from an archive
+APP_PAGES = frozenset({'_sidebar.html', '_page_shell.html', 'Tool_Index_Page.html', 'Fifo.html', 'Help.html',
+                       'Reapply.html', 'Overrides.html'})
 
 
 @dataclass
@@ -111,7 +116,18 @@ def write_config_archive(target):
     with zipfile.ZipFile(target, 'w', compression=zipfile.ZIP_DEFLATED) as archive:
         for folder, pattern in ARCHIVE_SOURCES:
             for path in sorted(glob.glob(os.path.join('.', folder, pattern))):
-                archive.write(path, folder + '/' + os.path.basename(path))
+                if not (folder == 'html' and os.path.basename(path) in APP_PAGES):
+                    archive.write(path, folder + '/' + os.path.basename(path))
+
+
+def extract_config_archive(path):
+    """Restore a configuration archive into the working folder, except the pages of the app (archives of
+    earlier versions contain theirs). Returns the names extracted."""
+    with zipfile.ZipFile(path) as archive:
+        names = [n for n in archive.namelist()
+                 if not (n.startswith('html/') and n[len('html/'):] in APP_PAGES)]
+        archive.extractall(members=names)
+    return names
 
 
 def run_code_generation(dbc, node, time_str):
@@ -121,9 +137,14 @@ def run_code_generation(dbc, node, time_str):
         _check_output_dir()
         run = _new_run_name()
         msg_cfg = _check_inputs(dbc, node)
+        overrides = _check_overrides(dbc, node)
         _check_multiplex(dbc, node, msg_cfg)
         plan, fifo_config = _check_fifo(dbc, node, msg_cfg)
-        _run_generators(dbc, node, time_str)
+        cogent_overrides.activate(overrides)
+        try:
+            _run_generators(dbc, node, time_str)
+        finally:
+            cogent_overrides.deactivate()
         _check_generated_rules(plan)
         manual = _write_reports(plan, fifo_config, dbc, node, msg_cfg, os.path.join("CODE_GEN", run))
         folder = _publish(run)
@@ -177,12 +198,33 @@ def _check_inputs(dbc, node):
     return loaded[MSG_DATA_FILE]
 
 
+def _check_overrides(dbc, node):
+    """The Code overrides of the run (data\\CanOverrideConfiguration.data), checked against the DBC."""
+    from Dbc_Parser import dbc_parser
+    item = "reading the Code overrides settings"
+    hint = ("Nothing was changed. Open 'Code overrides' (left menu), correct or remove the named entry and "
+            "press Save, then Generate code again.")
+    try:
+        overrides = cogent_overrides.load(DATA_DIR)
+    except cogent_overrides.OverrideConfigError as exc:
+        raise CogentError("Code generation", str(exc), item=item, hint=hint) from exc
+    if overrides.empty():
+        return overrides
+    parser = dbc_parser(dbc, node)
+    names = {d: {m['Msg_name'].upper() for m in parser.get_msg_type('ALL', d)} for d in ('tx', 'rx')}
+    problems = cogent_overrides.check_names(overrides, names['tx'], names['rx'])
+    if problems:
+        raise CogentError("Code generation", "data\\%s: %s" % (cogent_overrides.CONFIG_FILE, "; ".join(problems)),
+                          item=item, hint=hint)
+    return overrides
+
+
 def multiplex_error(msg_name, multiplexor, problem):
     return CogentError(
         "Code generation",
-        "message %s is multiplexed (multiplexor %s) and %s. CoGeNT can only generate multiplexed messages "
-        "laid out like VCU5_500: every multiplexed signal starts at bit 0 and the multiplexor is in byte 7"
-        % (msg_name, multiplexor, problem),
+        "message %s is multiplexed (multiplexor %s) and %s. CoGeNT generates multiplexed receive messages "
+        "with Intel signals of up to 32 bits, one multiplexor and a DLC of at most 8, and the VCU5_500 layout"
+        % (msg_name, multiplexor or "none", problem),
         item="generating nw_il_msg.h",
         hint="Untick the Rx enable box of %s in '%s' and press 'Save and Back', then press Generate code again. "
              "Generating this multiplex layout needs a generator extension (contact the tool maintainer)."
@@ -247,15 +289,41 @@ def _check_generated_rules(plan):
                                "CODE_GEN\\errorlog.txt to the tool maintainer.")
 
 
+def _dbc_messages(dbc, node):
+    from Dbc_Parser import dbc_parser
+    parser = dbc_parser(dbc, node)
+    return sorted({m['Msg_name'] for direction in ('rx', 'tx') for m in parser.get_msg_type('ALL', direction)})
+
+
+def _workspace_dispatch(plan):
+    """(path, {block label: findings}) for the nw_can_dll.c of the workspace folder chosen on the Re-apply
+    edits page, checked against the merged ID blocks; None when there is none."""
+    import cogent_carry
+    try:                        # a report detail: no problem here may stop the generation
+        with open(os.path.join(DATA_DIR, REAPPLY_SETTINGS), encoding='utf-8') as fh:
+            folder = json.load(fh).get('edited') or ''
+        if not plan.groups or not isinstance(folder, str) or not os.path.isdir(folder):
+            return None
+        path = cogent_carry.find_file(folder, 'nw_can_dll.c')[0]
+        if path is None:
+            return None
+        return str(path), {g.block.label(): cogent_fifo.check_dispatch_code(path, [g]) for g in plan.groups}
+    except (OSError, ValueError, AttributeError):
+        return None
+
+
 def _write_reports(plan, config, dbc, node, msg_cfg, run_dir):
     """fifo_plan.json and MANUAL_ACTIONS.md of the run (staged with the generated files)."""
     disabled = [n for n in config.additional_rx_messages
                 if msg_cfg.get(n.upper() + '_rx_enable') not in ('on', 'ON', 'On', 1, '1')]
-    text, entries = cogent_fifo.manual_actions(plan, config, os.path.basename(dbc), node, disabled, run_dir)
+    text, entries = cogent_fifo.manual_actions(plan, config, os.path.basename(dbc), node, disabled, run_dir,
+                                               _workspace_dispatch(plan))
     with open(os.path.join(STAGING_DIR, MANUAL_ACTIONS), 'w', encoding='utf-8') as fh:
         fh.write(text)
     with open(os.path.join(STAGING_DIR, FIFO_PLAN), 'w', encoding='utf-8') as fh:
-        json.dump(cogent_fifo.plan_summary(plan, config), fh, indent=1)
+        summary = cogent_fifo.plan_summary(plan, config)
+        summary["dbc_messages"] = _dbc_messages(dbc, node)      # read by Re-apply edits
+        json.dump(summary, fh, indent=1)
         fh.write("\n")
     return entries
 

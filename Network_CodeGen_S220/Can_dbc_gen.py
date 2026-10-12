@@ -1,3 +1,11 @@
+def init_value_default(start):
+    """Init value shown for a signal without saved settings: the DBC start value (hex() as before)."""
+    try:
+        return hex(int(start))
+    except (TypeError, ValueError):
+        return '0x0'
+
+
 def html_mes(file_name,node):
     import os
     js ='\n'
@@ -535,10 +543,7 @@ def html_sig(file_name,node):
             
             if (tx=='tx'):
                 temp_html_css_content+='''<td><input class="w3-input w3-validate" id = "'''+str(index['signal_name'].upper())+'''_tx_init_value" name = "'''+str(index['signal_name'].upper())+'''_tx_init_value" value ="'''
-                try:
-                    temp_html_css_content+=hex(int(index['GenSigStartValue']))
-                except:
-                    temp_html_css_content+='0x0'
+                temp_html_css_content+=init_value_default(index.get('GenSigStartValue'))
                 temp_html_css_content+='''" onblur="MakeWidth(this)" ></td>'''
                 
                 temp_js +='if ("'+index['signal_name'].upper()+'_tx_init_value" in data)\n {\n  document.getElementById("'+str(index['signal_name'].upper())+'_tx_init_value").value = data.'+index['signal_name'].upper()+'_tx_init_value;\n}\n'
@@ -553,10 +558,7 @@ def html_sig(file_name,node):
             else:
                 
                 temp_html_css_content+='''<td><input class="w3-input w3-validate" id = "'''+str(index['signal_name'].upper())+'''_rx_init_value" name = "'''+str(index['signal_name'].upper())+'''_rx_init_value" value ="'''
-                try:
-                    temp_html_css_content+=hex(int(index['GenSigStartValue']))
-                except:
-                    temp_html_css_content+='0x0'
+                temp_html_css_content+=init_value_default(index.get('GenSigStartValue'))
                 temp_html_css_content+='''" onblur="MakeWidth(this)" ></td>'''
                 temp_js +='if ("'+index['signal_name'].upper()+'_rx_init_value"  in data)\n {\n  document.getElementById("'+str(index['signal_name'].upper())+'_rx_init_value").value = data.'+index['signal_name'].upper()+'_rx_init_value;\n}\n'
                 

@@ -1,6 +1,8 @@
 import sys,json
 import os
 from cogent_io import open_output, close_output
+import cogent_mux
+import cogent_overrides
 from py2compat import py2_print as print, Py2Dict  # Python 2 print/dict-order semantics
 dbc=None
 dbc_file_name=None
@@ -78,6 +80,7 @@ def msg_order_enum_gen():
   il_sorted_mes_tx = sorted(il_msg_tx,key = lambda x: x['Msg_name'])
   
   all_message_rx = dbc.get_msg_type(full_msg,'rx')
+  indexed = cogent_mux.layouts(all_message_rx, vnim_msg_cfg_data)
   for mes in all_message_rx:
     if vnim_msg_cfg_data[mes['Msg_name']+'_rx_enable'] in ['on','ON','On',1,'1']:
       if vnim_msg_cfg_data[mes['Msg_name']+'_msg_type_no_of_events'] == 'Appl':
@@ -210,7 +213,10 @@ def msg_order_enum_gen():
                        
   for nodes in node_list:
     print('#define IS_'+nodes+'_DLC_FAULT(msg_id)  ((IS_'+nodes+'_NODE_DLC_INVALID() != FALSE)   || (IS_MSG_DLC_INVALID(msg_id) != FALSE))')
-  
+  rem_block = cogent_overrides.host_forward_block([mes['Msg_name'] for mes in il_sorted_mes_rx_ordered])
+  if rem_block:     # Code overrides: host forwarding
+    print('\n'.join(rem_block))
+
 
   print('''/* ===========================================================================
      M E M O R Y   A L L O C A T I O N
@@ -438,13 +444,15 @@ void vnim_clr_missing(void)
             
   print('/* Rx signal initialisation  */ ')
   for mes in il_sorted_mes_rx_ordered:
-      if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON']:
+      if vnim_msg_cfg_data[mes['Msg_name'].upper()+'_rx_enable'] in ['on','On',1,'1','ON'] and mes['Msg_name'].upper() not in indexed:
         for signals in mes['Sig_List']:
           if int(mes['Sig_List'][signals]['Len']) >32:
             print('   ILRxPut_'+signals.upper()+'(&Onfail_value_zero[0]);')
           else:
             print('   ILRxPut_'+signals.upper()+'('+vnim_sig_cfg_data[signals.upper()+'_rx_init_value']+'u);')
             
+  if indexed:
+    print('\n'.join(cogent_mux.init_lines(indexed, vnim_sig_cfg_data)))
   print('}\n')
   
   print('''\n/* ===========================================================================
@@ -681,7 +689,7 @@ void vnim_message_monitoring_periodic(void)
           print('       ret = vnim_start_error_healing(VNIM_'+msg_name+'_MSGID,VNIM_'+msg_name+'_MESSAGE,MSG_TIMEOUT_HEAL_COUNT);')
         print('       if( ret == TRUE)')
         print('       {')
-        for signal in mes['Sig_List']:
+        for signal in cogent_mux.vnim_order(mes, indexed):
           print('           ILSet_'+signal.upper()+'_DataChanged();')
         print('       }')
         if (signal_content == 1):
@@ -717,7 +725,7 @@ void vnim_message_monitoring_periodic(void)
         print('          (IS_'+node+'_DLC_FAULT(VNIM_'+msg_name+'_MSGID) == FALSE)) ||')
         print('          (IS_NM_NODE_MONITORING_ON() != TRUE))')
         print('      {')
-        for signal in mes['Sig_List']:
+        for signal in cogent_mux.vnim_order(mes, indexed, mux_first=True):
           print('          if(ILGet_'+signal.upper()+'_DataChanged() != FALSE)')
           print('          {')
           word_str = signal.upper()
@@ -739,13 +747,18 @@ void vnim_message_monitoring_periodic(void)
           
           print('              ILClr_'+signal.upper()+'_DataChanged();')
           print('          }\n')
-        if no_delay == 1:    
+        if msg_name in indexed:
+          print('\n'.join(cogent_mux.indication_notify(indexed[msg_name], node, vnim_sig_cfg_data)))
+        if no_delay == 1:
           print('          if((msg_changed == TRUE) && ('+node+'_node_cfg_st == CF_OPT_'+node+'_PRSNT))')
           print('          {')
-          print('              #if (vnim_notify_used(VNRCL_'+msg_name+'_MSGID) == YES)')
-          print('                os_notify(VNRCL_'+msg_name+'_MSGID,0, NULL );')
-          print('              #endif')
-          print('          }\n') 
+          if cogent_overrides.host_forward(msg_name):      # Code overrides: host forwarding
+            print('              '+cogent_overrides.host_forward(msg_name))
+          else:
+            print('              #if (vnim_notify_used(VNRCL_'+msg_name+'_MSGID) == YES)')
+            print('                os_notify(VNRCL_'+msg_name+'_MSGID,0, NULL );')
+            print('              #endif')
+          print('          }\n')
         
         if green_en == 1:
           print('          if((Greendrive_msg_changed == TRUE) && ('+node+'_node_cfg_st == CF_OPT_'+node+'_PRSNT))')
@@ -812,9 +825,12 @@ void vnim_message_monitoring_periodic(void)
           
         print('          if(('+node+'_node_cfg_st == CF_OPT_'+node+'_PRSNT))')
         print('          {')
-        print('              #if (vnim_notify_used(VNRCL_'+msg_name+'_MSGID) == YES)')
-        print('                os_notify(VNRCL_'+msg_name+'_MSGID,0, NULL );')
-        print('              #endif')
+        if cogent_overrides.host_forward(msg_name):        # Code overrides: host forwarding
+          print('              '+cogent_overrides.host_forward(msg_name))
+        else:
+          print('              #if (vnim_notify_used(VNRCL_'+msg_name+'_MSGID) == YES)')
+          print('                os_notify(VNRCL_'+msg_name+'_MSGID,0, NULL );')
+          print('              #endif')
         if green_en == 1:
           print('              #if (vnim_notify_used(VNRCL_GD_'+msg_name+'_MSGID) == YES)')
           print('                os_notify(VNRCL_GD_'+msg_name+'_MSGID,0, NULL );')
@@ -851,7 +867,7 @@ void vnim_message_monitoring_periodic(void)
         green_en = 0
         non_green_drv_sig=''
         green_drv_sig = ''
-        for signal in mes['Sig_List']:
+        for signal in cogent_mux.vnim_order(mes, indexed):
           non_green_drv_sig=signal.upper()
           if vnim_sig_cfg_data[signal.upper()+'_green_drive'] in ['on','On',1,'1','ON']:
             green_en = 1
@@ -1021,7 +1037,9 @@ void vnim_message_monitoring_periodic(void)
       if mes.upper() != rx_node_cfg[node].upper():
         if timeout_msg[mes] == 'YES':
           indexCount += 1;
-          print('      case VNIM_'+mes.upper()+'_MSGID:')            
+          if mes.upper() in indexed:      # indexed multiplexed messages: no message-loss case (S2XX hand code)
+            continue
+          print('      case VNIM_'+mes.upper()+'_MSGID:')
           print('         if(('+node+'_node_cfg_st == CF_OPT_'+node+'_PRSNT) && ('+mes.upper()+'_FC_cfg_st == TRUE))')
           print('         {')
           if timeout_msg_cnt[node] <=8:
@@ -1204,7 +1222,7 @@ void vnim_message_monitoring_periodic(void)
       msg_name=mes['Msg_name'].upper()
       node = vnim_msg_cfg_data[mes['Msg_name'].upper()+'_node_name']
       print('       case VNIM_'+msg_name+'_MSGID:')
-      for signals in mes['Sig_List']:
+      for signals in cogent_mux.vnim_order(mes, indexed):
         if int(mes['Sig_List'][signals]['Len']) <=32:
           print('         ILRxPut_'+signals.upper()+'('+vnim_sig_cfg_data[signals.upper()+'_rx_init_value']+'u);')
         else:
@@ -1217,7 +1235,7 @@ void vnim_message_monitoring_periodic(void)
       green_en = 0
       non_green_drv_sig=''
       green_drv_sig = ''
-      for signal in mes['Sig_List']:
+      for signal in cogent_mux.vnim_order(mes, indexed):
         non_green_drv_sig=signal.upper()
         if vnim_sig_cfg_data[signal.upper()+'_green_drive'] in ['on','On',1,'1','ON']:
           green_en = 1
@@ -1271,7 +1289,7 @@ void vnim_message_monitoring_periodic(void)
       green_en = 0
       non_green_drv_sig=''
       green_drv_sig = ''
-      for signal in mes['Sig_List']:
+      for signal in cogent_mux.vnim_order(mes, indexed):
         non_green_drv_sig=signal.upper()
         if vnim_sig_cfg_data[signal.upper()+'_green_drive'] in ['on','On',1,'1','ON']:
           green_en = 1
@@ -1700,6 +1718,7 @@ def vnim_app_h_gen():
   il_sorted_mes_tx = sorted(il_msg_tx,key = lambda x: x['Msg_name'])
   
   all_message_rx = dbc.get_msg_type(full_msg,'rx')
+  indexed = cogent_mux.layouts(all_message_rx, vnim_msg_cfg_data)
   for mes in all_message_rx:
     if vnim_msg_cfg_data[mes['Msg_name']+'_rx_enable'] in ['on','ON','On',1,'1']:
       if vnim_msg_cfg_data[mes['Msg_name']+'_msg_type_no_of_events'] == 'Appl':
@@ -1784,13 +1803,17 @@ def vnim_app_h_gen():
     if len(node_msg_list[node]) > 1:
       print('   VNIM_'+rx_node_cfg[node].upper()+'_MSGID,/*'+node+' Key msg - '+node+' msg start Index*/')
       cnt =0
+      entries = []
       for mes in node_msg_list[node]:
         if mes.upper() != rx_node_cfg[node].upper():
           if cnt == (len(node_msg_list[node])-1):
-            print('   VNIM_'+mes.upper()+'_MSGID,/*'+node+' msg stop index*/')
+            entries.append((mes, '   VNIM_'+mes.upper()+'_MSGID,/*'+node+' msg stop index*/'))
           else:
-            print('   VNIM_'+mes.upper()+'_MSGID,')
+            entries.append((mes, '   VNIM_'+mes.upper()+'_MSGID,'))
         cnt+=1
+      # Code overrides numeric_order: the lines move with their comments, as in the S2XX hand edit
+      for i in cogent_overrides.numeric_positions([mes for mes, _ in entries]):
+        print(entries[i][1])
     else:
       print('   VNIM_'+rx_node_cfg[node].upper()+'_MSGID,/*'+node+' Key msg - '+node+' msg start/Stop Index*/')
   print('   NUM_VNIM_MESSAGES')
@@ -1962,7 +1985,7 @@ BOOL vnim_is_message_missing(unsigned8 vnim_msgid);
 ''')
   
   for mes in il_sorted_mes_rx_ordered:
-    if vnim_msg_cfg_data[mes['Msg_name']+'_rx_enable'] in ['on','ON','On',1,'1']:
+    if vnim_msg_cfg_data[mes['Msg_name']+'_rx_enable'] in ['on','ON','On',1,'1'] and mes['Msg_name'].upper() not in indexed:
       sig_list=[]
       for signal in mes['Sig_List']:  
         mes['Sig_List'][signal]['Sig_name']=signal
@@ -2293,17 +2316,21 @@ def nm_par_gen():
   print('#define NM_IS_ACTIVE_TMH  3   /* 0-2 is for TP, 3 is for NM */')
   
   
-  print('#define NM_TX_MSG_DATA_STRUCT                            \\')
-  print('{                                                                                  \\')
-  print('   CAN_GPNUM_8,                                 /* CAN message data length  */     \\')
-  if len(nm_msg_tx) != 0:
-    print('   '+hex(int(nm_msg_tx[0]['id']))+',                                       /* CAN message identifier   */     \\')
+  nm_table = cogent_overrides.nm_tx_table({mes['Msg_name'].upper(): int(mes['id']) for mes in all_message_tx})
+  if nm_table:      # Code overrides: NM transmit table
+    print('\n'.join(nm_table))
   else:
-    print('   0x3C5,                                       /* CAN message identifier   */     \\')
-  print('   &Nm_msg_buffer[0],                           /* Pointer to Data          */      \\')
-  print('   CANB_TX_STD_DATA,                            /* CAN message options      */      \\')
-  print('   (DLL_NUM_IL_TX_FRAMES+1)                               /* Transmit Message Handle  */        \\')
-  print('}')
+    print('#define NM_TX_MSG_DATA_STRUCT                            \\')
+    print('{                                                                                  \\')
+    print('   CAN_GPNUM_8,                                 /* CAN message data length  */     \\')
+    if len(nm_msg_tx) != 0:
+      print('   '+hex(int(nm_msg_tx[0]['id']))+',                                       /* CAN message identifier   */     \\')
+    else:
+      print('   0x3C5,                                       /* CAN message identifier   */     \\')
+    print('   &Nm_msg_buffer[0],                           /* Pointer to Data          */      \\')
+    print('   CANB_TX_STD_DATA,                            /* CAN message options      */      \\')
+    print('   (DLL_NUM_IL_TX_FRAMES+1)                               /* Transmit Message Handle  */        \\')
+    print('}')
 
   
   print('typedef enum')

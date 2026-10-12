@@ -24,6 +24,9 @@ configuration archives:
 ```
 
 Optional keys `max_rx_rules` (192) and `max_rules_per_fifo` (64) are written only when changed.
+`additional_rx_messages` receives messages whose Rx enable is off (their code written by hand). Since
+CoGeNT generates multiplexed receive messages such as BMS19_100 / BMS20_100 (enable their Rx instead), an
+entry for an enabled message changes nothing and `MANUAL_ACTIONS.md` lists it as REVIEW.
 `cogent_fifo.config_from_dict` validates everything (11-bit IDs, base aligned to the mask, no overlap, numbers).
 
 ## Merged ID blocks
@@ -31,7 +34,9 @@ Optional keys `max_rx_rules` (192) and `max_rules_per_fifo` (64) are written onl
 A block (base, mask) is received through one rule: the lowest received ID keeps its rule slot (and FIFO) with
 mask `0xC0000000 | mask`; the other members' rules and `nw_can_dll.h` dispatch entries are removed. All members
 must share the layer (IL, TP, NM) and the DLC (`cogent_fifo.block_problems`). `nw_can_dll.c` is hand-written and
-must map each member ID to its VNIM handle; `MANUAL_ACTIONS.md` contains the code (`cogent_fifo.dispatch_snippet`).
+must map each member ID to its VNIM handle; `MANUAL_ACTIONS.md` contains the code (`cogent_fifo.dispatch_snippet`)
+and, when the workspace folder of the Re-apply edits page holds `nw_can_dll.c`, the result of
+`cogent_fifo.check_dispatch_code` for it (done, or what is missing).
 Candidates: aligned 16-ID blocks with at least two single-ID rules of one layer and DLC
 (`suggest_merge_blocks`); the page pre-selects the fewest needed (`preselect`, largest saving first).
 
